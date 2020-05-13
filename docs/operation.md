@@ -8,8 +8,7 @@
 - **Majority** means greater than 50% of Say behind Votes in a Poll.
 - **Member** means an individual who is a participant in a Community. A Member is identified by their Key.
 - **Notice** means communications sent through a Community's official channels to its Members.
-- **Off Chain** means activities, processes, or rules that are not implemented in SayDAO.
-- **Override** means a Poll to replace the final List presented by the Supervisor with an amended List. An Override requires a Supermajority.
+- **Off Chain** means activities, processes, or rules that are not implemented in SayDAO. Off Chain can mean offline or other online processes that are not part of SayDAO.
 - **Poll** means a question put to the Members of the Community for a Vote using Say. A Poll can be initiated by any Member of the Community with Say.
 - **Quorum** means the number of Members or amount of Say required for the result of a Poll to be accepted as valid. A Quorum is achieved when one third of the Members or one third of the Say has cast a Vote.
 - **Revision** means a change to the List by the Supervisor.
@@ -35,12 +34,7 @@
   - *See inflation charts - https://docs.google.com/spreadsheets/d/1pEkx2UZKIDKZs9_eY0snoXh6tkB28-YjLGvqLJD9HSs/edit#gid=0*
 - Any Member with Say can propose an Event by initiating a Poll.
 - The Supervisor will post a draft List within 24 hours of the conclusion of an Event. Members can review the draft List and request changes.
-- The Supervisor will post a final List within 48 hours of the conclusion of an Event.
-- A Member with Say can call for an Override any time within 48 hours of the final List being posted.
-- Say is awarded to Members on the List:
-  - If there is no Override, immediately after the time for requesting an Override is expired;
-  - If there is an unsuccessful Override, immediately after the Poll for the Override is closed; or
-  - If the Override is approved, immediately after the Override is approved.
+- After 72 hours, the Supervisor posts a final List and Say is awarded to Members on the List.
 
 ## Polls
 - Any Member with Say can open a Poll.
@@ -62,7 +56,6 @@
 ## Poll Results
 - SayDAO automatically implements the results of successful Polls to:
   - Create an Event;
-  - Override a List;
-  - Transfer Say; or
+  - Transfer Say; and
   - Revoke Say.
 - SayDAO does not implement the results of other Polls. Communities must decide how to respond to these Polls Off Chain.

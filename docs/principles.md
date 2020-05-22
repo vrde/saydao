@@ -1,4 +1,4 @@
-# ParTecK DAO Principles
+# SayDAO Principles
 ParTecK DAO is an experiment in facilitating group decision-making in loosely defined communities. It should operate with the following principles in mind:
 
 ## 1. Technological expertise should not be a barrier to participation in a community.

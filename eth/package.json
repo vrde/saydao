@@ -1,0 +1,19 @@
+{
+  "name": "saydao-contracts",
+  "version": "0.0.1",
+  "description": "",
+  "main": "build.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "etherea": "0.0.1",
+    "ethers": "^4.0.47",
+    "openzeppelin-solidity": "^3.0.1"
+  }
+}

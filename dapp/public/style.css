@@ -1,0 +1,51 @@
+/**
+ * # Back to the Basicss
+ */
+
+html {
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+/**
+ * ## Banner
+ *
+ * Banner is the top section containing meta information
+ * about the project.
+ */
+
+header[role="banner"] {
+  background-color: black;
+  color: white;
+  padding: 20px;
+}
+
+div {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+main,
+section,
+footer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+main {
+}
+
+footer {
+}

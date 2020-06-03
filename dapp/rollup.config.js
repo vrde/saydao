@@ -30,7 +30,9 @@ export default {
     copy({
       targets: [
         { src: "public/index.html", dest: "build" },
-        { src: "public/style.css", dest: "build" }
+        { src: "public/style.css", dest: "build" },
+        { src: "../docs/operation.md", dest: "build/docs" },
+        { src: "../docs/principles.md", dest: "build/docs" }
       ]
     }),
     svelte({

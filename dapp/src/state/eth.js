@@ -7,7 +7,7 @@ import { get } from "svelte/store";
 import etherea from "etherea";
 
 export async function authenticate() {
-  const w = await etherea.getWallet();
+  const w = await etherea.wallet();
   wallet.set(w);
   console.log("wallet", w);
   return w;

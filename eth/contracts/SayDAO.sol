@@ -4,7 +4,7 @@
 
 pragma solidity ^0.6.0;
 
-import 'openzeppelin-solidity/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract SayDAO is Ownable {
 

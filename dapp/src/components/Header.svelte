@@ -4,6 +4,8 @@
 
 <header role="banner">
   <div>
-    <h1>ParTecK DAO</h1>
+    <h1>
+      <a href="#">ParTecK DAO</a>
+    </h1>
   </div>
 </header>

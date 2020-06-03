@@ -28,24 +28,53 @@ body {
 header[role="banner"] {
   background-color: black;
   color: white;
-  padding: 20px;
-}
-
-div {
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 main,
-section,
-footer {
-  max-width: 800px;
-  margin: 0 auto;
+header {
   padding: 20px;
 }
+
+div,
+main,
+section,
+footer {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+/*
+section {
+  display: flex;
+  justify-content: space-between;
+}
+
+section > div {
+  flex: 1;
+}
+*/
 
 main {
 }
 
 footer {
+}
+
+a:visited {
+  color: inherit;
+}
+
+
+/**
+ * ## Forms
+ */
+
+form {
+}
+
+form label,
+form input[type="text"],
+form textarea,
+form button {
+  display: block;
 }

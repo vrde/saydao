@@ -7,13 +7,18 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node build ../dapp/src/contract",
+    "test:watch": "mocha -w",
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "etherea": "0.0.1",
-    "ethers": "^4.0.47",
-    "openzeppelin-solidity": "^3.0.1"
+    "@openzeppelin/contracts": "^3.0.1",
+    "dotenv": "^8.2.0",
+    "etherea": "0.0.1"
+  },
+  "devDependencies": {
+    "mocha": "^7.2.0"
   }
 }

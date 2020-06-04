@@ -60,10 +60,10 @@ main {
 footer {
 }
 
+a,
 a:visited {
   color: inherit;
 }
-
 
 /**
  * ## Forms

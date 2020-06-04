@@ -4,8 +4,9 @@
   "description": "Say DAO",
   "main": "index.js",
   "scripts": {
-    "build": "rollup --config",
-    "start": "rollup --watch --config",
+    "build": "rimraf build && rollup --config",
+    "start": "rimraf build && rollup --watch --config",
+    "deploy": "node ./deploy.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "vrde",
@@ -19,6 +20,7 @@
     "cypress": "^4.5.0",
     "prettier": "^1.19.1",
     "prettier-plugin-svelte": "^0.7.0",
+    "rimraf": "^3.0.2",
     "rollup": "^1.32.1",
     "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-livereload": "^1.3.0",
@@ -29,6 +31,7 @@
   "dependencies": {
     "dompurify": "^2.0.11",
     "ethers": "^4.0.47",
+    "ipfs-http-client": "^44.1.1",
     "marked": "^1.1.0",
     "svelte": "^3.14.1",
     "svelte-spa-router": "^2.0.0"

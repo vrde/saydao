@@ -1,5 +1,5 @@
 <script>
-  import { provider } from "../state/eth";
+
 </script>
 
 <header role="banner">

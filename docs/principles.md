@@ -1,9 +1,9 @@
 # SayDAO Principles
-ParTecK DAO is an experiment in facilitating group decision-making in loosely defined communities. It should operate with the following principles in mind:
+SayDAO is an experiment in facilitating group decision-making in loosely defined communities. It should operate with the following principles in mind:
 
 ## 1. Technological expertise should not be a barrier to participation in a community.
 Technology can be a great tool for community organization, but only if the members of the community are comfortable using the technology. Technology that is too complicated could even discourage participation.
-
+  
 SayDAO is designed to be used by participants who have no understanding of the underlying technology. It should not require them to learn how the technology works.
 
 ## 2. Technology relied on by communities should run on inexpensive and easily available hardware and software.

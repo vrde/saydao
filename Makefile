@@ -12,5 +12,5 @@ frontend-install:
 frontend-build:
 	cd dapp && npm run build
 
-frontend-deploy: frontend-install frontend-deploy
+frontend-deploy: frontend-install frontend-build
 	ipfs name publish --key=saydao $(shell ipfs add -Q -r dapp/build)

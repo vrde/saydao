@@ -25,7 +25,7 @@ const server = http.createServer((req, res) => {
     req.on("end", () => {
       const payload = JSON.parse(body);
       if (verifySignature(req, body)) {
-        const cmd = spawn("./hello.sh");
+        const cmd = spawn("./sync.sh");
         cmd.stdout.on("data", data => {
           console.log(`stdout: ${data}`);
         });

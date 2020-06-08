@@ -3,4 +3,5 @@
 cd ../..
 git fetch
 git checkout origin/master
-make frontend-deploy
+make frontend-install
+make frontend-build

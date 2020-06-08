@@ -1,12 +1,16 @@
-install-deps:
-	cd dapp && npm i
-	cd eth && npm i
+install-deps: frontend-install backend-install
 
-build-frontend:
-	cd dapp && npm run build
+backend-install:
+	cd eth && npm install
 
-build-backend:
+backend-build:
 	cd eth && npm run build
 
-deploy-frontend: build-frontend
+frontend-install:
+	cd dapp && npm install
+
+frontend-build:
+	cd dapp && npm run build
+
+frontend-deploy: frontend-install frontend-deploy
 	ipfs name publish --key=saydao $(shell ipfs add -Q -r dapp/build)

@@ -3,7 +3,11 @@
   import Router from "svelte-spa-router";
   import Header from "./components/Header.svelte";
   import Home from "./pages/Home.svelte";
-  import Members from "./pages/Members.svelte";
+
+  import memberAdd from "./pages/member/add.svelte";
+  import memberInvite from "./pages/member/invite.svelte";
+  import memberList from "./pages/member/list.svelte";
+
   import PollsOpen from "./pages/Polls/Open.svelte";
   import PollsClosed from "./pages/Polls/Closed.svelte";
   import PollsCreate from "./pages/Polls/Create.svelte";
@@ -14,7 +18,9 @@
 
   const routes = {
     "/": Home,
-    "/members": Members,
+    "/member/add": memberAdd,
+    "/member/invite": memberInvite,
+    "/member/list": memberList,
     "/polls/open": PollsOpen,
     "/polls/closed": PollsClosed,
     "/polls/create": PollsCreate,

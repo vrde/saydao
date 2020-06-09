@@ -1,11 +1,14 @@
 <script>
-  import { authenticate } from "../state/eth";
+  import { authenticate, wallet, role } from "../state/eth";
 </script>
 
+{#if !$wallet}
 <a on:click={authenticate}>Log in</a>
+{/if}
 
 <section>
 
+  {#if $wallet}
   <div>
     <h2>About You</h2>
     <p>You are <strong>member 42</strong>.</p>
@@ -19,6 +22,19 @@
       </li>
     </ul>
   </div>
+
+  {#if $role === 'owner'}
+  <div>
+    <h2>Administration</h2>
+    <p>You are also the <strong>owner of the DAO</strong>. You have special powers to bootstrap the DAO and assign administrative roles.</p>
+    <ul>
+      <li>
+          <a href="#/member/invite">Add a member to the DAO</a>.
+      </li>
+    </ul>
+  </div>
+  {/if}
+  {/if}
 
   <div>
     <h2>Members</h2>

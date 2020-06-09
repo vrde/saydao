@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "build": "node build ../dapp/src/contract",
+    "build": "node build ../dapp/src/contracts",
     "test:watch": "mocha -w",
     "test": "mocha"
   },

@@ -1,4 +1,6 @@
 import * as fs from "fs";
+import path from "path";
+import alias from "@rollup/plugin-alias";
 import json from "@rollup/plugin-json";
 import replace from "@rollup/plugin-replace";
 import svelte from "rollup-plugin-svelte";
@@ -13,6 +15,19 @@ const production = !process.env.ROLLUP_WATCH;
 const dedupe = importee =>
   importee === "svelte" || importee.startsWith("svelte/");
 
+function setAlias() {
+  const projectRootDir = path.resolve(__dirname);
+  return alias({
+    resolve: [".svelte", ".js"],
+    entries: [
+      {
+        find: "src",
+        replacement: path.resolve(projectRootDir, "src")
+      }
+    ]
+  });
+}
+
 export default {
   input: "src/index.js",
   output: {
@@ -24,7 +39,11 @@ export default {
     replace({
       __buildEnv__: JSON.stringify({
         production,
-        date: new Date()
+        date: new Date(),
+        walletOptions: {
+          endpoint: "localhost",
+          disableNativeAgent: true
+        }
       })
     }),
     copy({
@@ -39,6 +58,7 @@ export default {
       dev: !production,
       css: css => css.write("build/bundle.css")
     }),
+    setAlias(),
     json(),
     // rollup-plugin-node-resolve embeds external dependecies in the bundle,
     // more info here:

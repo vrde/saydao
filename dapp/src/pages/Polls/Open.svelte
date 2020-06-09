@@ -1,9 +1,9 @@
 <h1>Open Polls</h1>
 
 <h2>Descriptive title of poll (i.e. Who should speak at our next event)</h2>
-<p>This poll closes on DATE, 2020.
-<p>This poll has [reached quorum / needs X more votes to reach quorum].
-<p>This is the body of the poll (i.e. There will be an event on July 1, 2020. Which of the following speakers should give a talk?)</p>
+<p>Voting closes on DATE, 2020 at 11:59:59 pm.
+<p>Quorum has been reached / X more votes are needed for a quorum.
+<p>Body of the poll (i.e. There will be an event on July 1, 2020. Which of the following speakers should give a talk?)</p>
 
 <ul>
   <li>Option 1: 80% <button>Vote for this</button> </li>
@@ -13,7 +13,9 @@
 <hr>
 
 <h2>Descriptive title of second poll</h2>
-<p>This is the body of the poll (i.e. There will be an event on July 7, 2020. Which of the following speakers should give a talk?)</p>
+<p>Voting closes on DATE, 2020 at 11:59:59 pm.
+<p>Quorum has been reached / X more votes are needed for a quorum.
+<p>Body of the poll</p>
 
 <ul>
   <li>Option 1: 80% <button>Vote for this</button> </li>

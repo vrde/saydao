@@ -35,4 +35,6 @@
 
 <hr />
 
-<footer>production: {CONFIG.production}, built on: {CONFIG.date}</footer>
+<footer>
+  <small>Production: {CONFIG.production}, Built on: {CONFIG.date}</small>
+</footer>

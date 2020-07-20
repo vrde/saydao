@@ -2,7 +2,9 @@
   import CONFIG from "./config";
   import Router from "svelte-spa-router";
   import Header from "./components/Header.svelte";
+
   import Home from "./pages/Home.svelte";
+  import login from "./pages/login.svelte";
 
   import memberAdd from "./pages/member/add.svelte";
   import memberInvite from "./pages/member/invite.svelte";
@@ -18,6 +20,7 @@
 
   const routes = {
     "/": Home,
+    "/login": login,
     "/member/add": memberAdd,
     "/member/invite": memberInvite,
     "/member/list": memberList,

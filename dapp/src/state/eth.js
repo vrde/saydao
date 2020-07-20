@@ -8,11 +8,26 @@ import CONFIG from "../config";
 import db from "./db";
 import { clock } from "./clock";
 
-export async function authenticate() {
-  const w = await etherea.wallet(CONFIG.walletOptions);
+// Autologin
+(() => db.get("saydao:logged") && authenticate())();
+
+export async function authenticate(mnemonic) {
+  const options = {
+    ...CONFIG.walletOptions,
+    mnemonic
+  };
+  console.log("wallet options", options);
+  let w;
+  if (etherea.hasNativeWallet()) {
+    w = await etherea.getNativeWallet(options);
+  } else {
+    w = await etherea.getLocalWallet(options);
+  }
   w.loadContracts(contracts);
   wallet.set(w);
+  window.wallet = w;
   console.log("User authenticated with wallet", w);
+  db.set("saydao:logged", true);
   return w;
 }
 

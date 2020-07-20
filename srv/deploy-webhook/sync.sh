@@ -3,5 +3,5 @@
 cd ../..
 git fetch
 git checkout origin/master
-make frontend-install
-make frontend-build
+NETWORK=kovan make frontend-install frontend-build
+# make frontend-deploy

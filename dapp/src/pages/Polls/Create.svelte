@@ -1,16 +1,16 @@
-<h1>Create Poll</h1>
+<h1>Create a Poll</h1>
 
 <form>
-  <label>Title of the Poll
+  <label>What is the title of the poll?
     <input type="text" name="title"/>
   </label>
 
-  <label>Body of the Poll
+  <label>What is the poll question?
     <textarea></textarea>
   </label>
 
   <fieldset>
-    <legend>Options (at least two)</legend>
+    <legend>What are the choices in the poll? Enter at least two.</legend>
     <ul>
       <li>
         <input type="text"/>
@@ -19,16 +19,17 @@
         <input type="text"/>
       </li>
     </ul>
-    <button>Add another one</button>
+    <button>Add more poll options</button>
   </fieldset>
 
-  <label>How long should be the poll last?
+  <label>How long should be the poll stay open?
     <select>
+      <option>1 hour</option>
       <option>1 day</option>
-      <option>7 days</option>
+      <option>1 week</option>
       <option>1 month</option>
     </select>
   </label>
 
-  <button type="submit">Submit</button>
+  <button type="submit">Launch poll</button>
 </form>

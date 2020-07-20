@@ -4,10 +4,12 @@
 
 pragma solidity ^0.6.0;
 
-import '@openzeppelin/contracts/access/Ownable.sol';
+// import '@openzeppelin/contracts/access/Ownable.sol';
+import '@opengsn/gsn/contracts/BaseRelayRecipient.sol';
 
-contract SayDAO is Ownable {
+contract SayDAO is BaseRelayRecipient {
 
+  address public owner;
   uint constant PAGE_SIZE = 32;
 
   // ## Members
@@ -18,12 +20,22 @@ contract SayDAO is Ownable {
   // Each memberId is associated to the member address.
   mapping (uint16 => address) public memberToAddress;
 
+  constructor(address _forwarder) public {
+    trustedForwarder = _forwarder;
+    owner = _msgSender();
+  }
+
   function join(uint16 memberId, uint8 v, bytes32 r, bytes32 s) public {
     require(memberToAddress[memberId] == address(0), "Invite used already");
+    // FIXME: only two digits allowed
     bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n2", memberId));
-    require(ecrecover(messageHash, v, r, s) == owner(), "Invite not valid.");
+    require(ecrecover(messageHash, v, r, s) == owner, "Invite not valid.");
     memberToAddress[memberId] = _msgSender();
     members.push(memberId);
+  }
+
+  function foo() public {
+    owner = _msgSender();
   }
 
   function listMembers(uint page) view public returns(uint[PAGE_SIZE] memory chunk) {

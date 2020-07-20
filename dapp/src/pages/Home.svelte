@@ -2,13 +2,40 @@
   import { authenticate, wallet, role } from "../state/eth";
 </script>
 
-{#if !$wallet}
-<a on:click={authenticate}>Log in</a>
-{/if}
 
 <section>
 
-  {#if $wallet}
+{#if !$wallet}
+  <div>
+    <h2>Join the DAO</h2>
+    <p>In order to participate to the DAO by voting, creating polls and events, you need to log in.</p>
+    <ul>
+      <li>
+        <a href="#/login">Log in</a> if you have already activated your account by using an invite.
+      </li>
+      <li>
+        <a href="mailto:agranzot@mailbox.org?subject=I'm a member send me an invite to the DAO">Request an invitation</a> if you are a member of ParTecK but you didn't get your invitation.
+      </li>
+    </ul>
+    <p>If you are just taking a look around, you don't need to login.</p>
+  </div>
+
+  <div>
+    <h2>What's up</h2>
+    <ul>
+      <li>
+        <a href="#/polls/open">Open Polls</a>: Show open polls.
+      </li>
+      <li>
+        <a href="#/polls/create">Upcoming Events</a>: Show upcoming community events.
+      </li>
+      <li>
+        <a href="#/polls/closed">Closed Polls</a>: Show the polls that are now closed.
+      </li>
+    </ul>
+  </div>
+{:else}
+
   <div>
     <h2>About You</h2>
     <p>You are <strong>member 42</strong>.</p>
@@ -33,7 +60,6 @@
       </li>
     </ul>
   </div>
-  {/if}
   {/if}
 
   <div>
@@ -66,7 +92,7 @@
       </li>
     </ul>
   </div>
-
+{/if}
 
   <div>
     <h2>What is ParTecK DAO</h2>

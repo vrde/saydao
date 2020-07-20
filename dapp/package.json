@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "dompurify": "^2.0.11",
-    "etherea": "0.0.8",
+    "etherea": "0.0.10",
     "ipfs-http-client": "^44.1.1",
     "marked": "^1.1.0",
     "qs": "^6.9.4",

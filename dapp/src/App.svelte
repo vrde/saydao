@@ -1,10 +1,11 @@
 <script>
-  import CONFIG from "./config";
   import Router from "svelte-spa-router";
   import Header from "./components/Header.svelte";
 
   import Home from "./pages/Home.svelte";
+  import settings from "./pages/settings.svelte";
   import login from "./pages/login.svelte";
+  import logout from "./pages/logout.svelte";
 
   import memberAdd from "./pages/member/add.svelte";
   import memberInvite from "./pages/member/invite.svelte";
@@ -20,7 +21,9 @@
 
   const routes = {
     "/": Home,
+    "/settings": settings,
     "/login": login,
+    "/logout": logout,
     "/member/add": memberAdd,
     "/member/invite": memberInvite,
     "/member/list": memberList,
@@ -41,9 +44,3 @@
 <main>
   <Router {routes} />
 </main>
-
-<hr />
-
-<footer>
-  <small>Production: {CONFIG.production}, Built on: {CONFIG.date}</small>
-</footer>

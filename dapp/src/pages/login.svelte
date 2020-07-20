@@ -1,18 +1,29 @@
 <script>
   import {push} from 'svelte-spa-router'
-  import { authenticate, wallet, role } from "../state/eth";
+  import { login, wallet, role } from "../state/eth";
   import etherea from "etherea";
 
   let mnemonic = "";
-  let invalidMnemonic;
+  let error;
 
   async function submitMnemonic() {
-    invalidMnemonic = false;
+    error = false;
     try {
-      await authenticate(mnemonic);
+      await login(mnemonic);
     } catch(e) {
       console.log(e);
-      invalidMnemonic = true;
+      error = true;
+    }
+    push('/');
+  }
+
+  async function handleLogin() {
+    error = false;
+    try {
+      await login();
+    } catch(e) {
+      console.log(e);
+      error = true;
     }
     push('/');
   }
@@ -28,9 +39,13 @@
 
     <p>Your browser supports Ethereum.</p>
 
+    {#if error}
+    <p class="error">It didn't work out. Try again please.</p>
+    {/if}
+
     <ul>
       <li>
-        <a on:click|preventDefault={authenticate} href="#">Log in with your Ethereum account</a>.
+        <button on:click={handleLogin} href="#">Log in with your Ethereum account</button>
       </li>
     </ul>
 
@@ -41,11 +56,11 @@
     <ul>
       <li>
         <form on:submit|preventDefault={submitMnemonic}>
-          {#if invalidMnemonic}
+          {#if error}
           <p class="error">It didn't work out. Please double check your 12 magic words.</p>
           {/if}
           <textarea bind:value={mnemonic}></textarea>
-          <button type="submit">Log in</button>.
+          <button type="submit">Log in</button>
         </form>
       </li>
 

@@ -22,6 +22,14 @@ class DB {
     return value;
   }
 
+  remove(key) {
+    this.storage.removeItem(key);
+  }
+
+  clear(key) {
+    this.storage.clear();
+  }
+
   has(key) {
     return this.storage[key] !== undefined;
   }

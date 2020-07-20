@@ -1,7 +1,6 @@
 <script>
-  import { authenticate, wallet, role } from "../state/eth";
+  import { wallet, role } from "../state/eth";
 </script>
-
 
 <section>
 
@@ -42,10 +41,10 @@
     <p>You have <strong>542967</strong> Say. That is <em>12%</em> of the total Say in ParTecK DAO.</p>
     <ul>
       <li>
-        <a href="#">Settings</a>
+        <a href="#/settings">Settings</a>
       </li>
       <li>
-        <a href="#">Logout</a>
+        <a href="#/logout">Logout</a>
       </li>
     </ul>
   </div>

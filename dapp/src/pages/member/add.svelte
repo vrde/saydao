@@ -1,6 +1,6 @@
 <script>
 import etherea from "etherea";
-import { authenticate, wallet } from "src/state/eth"
+import { login, wallet } from "src/state/eth"
 import { parse } from 'qs'
 import {querystring} from 'svelte-spa-router'
 
@@ -11,7 +11,7 @@ let hash;
 let blockNumber;
 
 async function handleSubmit() {
-  await authenticate();
+  await login();
   //const { r, s, v} = etherea.signature.split(invite.signature);
   //console.log(r, s, v);
   //const transaction = await $wallet.contracts.SayDAO.join(invite.memberId, v, r, s);

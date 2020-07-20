@@ -37,15 +37,19 @@ export async function logout() {
 
 export const wallet = writable();
 
-export const role = derived(wallet, async ($wallet, set) => {
-  if ($wallet) {
-    if ((await $wallet.contracts.SayDAO.owner()) === $wallet.address) {
-      set("owner");
-    } else {
-      set("anon");
+export const role = derived(
+  wallet,
+  async ($wallet, set) => {
+    if ($wallet) {
+      const contract = $wallet.contracts.SayDAO;
+      set({
+        owner: (await contract.owner()) === $wallet.address,
+        member: (await contract.addressToMember($wallet.address)) !== 0
+      });
     }
-  }
-});
+  },
+  {}
+);
 
 export const addressShort = derived(wallet, async ($wallet, set) => {
   if ($wallet) {

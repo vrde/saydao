@@ -49,7 +49,7 @@
     </ul>
   </div>
 
-  {#if $role === 'owner'}
+  {#if $role.owner}
   <div>
     <h2>Administration</h2>
     <p>You are also the <strong>owner of the DAO</strong>. You have special powers to bootstrap the DAO and assign administrative roles.</p>

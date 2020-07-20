@@ -3,9 +3,7 @@ const etherea = require("etherea");
 const { compile, deploy } = require("etherea/lib/solidity");
 
 function merge(address, id) {
-  return etherea.BigNumber.from(address)
-    .shl(96)
-    .or(id);
+  return etherea.BigNumber.from(address).shl(96).or(id);
 }
 
 describe("SayDAO", async () => {
@@ -18,19 +16,20 @@ describe("SayDAO", async () => {
     alice = await etherea.wallet({ endpoint: "localhost" });
     bob = await etherea.wallet({
       endpoint: "localhost",
-      index: 1
+      index: 1,
     });
     carol = await etherea.wallet({
       endpoint: "localhost",
-      index: 2
+      index: 2,
     });
     mallory = await etherea.wallet({
       endpoint: "localhost",
-      index: 3
+      index: 3,
     });
     const contracts = await deploy(
       await compile("./contracts/SayDAO.sol"),
-      alice
+      alice,
+      "0x0000000000000000000000000000000000000000"
     );
 
     alice.loadContracts(contracts);
@@ -55,6 +54,7 @@ describe("SayDAO", async () => {
 
     // Bob should be now registered as a member with id 42
     assert.equal(await bob.contracts.SayDAO.memberToAddress(42), bob.address);
+    assert.equal(await bob.contracts.SayDAO.addressToMember(bob.address), 42);
 
     // Mallory wants to join as well, but she is not invited. She tries
     // to replay Bob's invite but the smart contract rejects her request.

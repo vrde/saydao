@@ -8,6 +8,7 @@
   import logout from "./pages/logout.svelte";
 
   import memberAdd from "./pages/member/add.svelte";
+  import memberSuccess from "./pages/member/success.svelte";
   import memberInvite from "./pages/member/invite.svelte";
   import memberList from "./pages/member/list.svelte";
 
@@ -25,6 +26,7 @@
     "/login": login,
     "/logout": logout,
     "/member/add": memberAdd,
+    "/member/success": memberSuccess,
     "/member/invite": memberInvite,
     "/member/list": memberList,
     "/polls/open": PollsOpen,

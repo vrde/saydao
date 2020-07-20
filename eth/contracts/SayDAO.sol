@@ -19,6 +19,7 @@ contract SayDAO is BaseRelayRecipient {
   uint16[] public members;
   // Each memberId is associated to the member address.
   mapping (uint16 => address) public memberToAddress;
+  mapping (address => uint16) public addressToMember;
 
   constructor(address _forwarder) public {
     trustedForwarder = _forwarder;
@@ -31,6 +32,7 @@ contract SayDAO is BaseRelayRecipient {
     bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n2", memberId));
     require(ecrecover(messageHash, v, r, s) == owner, "Invite not valid.");
     memberToAddress[memberId] = _msgSender();
+    addressToMember[_msgSender()] = memberId;
     members.push(memberId);
   }
 

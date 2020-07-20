@@ -12,19 +12,20 @@ describe("SayDAO ACL", async () => {
     alice = await etherea.wallet({ endpoint: "localhost" });
     bob = await etherea.wallet({
       endpoint: "localhost",
-      index: 1
+      index: 1,
     });
     carol = await etherea.wallet({
       endpoint: "localhost",
-      index: 2
+      index: 2,
     });
     mallory = await etherea.wallet({
       endpoint: "localhost",
-      index: 3
+      index: 3,
     });
     const contracts = await deploy(
       await compile("./contracts/SayDAO.sol"),
-      alice
+      alice,
+      "0x0000000000000000000000000000000000000000"
     );
 
     alice.loadContracts(contracts);

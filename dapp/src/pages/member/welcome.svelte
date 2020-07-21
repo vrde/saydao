@@ -12,6 +12,9 @@ $: success = parse($querystring);
   <p>You are registered as Member {success.memberId}!</p>
   <p>Go back to the <a href="#/">Home page</a> to start participating.</p>
   <details>
+    <summary>
+      Tell me more
+    </summary>
     <p>
       Your membership has been recorded in the {$wallet.networkName} Ethereum
       blockchain, with the following transaction hash:

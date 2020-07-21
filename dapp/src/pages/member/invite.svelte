@@ -2,6 +2,14 @@
   import { wallet } from "src/state/eth"
   import { invite } from "src/state/dao/member"
 
+	import { afterUpdate } from 'svelte';
+
+	afterUpdate(() => {
+    if (invitation) {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+	});
+
   let memberId;
   let invitation;
 
@@ -41,13 +49,16 @@ input {
 </fieldset>
 
 {#if invitation}
-<h2>The invite is ready</h2>
+<div>
 
-<p>
-  Share the following link with the member you want to invite. Copy and paste it in an email on in a personal message. <strong>Important:</strong> the DAO doesn't know the identity of the person connected to that member id, you should keep track yourself.
-</p>
+  <h2>The invite is ready</h2>
 
-<textarea readonly>{invitation}</textarea>
+  <p>
+    Share the following link with the member you want to invite. Copy and paste it in an email on in a personal message. <strong>Important:</strong> the DAO doesn't know the identity of the person connected to that member id, you should keep track yourself.
+  </p>
+
+  <textarea readonly>{invitation}</textarea>
+</div>
 {/if}
 
 <details>

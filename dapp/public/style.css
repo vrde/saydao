@@ -34,6 +34,10 @@ header > div {
   margin: auto;
 }
 
+footer {
+  margin: var(--size-s);
+}
+
 a,
 a:hover {
   color: var(--color-dark);

@@ -39,7 +39,7 @@ async function handleSubmit() {
   }
   console.log(transaction);
   console.log(receipt);
-  replace(`/member/success?memberId=${invite.memberId}&tx=${transaction.hash}`);
+  replace(`/member/welcome?memberId=${invite.memberId}&tx=${transaction.hash}`);
   //const transaction = await $wallet.contracts.SayDAO.foo();
   //hash = transaction.hash;
   //console.log('transaction hash is', transaction.hash);
@@ -58,7 +58,7 @@ async function handleSubmit() {
 
   <h1>You have been invited to join ParTecK DAO!</h1>
 
-  {#if etherea.hasNativeWallet()}
+  {#if !$wallet && etherea.hasNativeWallet()}
 
     <p>Your browser supports Ethereum, before you continue, you should log in.</p>
 

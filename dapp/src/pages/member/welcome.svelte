@@ -15,7 +15,7 @@ $: success = parse($querystring);
     <p>
       Your membership has been recorded in the {$wallet.networkName} Ethereum
       blockchain, with the following transaction hash:
-      <a href="https://{$wallet.networkName}.etherscan.io/tx/{success.tx}">{success.tx}</a>.
+      <a href="https://{$wallet.networkName}.etherscan.io/tx/{success.tx}" target="_blank">{success.tx}</a>.
     </p>
   </details>
 {/if}

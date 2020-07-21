@@ -14,7 +14,18 @@ import { clock } from "./clock";
 export async function login(mnemonic) {
   let w;
   if (etherea.hasNativeWallet()) {
-    w = await etherea.getNativeWallet(CONFIG.walletOptions);
+    try {
+      w = await etherea.getNativeWallet(CONFIG.walletOptions);
+      networkMismatch.set();
+    } catch (e) {
+      if (e instanceof etherea.exceptions.NetworkMismatch) {
+        // Try again when user changes network
+        db.set("saydao:autologin", true);
+        console.error(e.message);
+        networkMismatch.set(e);
+        return;
+      }
+    }
   } else {
     w = await etherea.getLocalWallet({
       ...CONFIG.walletOptions,
@@ -34,6 +45,8 @@ export async function logout() {
   db.clear();
   wallet.set(undefined);
 }
+
+export const networkMismatch = writable();
 
 export const wallet = writable();
 

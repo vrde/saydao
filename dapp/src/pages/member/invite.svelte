@@ -8,7 +8,7 @@
   async function createInvite() {
     const { origin, pathname } = window.location;
     let signature = await invite($wallet, memberId);
-    invitation = `${origin}${pathname}#/member/add?memberId=${memberId}&signature=${signature}`;
+    invitation = `${origin}${pathname}#/member/join?memberId=${memberId}&signature=${signature}`;
   }
 </script>
 

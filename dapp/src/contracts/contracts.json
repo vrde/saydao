@@ -4,12 +4,12 @@
     "abi": "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_forwarder\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"addressToMember\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"foo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getTrustedForwarder\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"memberId\",\"type\":\"uint16\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"join\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"page\",\"type\":\"uint256\"}],\"name\":\"listMembers\",\"outputs\":[{\"internalType\":\"uint256[32]\",\"name\":\"chunk\",\"type\":\"uint256[32]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"name\":\"memberToAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"members\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
     "networks": {
       "42": {
-        "address": "0x06447957941d57690572c9f4521326389b2a6270",
-        "transactionHash": "0x6e7b55df0243260704ecdba901f29c3e82b86a58988d4b5348b651aac17b803e"
+        "address": "0x3441719C563c3F1a2550B4211F3e540e3363B2dd",
+        "transactionHash": "0x2eadf9fa49b21176aeac8b521975530b1509346c3caed6f8be00e31ebf3f5235"
       },
       "1337": {
-        "address": "0xd67673f02a23a9A89b2e03cFf14943654306Df91",
-        "transactionHash": "0x09943a022d3c14ea9fbf6a9e70b588bf4c260a56e2e370ba6d9fa9361dc1b2c9"
+        "address": "0x4b664f68AE70c21acC514f6bc2DCbb78319B5CE5",
+        "transactionHash": "0xf03041baef060099ac7700b88110f82f5188bdefd58aa45814e0c4ea67b1bcd9"
       }
     }
   }

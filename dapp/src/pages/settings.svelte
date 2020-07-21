@@ -27,15 +27,21 @@
 
     <h3>SayDAO Address</h3>
 
-    <p>{$wallet.contracts.SayDAO.address}</p>
+    <p>The smart contract that regulates participation to the DAO can be found at
+      <a href="https://{$wallet.networkName}.etherscan.io/address/{$wallet.contracts.SayDAO.address}" target="_blank">{$wallet.contracts.SayDAO.address}</a>.
+    </p>
 
     <h3>Version</h3>
 
     <p>Built on: {CONFIG.date}</p>
 
+    <h3>Source Code</h3>
+
+    <p><a href="https://github.com/vrde/saydao" target="_blank">SayDAO source code</a>.</p>
+
 </section>
 
 {:else}
-<h1>Forbidden!</h1>
-<p>You need to be logged in to see this page</p>
+  <h1>Forbidden!</h1>
+  <p>You need to be logged in to see this page</p>
 {/if}

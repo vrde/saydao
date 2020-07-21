@@ -102,6 +102,7 @@ export default {
       targets: [
         { src: "node_modules/etherea/browser/etherea.min.js", dest: "build" },
         { src: "public/index.html", dest: "build" },
+        { src: "public/classless.css", dest: "build" },
         { src: "public/style.css", dest: "build" },
         { src: "../docs/operation.md", dest: "build/docs" },
         { src: "../docs/principles.md", dest: "build/docs" }

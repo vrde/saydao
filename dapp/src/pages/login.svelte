@@ -53,21 +53,19 @@
 
     <p>To log in please enter your 12 magic words.</p>
 
-    <ul>
-      <li>
+    <fieldset>
+      <legend>
+        Login
+      </legend>
         <form on:submit|preventDefault={submitMnemonic}>
           {#if error}
           <p class="error">It didn't work out. Please double check your 12 magic words.</p>
           {/if}
-          <textarea bind:value={mnemonic}></textarea>
+          <textarea required placeholder="pink friend ... ... ... ... ... ... ... ... ... ..." bind:value={mnemonic}></textarea>
           <button type="submit">Log in</button>
         </form>
-      </li>
-
-      <li>
-        <a href="mailto:agranzot@mailbox.org?subject=I forgot my 12 magic words">Recover your member account</a>.
-      </li>
-    </ul>
+    </fieldset>
+    <a href="mailto:agranzot@mailbox.org?subject=I forgot my 12 magic words">Recover your member account</a>.
 
     {/if}
   </div>

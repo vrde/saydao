@@ -44,5 +44,7 @@
 <Header />
 
 <main>
-  <Router {routes} />
+  <section>
+    <Router {routes} />
+  </section>
 </main>

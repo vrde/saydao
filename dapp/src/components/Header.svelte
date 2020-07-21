@@ -16,7 +16,9 @@ import { networkMismatch } from 'src/state/eth';
   <p class="error">
       Your wallet is connected to the <strong>{$networkMismatch.actual} network</strong>, please connect it to the <strong>{$networkMismatch.expected} network</strong>.
   </p>
+
 {/if}
+
 <header role="banner">
   <div>
     <h1>

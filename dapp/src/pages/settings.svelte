@@ -6,20 +6,22 @@
 {#if $wallet}
 <section>
 
-    <h2>Settings</h2>
-
-    <p>Here you can find all the details about your account.</p>
-
     {#if $wallet.mnemonic}
-    <h3>Backup</h3>
+  <h2>Magic Word Backup</h2>
+
+
+    <h3>Magic Word Backup</h3>
 
     <p>
-      Important! You should save somewhere your personal <strong>12 magic words</strong>. Those 12 magic words will allow to log in again. If you lose them, you will have to recover your account and it might take some time.
-    </p>
+      <strong>Important!</strong> Make sure to save your <strong>12 magic words</strong> before leaving this page.You will need these magic words to log in again.  Write them down and keep them safe.</p>
     <p>Your 12 magic words are:</p>
 
     <textarea readonly>{$wallet.mnemonic}</textarea>
     {/if}
+
+    <h2>Settings</h2>
+
+    <p>Your account details can be viewed and changed here.</p>
 
     <h3>Your Ethereum Address</h3>
 
@@ -43,5 +45,5 @@
 
 {:else}
   <h1>Forbidden!</h1>
-  <p>You need to be logged in to see this page</p>
+  <p>You need to be logged in to see this page.</p>
 {/if}

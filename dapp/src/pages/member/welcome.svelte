@@ -9,14 +9,14 @@ $: success = parse($querystring);
 
 {#if $wallet && success}
   <h1>Welcome to ParTecK DAO!</h1>
-  <p>You are registered as Member {success.memberId}!</p>
-  <p>Go back to the <a href="#/">Home page</a> to start participating.</p>
+  <p>You are registered as <strong>member {success.memberId}</strong>!</p>
+  <p>Go back to the <a href="#/">home page</a> to participate.</p>
   <details>
     <summary>
-      Tell me more
+      What just happened?
     </summary>
     <p>
-      Your membership has been recorded in the {$wallet.networkName} Ethereum
+      Your membership was recorded on the {$wallet.networkName} Ethereum
       blockchain, with the following transaction hash:
       <a href="https://{$wallet.networkName}.etherscan.io/tx/{success.tx}" target="_blank">{success.tx}</a>.
     </p>

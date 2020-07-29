@@ -34,13 +34,13 @@ input {
 
 <h2>How to add a member</h2>
 
-<p>To add a member you need to generate a <strong>member invite</strong>. A <strong>member invite</strong> is a link you share with the member you want to invite. The <strong>member invite</strong> can be used only once and it's connected to a member id. You can generate as many invites you need.</p>
+<p>To add a new member, you must generate a <strong>member invite</strong>. A <strong>member invite</strong> is a link you can share with the member you want to invite. The <strong>member invite</strong> can only be used once. Each new member needs their own invite. You can generate as many invites you need.</p>
 
 <fieldset>
   <legend>Invite a member</legend>
   <form on:submit|preventDefault={createInvite}>
     <label>
-      Member Id to assign
+      Member id to assign
       <input bind:value={memberId} type="number" name="memberId" placeholder="42" required />
     </label>
     <br />
@@ -51,10 +51,15 @@ input {
 {#if invitation}
 <div>
 
-  <h2>The invite is ready</h2>
+  <h2>The invite you requested is ready</h2>
 
   <p>
-    Share the following link with the member you want to invite. Copy and paste it in an email on in a personal message. <strong>Important:</strong> the DAO doesn't know the identity of the person connected to that member id, you should keep track yourself.
+    Share this link with the member you want to invite. You can copy and paste it in an email or a message. Here is sample text you can use:
+  </p>
+  <p>Hello friend! You are invited to join ParTecK DAO. Click the link below and
+  </p>
+  <p>
+     <strong>Important:</strong> The DAO doesn't know the identity of the person connected to a member id. If that is important, you should keep track of what user has what member id yourself.
   </p>
 
   <textarea readonly>{invitation}</textarea>
@@ -64,6 +69,6 @@ input {
 <details>
   <summary>How does an invite work?</summary>
   <p>
-    An invite can be used only once. It activates only one member, and assignes the member id to exactly one person.
+    An invite can only be used once. It creates one new member id for one person, and then it stops working.
   </p>
 </details>

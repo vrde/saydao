@@ -10,7 +10,7 @@
 
     {#if $wallet && $wallet.mnemonic}
     <p>
-      Important! Before logging out, you should save somewhere your personal <strong>12 magic words</strong>. Those 12 magic words will allow to log in again. If you lose them, you will have to recover your account and it might take some time.
+      <strong>PLEASE NOTE:</strong> If you log out, you will need your <strong>12 magic words</strong> to log in again. If you don't have your magic words, you will not be able to access your account. Your account can be reset, but it may be a slow process.
     </p>
 
     <p>Your 12 magic words are:</p>

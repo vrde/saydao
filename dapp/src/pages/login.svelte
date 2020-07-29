@@ -61,7 +61,7 @@
         {#if error}
         <p class="error">It didn't work out. Please double check your 12 magic words.</p>
         {/if}
-        <textarea required placeholder="pink friend ... ... ... ... ... ... ... ... ... ..." bind:value={mnemonic}></textarea>
+        <textarea required placeholder="example words friend ... ... ... ... ... ... ... ... ..." bind:value={mnemonic}></textarea>
         <button type="submit">Log in</button>
       </form>
     </fieldset>

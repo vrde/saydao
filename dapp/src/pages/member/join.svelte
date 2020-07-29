@@ -56,14 +56,14 @@ async function handleSubmit() {
 
 {:else}
 
-  <h1>You have been invited to join ParTecK DAO!</h1>
+  <h1>Welcome! You have been invited to join ParTecK DAO.</h1>
 
   {#if !$wallet && etherea.hasNativeWallet()}
 
-    <p>Your browser supports Ethereum, before you continue, you should log in.</p>
+    <p>Your browser supports Ethereum. Before you continue, you should log in to your Ethereum account.</p>
 
     {#if loginError}
-      <p class="error">It didn't work out. Try again please.</p>
+      <p class="error">That didn't work. Please try again.</p>
     {/if}
 
     <ul>
@@ -81,10 +81,11 @@ async function handleSubmit() {
 
     {#if state === "working"}
 
-      <p>Please wait until your membership is stored in the DAO. This may require up to 15 seconds.</p>
+      <p>Please wait while your membership is created. This may take up to 30 seconds. Be patient!</p>
+
     {:else if state === "error"}
 
-      <p class="error">There was an error joining the DAO</p>
+      <p class="error">There was an error joining the DAO. Please try again. If this is the second time you've tried, please contact the person who invited you.</p>
       <details>
         {inviteError}
       </details>

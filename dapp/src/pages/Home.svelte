@@ -6,39 +6,39 @@
 
 {#if !$wallet}
   <div>
-    <h2>Join the DAO</h2>
-    <p>In order to participate to the DAO by voting, creating polls and events, you need to log in.</p>
+    <h2>Log in or join</h2>
+    <p>To participate in the DAO, you need to log in.</p>
     <ul>
       <li>
-        <a href="#/login">Log in</a> if you have already activated your account by using an invite.
+        <a href="#/login">Log in now</a> if you've already activated your account by using an invite.
       </li>
       <li>
-        <a href="mailto:agranzot@mailbox.org?subject=I'm a member send me an invite to the DAO">Request an invitation</a> if you are a member of ParTecK but you didn't get your invitation.
+        <a href="mailto:agranzot@mailbox.org?subject=Send me an invite to the DAO">Request an invite</a> if you are a community member but haven't been invited to the DAO.
       </li>
     </ul>
-    <p>If you are just taking a look around, you don't need to login.</p>
+    <p>If you're just looking around, you don't need to log in.</p>
   </div>
 
   <div>
     <h2>What's up</h2>
     <ul>
       <li>
-        <a href="#/polls/open">Open Polls</a>: Show open polls.
+        <a href="#/polls/open">Open Polls</a>: Show polls you can vote on.
       </li>
       <li>
         <a href="#/polls/create">Upcoming Events</a>: Show upcoming community events.
       </li>
       <li>
-        <a href="#/polls/closed">Closed Polls</a>: Show the polls that are now closed.
+        <a href="#/polls/closed">Closed Polls</a>: Show closed polls.
       </li>
     </ul>
   </div>
 {:else}
 
   <div>
-    <h2>About You</h2>
+    <h2>About you</h2>
     <p>You are <strong>member 42</strong>.</p>
-    <p>You have <strong>542967</strong> Say. That is <em>12%</em> of the total Say in ParTecK DAO.</p>
+    <p>You have <strong>542967</strong> Say. That is <em>12%</em> of the total Say in the DAO.</p>
     <ul>
       <li>
         <a href="#/settings">Settings</a>
@@ -52,7 +52,7 @@
   {#if $role.owner}
   <div>
     <h2>Administration</h2>
-    <p>You are also the <strong>owner of the DAO</strong>. You have special powers to bootstrap the DAO and assign administrative roles.</p>
+    <p>You are the <strong>owner of the DAO</strong>. You have special powers to bootstrap the DAO and assign roles.</p>
     <ul>
       <li>
           <a href="#/member/invite">Add a member to the DAO</a>.
@@ -63,7 +63,7 @@
 
   <div>
     <h2>Members</h2>
-    <p>There are currently 42 members of the ParTecK DAO.</p>
+    <p>There are currently 42 members of theDAO.</p>
     <ul>
       <li>
         <a href="#/members">List members</a>

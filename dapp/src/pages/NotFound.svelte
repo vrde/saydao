@@ -2,5 +2,5 @@
   import { location } from "svelte-spa-router";
 </script>
 
-<h1>Not Found!</h1>
-<p>Cannot find {$location}</p>
+<h1>File not Found!</h1>
+<p>We cannot find {$location}. Please try again.</p>

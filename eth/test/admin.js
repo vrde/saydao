@@ -41,6 +41,6 @@ describe("SayDAO ACL", async () => {
   });
 
   it("should allow alice to invite admins", async () => {
-    // await alice.contracts.SayDAO.
+    //
   });
 });

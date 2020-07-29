@@ -1,6 +1,6 @@
 const assert = require("assert").strict;
 const etherea = require("etherea");
-const { compile, deploy } = require("etherea/lib/solidity");
+const { deployAll } = require("./utils");
 
 function merge(address, id) {
   return etherea.BigNumber.from(address).shl(96).or(id);
@@ -26,11 +26,7 @@ describe("SayDAO", async () => {
       endpoint: "localhost",
       index: 3,
     });
-    const contracts = await deploy(
-      await compile("./contracts/SayDAO.sol"),
-      alice,
-      "0x0000000000000000000000000000000000000000"
-    );
+    const contracts = await deployAll(alice);
 
     alice.loadContracts(contracts);
     bob.loadContracts(contracts);

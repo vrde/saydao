@@ -7,11 +7,12 @@ pragma solidity ^0.6.0;
 import "@openzeppelin/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@opengsn/gsn/contracts/BaseRelayRecipient.sol";
-import "./IMembership.sol";
+import "./SayToken.sol";
 
 contract SayDAO is BaseRelayRecipient, AccessControl {
   bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
 
+  address public tokenAddress;
   uint constant PAGE_SIZE = 32;
 
   // ## Members
@@ -42,6 +43,8 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     memberToAddress[memberId] = _msgSender();
     addressToMember[_msgSender()] = memberId;
     members.push(memberId);
+    SayToken token = SayToken(tokenAddress);
+    token.mint(memberId, 100e18);
   }
 
   function listMembers(uint page) view public returns(uint[PAGE_SIZE] memory chunk) {
@@ -68,5 +71,12 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
   //   require(end >= 1 days, "A poll must have a time limit of at least one day");
 
   // }
+
+
+  // ## Token methods
+
+  function setTokenAddress(address a) public {
+    tokenAddress = a;
+  }
 
 }

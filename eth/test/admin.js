@@ -34,8 +34,10 @@ describe("SayDAO ACL", async () => {
     mallory.loadContracts(contracts);
   });
 
-  it("should have alice as the owner", async () => {
-    assert.equal(await alice.contracts.SayDAO.owner(), alice.address);
+  it("should have alice as the admin", async () => {
+    const saydao = alice.contracts.SayDAO;
+    const defaultAdminRole = await saydao.DEFAULT_ADMIN_ROLE();
+    assert(await saydao.hasRole(defaultAdminRole, alice.address));
   });
 
   it("should allow alice to invite admins", async () => {

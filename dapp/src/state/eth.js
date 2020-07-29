@@ -55,8 +55,9 @@ export const role = derived(
   async ($wallet, set) => {
     if ($wallet) {
       const contract = $wallet.contracts.SayDAO;
+      const defaultAdminRole = await contract.DEFAULT_ADMIN_ROLE();
       set({
-        owner: (await contract.owner()) === $wallet.address,
+        owner: await contract.hasRole(defaultAdminRole, $wallet.address),
         member: (await contract.addressToMember($wallet.address)) !== 0
       });
     }

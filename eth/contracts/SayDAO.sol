@@ -4,12 +4,14 @@
 
 pragma solidity ^0.6.0;
 
-// import '@openzeppelin/contracts/access/Ownable.sol';
-import '@opengsn/gsn/contracts/BaseRelayRecipient.sol';
+import "@openzeppelin/contracts/GSN/Context.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@opengsn/gsn/contracts/BaseRelayRecipient.sol";
+import "./IMembership.sol";
 
-contract SayDAO is BaseRelayRecipient {
+contract SayDAO is BaseRelayRecipient, AccessControl {
+  bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
 
-  address public owner;
   uint constant PAGE_SIZE = 32;
 
   // ## Members
@@ -23,21 +25,23 @@ contract SayDAO is BaseRelayRecipient {
 
   constructor(address _forwarder) public {
     trustedForwarder = _forwarder;
-    owner = _msgSender();
+    _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    _setupRole(MANAGER_ROLE, _msgSender());
+  }
+
+  function _msgSender() internal view override(BaseRelayRecipient, Context) returns (address payable) {
+    return BaseRelayRecipient._msgSender();
   }
 
   function join(uint16 memberId, uint8 v, bytes32 r, bytes32 s) public {
     require(memberToAddress[memberId] == address(0), "Invite used already");
     // FIXME: only two digits allowed
     bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n2", memberId));
-    require(ecrecover(messageHash, v, r, s) == owner, "Invite not valid.");
+    address signer = ecrecover(messageHash, v, r, s);
+    require(hasRole(MANAGER_ROLE, signer), "Invite not valid.");
     memberToAddress[memberId] = _msgSender();
     addressToMember[_msgSender()] = memberId;
     members.push(memberId);
-  }
-
-  function foo() public {
-    owner = _msgSender();
   }
 
   function listMembers(uint page) view public returns(uint[PAGE_SIZE] memory chunk) {

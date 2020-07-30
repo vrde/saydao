@@ -1,6 +1,6 @@
 <script>
   import { wallet } from "src/state/eth";
-  import { role, memberId, balance, shares } from "src/state/dao";
+  import { role, memberId, balance, shares, totalMembers } from "src/state/dao";
 </script>
 
 <section>
@@ -79,10 +79,10 @@
 
   <div>
     <h2>Members</h2>
-    <p>There are currently 42 members of theDAO.</p>
+    <p>There are currently {$totalMembers} members of theDAO.</p>
     <ul>
       <li>
-        <a href="#/members">List members</a>
+        <a href="#/member/list">List members</a>
       </li>
     </ul>
   </div>

@@ -2,6 +2,18 @@ import { derived } from "svelte/store";
 import etherea from "etherea";
 import { wallet } from "src/state/eth";
 
+function prettyBalance(raw) {
+  return raw.value.div(etherea.BigNumber.from(10).pow(raw.decimals)).toString();
+}
+
+function prettyShares(raw) {
+  const factor = etherea.BigNumber.from(1000);
+  const owned = raw.value.mul(factor);
+  // This is a bit redundant, but hey.
+  const perc = (100 * owned.div(raw.total).toNumber()) / 1000;
+  return perc.toString() + "%";
+}
+
 export async function invite(wallet, memberId) {
   return await wallet.signMessage(etherea.to.array.uint16(memberId));
 }
@@ -20,6 +32,40 @@ export const role = derived(
   },
   {}
 );
+
+export const memberList = derived(
+  wallet,
+  async ($wallet, set) => {
+    if (!$wallet) return;
+    const list = [];
+    // A bit redundant, can be optimized later
+    const decimals = await $wallet.contracts.SayToken.decimals();
+    const total = await $wallet.contracts.SayToken.totalSupply();
+    for (let page = 0; ; page++) {
+      const members = await $wallet.contracts.SayDAO.listMembers(page);
+      for (let member of members) {
+        if (member.isZero()) {
+          set(list);
+          return;
+        }
+        const address = member.shr(96).toHexString();
+        const memberId = member.mask(16).toNumber();
+        const rawBalance = await $wallet.contracts.SayToken.balanceOf(address);
+        const balance = prettyBalance({ value: rawBalance, total, decimals });
+        const shares = prettyShares({ value: rawBalance, total, decimals });
+        list.push({ address, memberId, balance, shares });
+      }
+      set(list);
+    }
+  },
+  []
+);
+
+export const totalMembers = derived(wallet, async ($wallet, set) => {
+  if (!$wallet) return;
+  const total = await $wallet.contracts.SayDAO.totalMembers();
+  set(total.toNumber());
+});
 
 export const memberId = derived(wallet, async ($wallet, set) => {
   if (!$wallet) return;
@@ -41,11 +87,7 @@ export const rawBalance = derived(
 
 export const balance = derived(
   rawBalance,
-  $rawBalance =>
-    $rawBalance &&
-    $rawBalance.value
-      .div(etherea.BigNumber.from(10).pow($rawBalance.decimals))
-      .toString()
+  $rawBalance => $rawBalance && prettyBalance($rawBalance)
 );
 
 export const totalSupply = derived(
@@ -57,11 +99,7 @@ export const totalSupply = derived(
       .toString()
 );
 
-export const shares = derived(rawBalance, $rawBalance => {
-  if (!$rawBalance) return;
-  const factor = etherea.BigNumber.from(1000);
-  const owned = $rawBalance.value.mul(factor);
-  // This is a bit redundant, but hey.
-  const perc = (100 * owned.div($rawBalance.total).toNumber()) / 1000;
-  return perc.toString() + "%";
-});
+export const shares = derived(
+  rawBalance,
+  $rawBalance => $rawBalance && prettyShares($rawBalance)
+);

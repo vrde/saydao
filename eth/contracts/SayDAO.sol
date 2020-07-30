@@ -54,6 +54,10 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     }
   }
 
+  function totalMembers() view public returns (uint) {
+    return members.length;
+  }
+
   // ## Poll functions
   //
   // A Poll means a question put to the Members of the Community for a Vote

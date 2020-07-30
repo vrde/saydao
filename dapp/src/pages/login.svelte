@@ -1,6 +1,6 @@
 <script>
   import {push} from 'svelte-spa-router'
-  import { login, wallet, role } from "../state/eth";
+  import { login } from "src/state/eth";
   import etherea from "etherea";
 
   let mnemonic = "";

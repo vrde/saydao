@@ -1,8 +1,9 @@
 <script>
 import etherea from "etherea";
-import { login, wallet, role } from "src/state/eth"
+import { login, wallet } from "src/state/eth"
+import { role } from "src/state/dao"
 import { parse } from 'qs'
-import { querystring, replace } from 'svelte-spa-router'
+import { querystring, replace, push } from 'svelte-spa-router'
 
 
 $: invite = parse($querystring);
@@ -19,7 +20,6 @@ async function handleLogin() {
     console.log(e);
     loginError = true;
   }
-  push('/');
 }
 
 async function handleSubmit() {
@@ -87,7 +87,7 @@ async function handleSubmit() {
 
       <p class="error">There was an error joining the DAO. Please try again. If this is the second time you've tried, please contact the person who invited you.</p>
       <details>
-        {inviteError}
+        {inviteError.toString()}
       </details>
 
     {/if}

@@ -50,21 +50,6 @@ export const networkMismatch = writable();
 
 export const wallet = writable();
 
-export const role = derived(
-  wallet,
-  async ($wallet, set) => {
-    if ($wallet) {
-      const contract = $wallet.contracts.SayDAO;
-      const defaultAdminRole = await contract.DEFAULT_ADMIN_ROLE();
-      set({
-        owner: await contract.hasRole(defaultAdminRole, $wallet.address),
-        member: (await contract.addressToMember($wallet.address)) !== 0
-      });
-    }
-  },
-  {}
-);
-
 export const addressShort = derived(wallet, async ($wallet, set) => {
   if ($wallet) {
     set($wallet.address.substr(0, 6) + "…" + $wallet.address.substr(-4));

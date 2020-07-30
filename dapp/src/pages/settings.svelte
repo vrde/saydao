@@ -1,6 +1,7 @@
 <script>
   import CONFIG from "src/config";
-  import { wallet } from "../state/eth";
+  import { wallet } from "src/state/eth";
+  import { totalSupply } from "src/state/dao";
 </script>
 
 {#if $wallet}
@@ -27,10 +28,22 @@
 
     <p>{$wallet.address}</p>
 
-    <h3>SayDAO Address</h3>
+    <h3>Smart Contracts Details</h3>
+
+    <h4>SayDAO Address</h4>
 
     <p>The smart contract that regulates participation to the DAO can be found at
       <a href="https://{$wallet.networkName}.etherscan.io/address/{$wallet.contracts.SayDAO.address}" target="_blank">{$wallet.contracts.SayDAO.address}</a>.
+    </p>
+
+    <h4>SayToken Address</h4>
+
+    <p>The smart contract that represents the token can be found at
+      <a href="https://{$wallet.networkName}.etherscan.io/address/{$wallet.contracts.SayToken.address}" target="_blank">{$wallet.contracts.SayToken.address}</a>.
+    </p>
+
+    <p>
+      The total amount of SayTokens is <strong>{$totalSupply}</strong>.
     </p>
 
     <h3>Version</h3>

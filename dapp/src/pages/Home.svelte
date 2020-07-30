@@ -1,5 +1,6 @@
 <script>
-  import { wallet, role } from "../state/eth";
+  import { wallet } from "src/state/eth";
+  import { role, memberId, balance, shares } from "src/state/dao";
 </script>
 
 <section>
@@ -35,10 +36,11 @@
   </div>
 {:else}
 
+{#if $role.member}
   <div>
     <h2>About you</h2>
-    <p>You are <strong>member 42</strong>.</p>
-    <p>You have <strong>542967</strong> Say. That is <em>12%</em> of the total Say in the DAO.</p>
+    <p>You are <strong>Member {$memberId}</strong>.</p>
+    <p>You have <strong>{$balance}</strong> Say. That is <em>{$shares}</em> of the total Say in the DAO.</p>
     <ul>
       <li>
         <a href="#/settings">Settings</a>
@@ -48,8 +50,22 @@
       </li>
     </ul>
   </div>
+{:else}
+  <div>
+    <h2>About you</h2>
+    <p>You are <strong>logged in</strong> but you are not a member.</p>
+    <ul>
+      <li>
+        <a href="mailto:agranzot@mailbox.org?subject=Send me an invite to the DAO">Request an invite</a> if you are a community member but haven't been invited to the DAO.
+      </li>
+      <li>
+        <a href="#/logout">Logout</a>
+      </li>
+    </ul>
+  </div>
+{/if}
 
-  {#if $role.owner}
+{#if $role.owner}
   <div>
     <h2>Administration</h2>
     <p>You are the <strong>owner of the DAO</strong>. You have special powers to bootstrap the DAO and assign roles.</p>
@@ -59,7 +75,7 @@
       </li>
     </ul>
   </div>
-  {/if}
+{/if}
 
   <div>
     <h2>Members</h2>

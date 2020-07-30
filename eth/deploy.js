@@ -18,7 +18,7 @@ async function getTrustedForwarder() {
   if (NETWORK === "localhost") {
     return JSON.parse(await readFile("./gsn.json"))["forwarderAddress"];
   } else if (NETWORK === "kovan") {
-    // Addresse from https://docs.opengsn.org/gsn-provider/networks.html
+    // Address from https://docs.opengsn.org/gsn-provider/networks.html
     return "0x6453D37248Ab2C16eBd1A8f782a2CBC65860E60B";
   }
 }
@@ -29,11 +29,32 @@ async function compile(outdir = "./dist") {
     privateKey: getEnv("PRIVATE_KEY"),
     mnemonic: getEnv("MNEMONIC"),
   });
-  await build(
+
+  // Deploy the DAO
+  const sayDaoContract = await build(
     "./contracts/SayDAO.sol",
     outdir,
     wallet,
     await getTrustedForwarder()
+  );
+
+  // FIXME: etherea
+  delete sayDaoContract["SayToken"];
+  wallet.loadContracts(sayDaoContract);
+
+  // Deploy the token and specify who is the minter (the DAO)
+  const sayTokenContract = await build(
+    "./contracts/SayToken.sol",
+    outdir,
+    wallet,
+    wallet.contracts.SayDAO.address
+  );
+
+  wallet.loadContracts({ ...sayDaoContract, ...sayTokenContract });
+
+  // Update the DAO so it knows which token to use
+  await wallet.contracts.SayDAO.setTokenAddress(
+    wallet.contracts.SayToken.address
   );
 }
 

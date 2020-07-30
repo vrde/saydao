@@ -1,6 +1,6 @@
 <script>
   import { wallet } from "src/state/eth"
-  import { invite } from "src/state/dao/member"
+  import { invite } from "src/state/dao"
 
 	import { afterUpdate } from 'svelte';
 

@@ -36,7 +36,6 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
   function join(uint16 memberId, uint8 v, bytes32 r, bytes32 s) public {
     require(memberToAddress[memberId] == address(0), "Invite used already");
-    // FIXME: only two digits allowed
     bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n2", memberId));
     address signer = ecrecover(messageHash, v, r, s);
     require(hasRole(MANAGER_ROLE, signer), "Invite not valid.");

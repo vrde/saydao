@@ -77,7 +77,6 @@ export const rawBalance = derived(
   [wallet, memberId],
   async ([$wallet, $memberId], set) => {
     if (!$wallet || !$memberId) return;
-    //const value = await $wallet.contracts.SayToken.balanceOf($memberId);
     const value = await $wallet.contracts.SayToken.balanceOf($wallet.address);
     const decimals = await $wallet.contracts.SayToken.decimals();
     const total = await $wallet.contracts.SayToken.totalSupply();

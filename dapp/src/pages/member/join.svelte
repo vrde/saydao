@@ -5,7 +5,6 @@ import { role } from "src/state/dao"
 import { parse } from 'qs'
 import { querystring, replace, push } from 'svelte-spa-router'
 
-
 $: invite = parse($querystring);
 
 let state = "idle";

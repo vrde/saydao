@@ -75,6 +75,90 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
   // }
 
+  struct Poll {
+    // IPFS Content ID without the first two bytes.
+    uint cid;
+    // When does the poll ends, UNIX timestamp.
+    uint end;
+    // Total amount of token supply.
+    uint supply;
+    // Number of options.
+    uint8 options;
+    // Number of voters.
+    uint16 voters;
+  }
+
+  Poll[] public polls;
+  mapping(uint => uint[]) public pollToVotes;
+
+  // A poll is connected to a bitmap of voters.
+  // Given a pollId, we retrieve its bitmap of voters that is a mapping
+  // divided into smaller bitmaps of 256 voters.
+  mapping(uint => mapping(uint8 => uint)) public pollToVoters;
+
+  function createPoll(uint cid, uint secondsAfter, uint8 options) public returns(uint){
+    require(addressToMember[_msgSender()] != 0, "Sender is not a member");
+    require(secondsAfter >= 3600, "Poll too short");
+    require(options > 1, "Poll must have at least 2 options");
+    require(options <= 8, "Poll must have less than 9 options");
+
+    Poll memory poll = Poll(
+      cid,
+      block.timestamp + secondsAfter,
+      0,
+      options,
+      0);
+    polls.push(poll);
+
+    for (uint8 i = 0; i < options; i++) {
+      pollToVotes[polls.length - 1].push(0);
+    }
+    return polls.length - 1;
+  }
+
+  function hasVoted(uint pollId, uint16 memberId) view public returns(bool) {
+    // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
+    uint bitmap = pollToVoters[pollId][uint8(memberId / 256)];
+    return (bitmap & (1 << (memberId % 256))) > 0;
+  }
+
+  function vote(uint pollId, uint8 option) public {
+    uint16 memberId = addressToMember[_msgSender()];
+    require(memberId != 0, "Sender is not a member");
+    require(!hasVoted(pollId, memberId), "Member voted already");
+
+    // Load the poll
+    Poll storage poll = polls[pollId];
+
+    require(poll.cid != 0, "Poll doesn't exist");
+    require(poll.end > block.timestamp, "Poll is closed");
+    require(option < poll.options, "Invalid option");
+
+    // Load token contract
+    SayToken token = SayToken(tokenAddress);
+
+    poll.supply = token.totalSupply();
+    poll.voters++;
+    //polls[pollId].supply = token.totalSupply();
+    //polls[pollId].voters++;
+
+    // FIXME: add "SafeMath"
+    pollToVotes[pollId][option] += token.balanceOf(_msgSender());
+
+    // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
+    pollToVoters[pollId][uint8(memberId / 256)] |= 1 << (memberId % 256);
+  }
+
+  function getVotes(uint pollId) view public returns(uint[8] memory result) {
+    Poll memory poll = polls[pollId];
+    for (uint8 option = 0; option < poll.options; option++) {
+      result[option] = pollToVotes[pollId][option];
+    }
+  }
+
+  function totalPolls() view public returns(uint) {
+    return polls.length;
+  }
 
   // ## Token methods
 

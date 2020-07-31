@@ -1,6 +1,9 @@
 import * as fs from "fs";
 import path from "path";
+
 import alias from "@rollup/plugin-alias";
+import builtins from "rollup-plugin-node-builtins";
+import globals from "rollup-plugin-node-globals";
 import commonjs from "@rollup/plugin-commonjs";
 import copy from "rollup-plugin-copy";
 import json from "@rollup/plugin-json";
@@ -85,13 +88,14 @@ function getWalletOptions(production) {
 export default {
   input: "src/index.js",
   // Import etherea as a umd external module to speed up build time.
-  external: ["etherea"],
+  external: ["etherea", "ipfs-http-client"],
   output: {
     file: "build/bundle.js",
     format: "iife",
     sourcemap: true,
     globals: {
-      etherea: "etherea"
+      etherea: "etherea",
+      "ipfs-http-client": "ipfs-http-client"
     }
   },
   plugins: [
@@ -100,6 +104,11 @@ export default {
     }),
     copy({
       targets: [
+        {
+          src: "node_modules/ipfs-http-client/dist/index.min.js",
+          dest: "build",
+          rename: "ipfs-http-client.min.js"
+        },
         { src: "node_modules/etherea/browser/etherea.min.js", dest: "build" },
         { src: "public/index.html", dest: "build" },
         { src: "public/classless.css", dest: "build" },
@@ -112,6 +121,8 @@ export default {
       dev: !PRODUCTION,
       css: css => css.write("build/bundle.css")
     }),
+    builtins(),
+    globals(),
     setAlias(),
     json(),
     // rollup-plugin-node-resolve embeds external dependecies in the bundle,

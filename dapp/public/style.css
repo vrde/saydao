@@ -86,3 +86,18 @@ input:not([type="checkbox"]):not([type="radio"]):focus {
   border-color: var(--color-dark);
   box-shadow: 0 0 5px var(--color-dark);
 }
+
+label,
+legend {
+  font-weight: bold;
+  display: block;
+}
+
+label {
+  margin-bottom: var(--size-s);
+}
+
+input[type="text"] {
+  display: inline-block;
+  width: 100%;
+}

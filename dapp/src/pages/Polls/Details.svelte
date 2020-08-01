@@ -1,16 +1,21 @@
 <script>
+  import DateTime from 'src/components/DateTime.svelte';
   import { wallet } from 'src/state/eth';
-  import { currentPollId, currentPoll as poll } from 'src/state/dao/poll';
+  import { currentPollId, refresh, currentPoll as poll } from 'src/state/dao/poll';
   import { location } from 'svelte-spa-router';
   import Loading from "src/components/Loading.svelte";
+  export let params = null;
+
+  let vote = null;
+  let state = "idle";
+
+  $currentPollId = params.id;
 
   $: {
-    $currentPollId = $location.split("/").pop();
-    console.log($currentPollId);
+    if ($poll && $poll.hasVotedFor) {
+      vote = $poll.hasVotedFor;
+    }
   }
-
-  let vote;
-  let state = "idle";
 
   async function handleSubmit() {
     state = "submit";
@@ -19,10 +24,49 @@
     } catch(e) {
       console.error(e);
     }
-    let state = "idle";
+    state = "idle";
+    $refresh = Date.now();
   }
 
 </script>
+
+<style>
+  label {
+    padding: var(--size-xs) var(--size-s);
+    border: 2px solid transparent;
+  }
+
+  input {
+    width: var(--size-s);
+    height: var(--size-s);
+    vertical-align: bottom;
+  }
+
+  label.active {
+    border: 2px solid black;
+  }
+
+  fieldset {
+    background-color: white;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  li p {
+    margin: 0;
+  }
+
+  .question {
+    font-size: 1.5rem;
+  }
+
+  .details p {
+    margin: 0;
+  }
+
+</style>
 
 {#if state !== "idle"}
   <Loading>
@@ -32,20 +76,67 @@
 {/if}
 
 {#if $poll}
+  {#if $poll.open}
+    <a href="#/polls/open">Go to open polls</a>
+  {:else}
+    <a href="#/polls/closed">Go to closed polls</a>
+  {/if}
 
   <h1>{$poll.title}</h1>
-  <p><em>Voting closes on {$poll.end}</em></p>
-  <p>{$poll.question}</p>
-  <form on:submit|preventDefault={handleSubmit}>
-    <fieldset>
-      <legend>Make your choice</legend>
-      {#each $poll.choices as choice, i}
-        <label><input type="radio" bind:group={vote} value={i} />{choice}</label>
-      {/each}
-    </fieldset>
-    <button>Vote!</button>
-  </form>
+  {#if $poll.open}
+    <div class="details">
+      <p>
+        <strong>{$poll.totalVotesPerc}%</strong> of the DAO voted on this poll.
+        {#if $poll.quorumReached}
+          <strong>Quorum has been reached</strong>.
+        {:else}
+          <strong>{$poll.toQuorum}%</strong> more votes are needed for a quorum.
+        {/if}
+      </p>
+      <p><em>Voting closes on <DateTime date={$poll.end} countdown={true} /></em></p>
+    </div>
+  {:else}
+    <div class="details">
+      <p>
+        <strong>{$poll.totalVotesPerc}%</strong> of the DAO voted on this poll.
+        {#if $poll.quorumReached}
+          <strong>Quorum has been reached</strong>.
+        {:else}
+          <strong>Quorum has not been reached</strong>.
+        {/if}
+      </p>
+      <p><em>Voting ended on <DateTime date={$poll.end} /></em></p>
+    </div>
+  {/if}
 
-{:else}
-  loading...
+  <p class="question">{$poll.question}</p>
+  {#if $poll.hasVotedFor === null && $poll.open}
+    <form on:submit|preventDefault={handleSubmit}>
+      <fieldset disabled={$poll.hasVotedFor}>
+        <legend>Make your choice</legend>
+        {#each $poll.choices as choice, i}
+          <label class:active={vote===i}>
+            <input type="radio" bind:group={vote} value={i} />
+            {choice}
+          </label>
+        {/each}
+        <button disabled={vote===null}>Vote!</button>
+      </fieldset>
+    </form>
+  {:else}
+    <ol>
+      {#each $poll.choices as choice, i}
+        <li>
+          <p><strong>{choice}</strong></p>
+          <p>
+            Votes: {$poll.votesPerc[i]}%
+            {#if $poll.hasVotedFor === i}
+              (You voted for this)
+            {/if}
+          </p>
+        </li>
+      {/each}
+    </ol>
+  {/if}
+
 {/if}

@@ -1,7 +1,8 @@
 :root {
-  --size-s: 2em;
-  --size-m: 4em;
-  --size-l: 8em;
+  --size-xs: 1rem;
+  --size-s: 2rem;
+  --size-m: 4rem;
+  --size-l: 8rem;
 
   --color-light: beige;
   --color-dark: #424456;

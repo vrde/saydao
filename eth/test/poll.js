@@ -75,6 +75,10 @@ describe("SayDAO Poll", async () => {
 
     // Bob tries to vote again but it doesn't work
     await assert.rejects(bob.contracts.SayDAO.vote(0, 1));
+    await assert.rejects(bob.contracts.SayDAO.vote(0, 2));
+
+    assert.equal(await bob.contracts.SayDAO.hasVotedFor(0, 1), 1);
+    assert.equal(await carol.contracts.SayDAO.hasVotedFor(0, 2), 0);
 
     const pollAfterVote = await alice.contracts.SayDAO.polls(0);
 

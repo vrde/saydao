@@ -116,16 +116,21 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     return polls.length - 1;
   }
 
-  function hasVoted(uint pollId, uint16 memberId) view public returns(bool) {
+  function hasVotedFor(uint pollId, uint16 memberId) view public returns(uint8) {
     // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
-    uint bitmap = pollToVoters[pollId][uint8(memberId / 256)];
-    return (bitmap & (1 << (memberId % 256))) > 0;
+    for (uint8 i = 0; i < 8; i++) {
+      uint bitmap = pollToVoters[uint(keccak256(abi.encodePacked(pollId, i)))][uint8(memberId / 256)];
+      if((bitmap & (1 << (memberId % 256))) > 0) {
+        return i;
+      }
+    }
+    return 255;
   }
 
   function vote(uint pollId, uint8 option) public {
     uint16 memberId = addressToMember[_msgSender()];
     require(memberId != 0, "Sender is not a member");
-    require(!hasVoted(pollId, memberId), "Member voted already");
+    require(hasVotedFor(pollId, memberId) == 255, "Member voted already");
 
     // Load the poll
     Poll storage poll = polls[pollId];
@@ -146,7 +151,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     pollToVotes[pollId][option] += token.balanceOf(_msgSender());
 
     // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
-    pollToVoters[pollId][uint8(memberId / 256)] |= 1 << (memberId % 256);
+    pollToVoters[uint(keccak256(abi.encodePacked(pollId, option)))][uint8(memberId / 256)] |= 1 << (memberId % 256);
   }
 
   function getVotes(uint pollId) view public returns(uint[8] memory result) {

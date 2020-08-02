@@ -3,12 +3,12 @@
   import Loading from "src/components/Loading.svelte";
   import baseX from "base-x";
   import { push } from 'svelte-spa-router'
+  import CONFIG from "src/config";
 
   const bs58 = baseX("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
 
   // FIXME: should not use an object from window
-  //const ipfs = IpfsHttpClient("https://ipfs.infura.io:5001");
-  const ipfs = IpfsHttpClient("http://localhost:5001");
+  const ipfs = IpfsHttpClient(CONFIG.ipfsEndpoint);
 
   let title = "";
   let question = "";

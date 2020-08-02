@@ -3,8 +3,8 @@ import { get } from "svelte/store";
 
 import etherea from "etherea";
 
-import contracts from "../contracts/contracts.json";
-import CONFIG from "../config";
+import contracts from "src/contracts/contracts.json";
+import CONFIG from "src/config";
 import db from "./db";
 import { clock } from "./clock";
 

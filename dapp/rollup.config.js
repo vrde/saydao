@@ -45,7 +45,7 @@ function setAlias() {
   });
 }
 
-function getWalletOptions(production) {
+function getConfig(production) {
   let gsn = {};
   let walletOptions = {};
 
@@ -77,10 +77,14 @@ function getWalletOptions(production) {
   }
 
   walletOptions.gsn = gsn;
+  const ipfsEndpoint = production
+    ? "https://ipfs.infura.io:5001"
+    : "http://localhost:5001";
 
   return {
     production,
     date: new Date(),
+    ipfsEndpoint,
     walletOptions
   };
 }
@@ -100,7 +104,7 @@ export default {
   },
   plugins: [
     replace({
-      __buildEnv__: JSON.stringify(getWalletOptions(PRODUCTION))
+      __buildEnv__: JSON.stringify(getConfig(PRODUCTION))
     }),
     copy({
       targets: [

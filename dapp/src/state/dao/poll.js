@@ -5,14 +5,14 @@ import { wallet } from "src/state/eth";
 import { Buffer } from "buffer";
 import { memberId } from "./";
 import ehterea from "etherea";
+import CONFIG from "src/config";
 
 const bs58 = baseX(
   "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 );
 
 // FIXME: should not use an object from window
-//const ipfs = IpfsHttpClient("https://ipfs.infura.io:5001");
-const ipfs = IpfsHttpClient("http://localhost:5001");
+const ipfs = IpfsHttpClient(CONFIG.ipfsEndpoint);
 
 async function getPollFromIpfs(cid) {
   const realCid = bs58.encode(Buffer.from("1220" + cid.substr(2), "hex"));

@@ -105,6 +105,12 @@ export const currentPoll = derived(
           .div(supply)
           .toNumber() / 100;
 
+    // How many tokens the member had when the poll was created?
+    const tokensAvailableToVote = await $wallet.contracts.SayToken.balanceOfAt(
+      $wallet.address,
+      poll.snapshot
+    );
+
     content.id = $currentPollId;
     content.end = utcTimestampToDate(poll.end.toNumber());
     content.open = now < content.end;
@@ -113,6 +119,9 @@ export const currentPoll = derived(
     content.totalVotesPerc = totalVotesPerc;
     content.quorumReached = totalVotesPerc >= 33;
     content.toQuorum = 33 - totalVotesPerc;
+    content.hasTokens = tokensAvailableToVote.isZero()
+      ? null
+      : tokensAvailableToVote.toString();
 
     console.log("content", content);
     set(content);

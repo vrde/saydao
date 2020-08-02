@@ -80,8 +80,12 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     uint cid;
     // When does the poll ends, UNIX timestamp.
     uint end;
-    // Total amount of token supply.
+    // Total amount of token supply at the time.
+    // This is redundand and can be extracted from the
+    // token snapshot.
     uint supply;
+    // Snapshot id
+    uint snapshot;
     // Number of options.
     uint8 options;
     // Number of voters.
@@ -102,10 +106,15 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     require(options > 1, "Poll must have at least 2 options");
     require(options <= 8, "Poll must have less than 9 options");
 
+    SayToken token = SayToken(tokenAddress);
+    // Take a snapshot of the ERC20 token distribution.
+    uint snapshot = token.snapshot();
+
     Poll memory poll = Poll(
       cid,
       block.timestamp + secondsAfter,
-      0,
+      token.totalSupply(),
+      snapshot,
       options,
       0);
     polls.push(poll);
@@ -135,20 +144,18 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     // Load the poll
     Poll storage poll = polls[pollId];
 
-    require(poll.cid != 0, "Poll doesn't exist");
-    require(poll.end > block.timestamp, "Poll is closed");
-    require(option < poll.options, "Invalid option");
-
     // Load token contract
     SayToken token = SayToken(tokenAddress);
 
-    poll.supply = token.totalSupply();
+    require(poll.cid != 0, "Poll doesn't exist");
+    require(poll.end > block.timestamp, "Poll is closed");
+    require(option < poll.options, "Invalid option");
+    require(token.balanceOfAt(_msgSender(), poll.snapshot) > 0, "Member has no tokens");
+
     poll.voters++;
-    //polls[pollId].supply = token.totalSupply();
-    //polls[pollId].voters++;
 
     // FIXME: add "SafeMath"
-    pollToVotes[pollId][option] += token.balanceOf(_msgSender());
+    pollToVotes[pollId][option] += token.balanceOfAt(_msgSender(), poll.snapshot);
 
     // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
     pollToVoters[uint(keccak256(abi.encodePacked(pollId, option)))][uint8(memberId / 256)] |= 1 << (memberId % 256);

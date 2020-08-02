@@ -1,14 +1,16 @@
 pragma solidity ^0.6.0;
 
 import "./ERC20.sol";
+import "./ERC20Snapshot.sol";
 import "./SayDAO.sol";
 
-contract SayToken is ERC20 {
+contract SayToken is ERC20Snapshot {
 
   address public daoAddress;
 
   constructor(address a) public ERC20("SayToken", "SAY") {
     daoAddress = a;
+    //_snapshot();
   }
 
   // ## ERC-20 methods override
@@ -27,8 +29,36 @@ contract SayToken is ERC20 {
     returns (uint256) {
       SayDAO dao = SayDAO(daoAddress);
       uint16 member = dao.addressToMember(account);
+      //require(member != 0, "Account is not a member");
       return super.balanceOf(address(member));
   }
+
+  function balanceOfMember(address member)
+    public
+    view
+    override
+    returns (uint256) {
+      return super.balanceOf(member);
+  }
+
+  function balanceOfAt(address account, uint256 snapshotId) public view override returns (uint256) {
+    SayDAO dao = SayDAO(daoAddress);
+    uint16 member = dao.addressToMember(account);
+    return super.balanceOfAt(address(member), snapshotId);
+  }
+
+  function snapshot() public returns (uint256) {
+    require(daoAddress == _msgSender(), "Only the DAO can create snapshots");
+    return _snapshot();
+  }
+
+
+  /*
+  function mint2(address account, uint256 amount) public {
+    _mint(account, amount);
+  }
+  */
+
 
   function mint(uint16 member, uint256 amount) public {
     require(daoAddress == _msgSender(), "Only the DAO can mint new tokens");

@@ -110,7 +110,7 @@
   {/if}
 
   <p class="question">{$poll.question}</p>
-  {#if $poll.hasVotedFor === null && $poll.open}
+  {#if $poll.hasVotedFor === null && $poll.open && $poll.hasTokens}
     <form on:submit|preventDefault={handleSubmit}>
       <fieldset disabled={$poll.hasVotedFor}>
         <legend>Make your choice</legend>
@@ -137,6 +137,9 @@
         </li>
       {/each}
     </ol>
+    {#if $poll.open && $poll.hasTokens === null}
+    <p><strong>Note:</strong> you cannot vote on this poll because you joined the DAO after the poll was created.</p>
+    {/if}
   {/if}
 
 {/if}

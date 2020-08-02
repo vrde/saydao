@@ -110,6 +110,13 @@
   {/if}
 
   <p class="question">{$poll.question}</p>
+
+  <p>
+    The event will happen between
+    <DateTime date={$poll.meetingStart} />
+    and
+    <DateTime date={$poll.meetingEnd} />.
+  </p>
   {#if $poll.hasVotedFor === null && $poll.open && $poll.hasTokens}
     <form on:submit|preventDefault={handleSubmit}>
       <fieldset disabled={$poll.hasVotedFor}>

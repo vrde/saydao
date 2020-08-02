@@ -10,10 +10,12 @@ import "@opengsn/gsn/contracts/BaseRelayRecipient.sol";
 import "./SayToken.sol";
 
 contract SayDAO is BaseRelayRecipient, AccessControl {
+
   bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
+  uint public constant PAGE_SIZE = 32;
+  uint public constant NULL = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
   address public tokenAddress;
-  uint constant PAGE_SIZE = 32;
 
   // ## Members
   //
@@ -86,13 +88,23 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     uint supply;
     // Snapshot id
     uint snapshot;
+    // If the poll is for an meeting, link to the meetingId
+    uint meetingId;
     // Number of options.
     uint8 options;
     // Number of voters.
     uint16 voters;
   }
 
+  struct Meeting {
+    uint start;
+    uint end;
+    uint pollId;
+  }
+
   Poll[] public polls;
+  Meeting[] public meetings;
+
   mapping(uint => uint[]) public pollToVotes;
 
   // A poll is connected to a bitmap of voters.
@@ -115,6 +127,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
       block.timestamp + secondsAfter,
       token.totalSupply(),
       snapshot,
+      NULL,
       options,
       0);
     polls.push(poll);
@@ -122,6 +135,42 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     for (uint8 i = 0; i < options; i++) {
       pollToVotes[polls.length - 1].push(0);
     }
+    return polls.length - 1;
+  }
+
+  function createMeetingPoll(uint cid, uint secondsAfter, uint start, uint end) public returns(uint){
+    require(addressToMember[_msgSender()] != 0, "Sender is not a member");
+    // One week
+    require(secondsAfter >= 604800, "Poll too short");
+    require(start >= block.timestamp + secondsAfter, "Meeting must start after the poll ends");
+    require(start < end, "Meeting must have a positive duration");
+
+    SayToken token = SayToken(tokenAddress);
+    // Take a snapshot of the ERC20 token distribution.
+    uint snapshot = token.snapshot();
+
+    Poll memory poll = Poll(
+      cid,
+      block.timestamp + secondsAfter,
+      token.totalSupply(),
+      snapshot,
+      meetings.length,
+      2,
+      0);
+
+    Meeting memory meeting = Meeting(
+      start,
+      end,
+      polls.length
+    );
+
+    polls.push(poll);
+    meetings.push(meeting);
+
+    // Push two options, first one for yes, second one for no.
+    pollToVotes[polls.length - 1].push(0);
+    pollToVotes[polls.length - 1].push(0);
+
     return polls.length - 1;
   }
 

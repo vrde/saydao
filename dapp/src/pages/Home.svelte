@@ -103,7 +103,7 @@
         <a href="#/polls/create">Create a Poll</a>: Open a poll for voting by the community.
       </li>
       <li>
-        <a href="#/polls/create">Create an Event</a>: Propose an event for the community.
+        <a href="#/polls/create-event">Create an Event</a>: Propose an event for the community.
       </li>
     </ul>
   </div>

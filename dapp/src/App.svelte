@@ -15,6 +15,7 @@
   import PollsOpen from "./pages/Polls/Open.svelte";
   import PollsClosed from "./pages/Polls/Closed.svelte";
   import PollsCreate from "./pages/Polls/Create.svelte";
+  import PollsCreateMeeting from "./pages/Polls/CreateMeeting.svelte";
   import PollsDetails from "./pages/Polls/Details.svelte";
   import Docs from "./pages/Docs.svelte";
   import NotFound from "./pages/NotFound.svelte";
@@ -33,6 +34,7 @@
     "/polls/open": PollsOpen,
     "/polls/closed": PollsClosed,
     "/polls/create": PollsCreate,
+    "/polls/create-event": PollsCreateMeeting,
     "/polls/details/:id": PollsDetails,
     "/docs/:name": Docs,
     "*": NotFound

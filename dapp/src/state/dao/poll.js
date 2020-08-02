@@ -7,6 +7,10 @@ import { memberId } from "./";
 import ehterea from "etherea";
 import CONFIG from "src/config";
 
+const NULL = etherea.BigNumber.from(
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+);
+
 const bs58 = baseX(
   "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 );
@@ -79,10 +83,20 @@ export const currentPoll = derived(
     const now = new Date();
     const poll = await $wallet.contracts.SayDAO.polls($currentPollId);
     const content = await getPollFromIpfs(poll.cid.toHexString());
+    if (!content.choices) {
+      content.choices = ["Yes", "No"];
+    }
     const hasVotedFor = await $wallet.contracts.SayDAO.hasVotedFor(
       $currentPollId,
       $memberId
     );
+
+    if (!poll.meetingId.eq(NULL)) {
+      const meeting = await $wallet.contracts.SayDAO.meetings(poll.meetingId);
+      content.isMeeting = true;
+      content.meetingStart = new Date(meeting.start.toNumber() * 1000);
+      content.meetingEnd = new Date(meeting.end.toNumber() * 1000);
+    }
 
     const supply = poll.supply;
     const votes = await $wallet.contracts.SayDAO.getVotes($currentPollId);

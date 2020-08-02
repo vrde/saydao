@@ -112,65 +112,6 @@ describe("SayDAO Poll", async () => {
     await bob.contracts.SayDAO.vote(1, 0);
     await carol.contracts.SayDAO.vote(1, 0);
     await erin.contracts.SayDAO.vote(1, 0);
-
-    //await add(alice, erin, 42);
-    /*
-    await alice.contracts.SayToken.snapshot();
-    await alice.contracts.SayToken.mint2(erin.address, "1");
-    await alice.contracts.SayToken.snapshot();
-    await alice.contracts.SayToken.mint2(erin.address, "2");
-    await alice.contracts.SayToken.snapshot();
-    await alice.contracts.SayToken.mint2(erin.address, "3");
-    await alice.contracts.SayToken.snapshot();
-    await alice.contracts.SayToken.mint2(bob.address, "3");
-    await alice.contracts.SayToken.snapshot();
-    // Since Erin has been added after the poll was created, she is not allowed
-    // to vote.
-    console.log(
-      "Erin's tokens",
-      (await erin.contracts.SayToken.balanceOfAt(erin.address, 1)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(erin.address, 2)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(erin.address, 3)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(erin.address, 4)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(erin.address, 5)).toString(),
-      "\nBob's tokens ",
-      (await erin.contracts.SayToken.balanceOfAt(bob.address, 1)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(bob.address, 2)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(bob.address, 3)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(bob.address, 4)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(bob.address, 5)).toString()
-    );
-
-    b = "0x0000000000000000000000000000000000000010";
-    e = "0x0000000000000000000000000000000000000020";
-    await add(alice, bob, "0x10");
-    await alice.contracts.SayToken.snapshot();
-    await alice.contracts.SayToken.mint2(b, "1");
-    await alice.contracts.SayToken.snapshot();
-    await alice.contracts.SayToken.mint2(b, "2");
-    await alice.contracts.SayToken.snapshot();
-    await alice.contracts.SayToken.mint2(b, "3");
-    await add(alice, erin, "0x20");
-    await alice.contracts.SayToken.snapshot();
-    await alice.contracts.SayToken.mint2(e, "3");
-    await alice.contracts.SayToken.snapshot();
-    // Since Erin has been added after the poll was created, she is not allowed
-    // to vote.
-    console.log(
-      "Erin's tokens",
-      (await erin.contracts.SayToken.balanceOfAt(e, 1)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(e, 2)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(e, 3)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(e, 4)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(e, 5)).toString(),
-      "\nBob's tokens ",
-      (await erin.contracts.SayToken.balanceOfAt(b, 1)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(b, 2)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(b, 3)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(b, 4)).toString(),
-      (await erin.contracts.SayToken.balanceOfAt(b, 5)).toString()
-    );
-    */
   });
 
   it("doesn't allow a non member to create a poll", async () => {

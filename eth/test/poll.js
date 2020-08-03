@@ -92,7 +92,7 @@ describe("SayDAO Poll", async () => {
 
     assert.equal(pollAfterVote.cid.toHexString(), cid);
     assert.equal(pollAfterVote.options, options);
-    assert.equal(pollAfterVote.voters, 2);
+    assert.equal(pollAfterVote.tokenStaked, 200);
     assert(
       pollAfterVote.supply.eq(await alice.contracts.SayToken.totalSupply())
     );

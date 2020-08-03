@@ -114,11 +114,86 @@ describe("SayDAO Meeting Poll", async () => {
     await carol.contracts.SayDAO.vote(0, 1);
   });
 
+  it("should invalidate meeting proposals without quorum", async () => {
+    const cid =
+      "0x5f9921586542097d33e99dabc8ef759b122f20b9a77ead6a86f70e9b0af20f05";
+    const secondsAfter = ONE_WEEK;
+    const start = now() + ONE_MONTH;
+    const end = start + ONE_DAY;
+    await bob.contracts.SayDAO.createMeetingPoll(
+      cid,
+      secondsAfter,
+      start,
+      end,
+      // Alice is the supervisor
+      1
+    );
+
+    // Alice vote "yes" but that's not enough to reach the quorum
+    await alice.contracts.SayDAO.vote(0, 0);
+
+    // Let's do the time warp again
+    increaseTime(end + ONE_DAY);
+
+    // alice
+    const participantsBitmap = createBitmaps([1]);
+
+    // Now the supervisor can update the participants
+    for (const clusterId of Object.keys(participantsBitmap)) {
+      await assert.rejects(
+        alice.contracts.SayDAO.updateMeetingParticipants(
+          0,
+          clusterId,
+          participantsBitmap[clusterId]
+        )
+      );
+    }
+  });
+
+  it("should invalidate meeting proposals without a 'yes' majority", async () => {
+    const cid =
+      "0x5f9921586542097d33e99dabc8ef759b122f20b9a77ead6a86f70e9b0af20f05";
+    const secondsAfter = ONE_WEEK;
+    const start = now() + ONE_MONTH;
+    const end = start + ONE_DAY;
+    await bob.contracts.SayDAO.createMeetingPoll(
+      cid,
+      secondsAfter,
+      start,
+      end,
+      // Alice is the supervisor
+      1
+    );
+
+    await alice.contracts.SayDAO.vote(0, 1);
+    await bob.contracts.SayDAO.vote(0, 1);
+    await carol.contracts.SayDAO.vote(0, 1);
+    await dan.contracts.SayDAO.vote(0, 0);
+    await erin.contracts.SayDAO.vote(0, 0);
+
+    // Let's do the time warp again
+    increaseTime(end + ONE_DAY);
+
+    // alice
+    const participantsBitmap = createBitmaps([1]);
+
+    // Now the supervisor can update the participants
+    for (const clusterId of Object.keys(participantsBitmap)) {
+      await assert.rejects(
+        alice.contracts.SayDAO.updateMeetingParticipants(
+          0,
+          clusterId,
+          participantsBitmap[clusterId]
+        )
+      );
+    }
+  });
+
   it("allows the supervisor to create a participant list", async () => {
     const balanceOf = async (account) =>
       (await alice.contracts.SayToken.balanceOf(account))
         .div(etherea.BigNumber.from(10).pow(18))
-        .toString();
+        .toNumber();
     const cid =
       "0x5f9921586542097d33e99dabc8ef759b122f20b9a77ead6a86f70e9b0af20f05";
     const secondsAfter = ONE_WEEK;
@@ -134,10 +209,10 @@ describe("SayDAO Meeting Poll", async () => {
       1
     );
 
-    // Alice, Bob and Carol vote "yes"
-    await alice.contracts.SayDAO.vote(0, 1);
-    await bob.contracts.SayDAO.vote(0, 1);
-    await carol.contracts.SayDAO.vote(0, 1);
+    // Alice, Bob and Carol vote "no"
+    await alice.contracts.SayDAO.vote(0, 0);
+    await bob.contracts.SayDAO.vote(0, 0);
+    await carol.contracts.SayDAO.vote(0, 0);
 
     // Let's do the time warp again
     increaseTime(end + ONE_DAY);
@@ -161,20 +236,25 @@ describe("SayDAO Meeting Poll", async () => {
     await alice.contracts.SayDAO.sealMeetingParticipants(0);
 
     console.log("before");
-    console.log(await balanceOf(alice.address));
-    console.log(await balanceOf(bob.address));
-    console.log(await balanceOf(carol.address));
-    console.log(await balanceOf(dan.address));
-    console.log(await balanceOf(erin.address));
+
+    assert.equal(await balanceOf(alice.address), 100);
+    assert.equal(await balanceOf(bob.address), 100);
+    assert.equal(await balanceOf(carol.address), 100);
+    assert.equal(await balanceOf(dan.address), 100);
+    assert.equal(await balanceOf(erin.address), 100);
 
     console.log(
       "Distribution bitmap",
       toBinary(await alice.contracts.SayDAO.getNextDistributionBitmap(0))
     );
 
-    // Alice starts distributing the tokens for event 0
-    await alice.contracts.SayDAO.distributeMeetingTokens(0, 128);
+    // Alice starts distributing the tokens for event 0 in batches of 32.
+    // Distribution starts from the end, and we have only Erin in the last
+    // batch. Given that all tokens for that batch are distributed,
+    // the batch is destroyed.
+    await alice.contracts.SayDAO.distributeMeetingTokens(0, 32);
 
+    // We have one cluster left
     assert.equal(
       (
         await alice.contracts.SayDAO.getRemainingDistributionClusters(0)
@@ -182,19 +262,26 @@ describe("SayDAO Meeting Poll", async () => {
       1
     );
 
+    assert.equal(await balanceOf(alice.address), 100);
+    assert.equal(await balanceOf(bob.address), 100);
+    assert.equal(await balanceOf(carol.address), 100);
+    assert.equal(await balanceOf(dan.address), 100);
+    // We processed the last cluster that contained Erin's participation
+    assert.equal(await balanceOf(erin.address), 300);
+
     console.log(
       "Distribution bitmap",
       toBinary(await alice.contracts.SayDAO.getNextDistributionBitmap(0))
     );
 
-    await alice.contracts.SayDAO.distributeMeetingTokens(0, 128);
+    // Alice goes for the second round.
+    await alice.contracts.SayDAO.distributeMeetingTokens(0, 32);
 
-    console.log("after");
-    console.log(await balanceOf(alice.address));
-    console.log(await balanceOf(bob.address));
-    console.log(await balanceOf(carol.address));
-    console.log(await balanceOf(dan.address));
-    console.log(await balanceOf(erin.address));
+    assert.equal(await balanceOf(alice.address), 300);
+    assert.equal(await balanceOf(bob.address), 300);
+    assert.equal(await balanceOf(carol.address), 100);
+    assert.equal(await balanceOf(dan.address), 300);
+    assert.equal(await balanceOf(erin.address), 300);
 
     assert.equal(
       (

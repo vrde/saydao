@@ -85,15 +85,15 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     // Total amount of token supply at the time.
     // This is redundand and can be extracted from the
     // token snapshot.
-    uint supply;
+    uint tokenSupply;
+    // Total token staked.
+    uint tokenStaked;
     // Snapshot id
     uint snapshot;
     // If the poll is for an meeting, link to the meetingId
     uint meetingId;
     // Number of options.
     uint8 options;
-    // Number of voters.
-    uint16 voters;
   }
 
   Poll[] public polls;
@@ -119,10 +119,10 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
       cid,
       block.timestamp + secondsAfter,
       token.totalSupply(),
+      0,
       snapshot,
       NULL,
-      options,
-      0);
+      options);
     polls.push(poll);
 
     for (uint8 i = 0; i < options; i++) {
@@ -158,10 +158,11 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     require(option < poll.options, "Invalid option");
     require(token.balanceOfAt(_msgSender(), poll.snapshot) > 0, "Member has no tokens");
 
-    poll.voters++;
+    uint stake = token.balanceOfAt(_msgSender(), poll.snapshot);
 
     // FIXME: add "SafeMath"
-    pollToVotes[pollId][option] += token.balanceOfAt(_msgSender(), poll.snapshot);
+    poll.tokenStaked += stake;
+    pollToVotes[pollId][option] += stake;
 
     // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
     pollToVoters[uint(keccak256(abi.encodePacked(pollId, option)))][uint8(memberId / 256)] |= 1 << (memberId % 256);
@@ -219,10 +220,10 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
       cid,
       block.timestamp + secondsAfter,
       token.totalSupply(),
+      0,
       snapshot,
       meetings.length,
-      2,
-      0);
+      2);
 
     Meeting memory meeting = Meeting(
       polls.length,
@@ -243,12 +244,25 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     return polls.length - 1;
   }
 
+  function isMeetingValid(uint meetingId) public view returns (bool) {
+    Meeting memory meeting = meetings[meetingId];
+    Poll memory poll = polls[meeting.pollId];
+
+    return
+      // Did the poll reached quorum?
+      (poll.tokenStaked / (poll.tokenSupply / 100) >= 33) &&
+      // Did the majority voted "yes"?
+      (pollToVotes[meeting.pollId][0] > pollToVotes[meeting.pollId][1]);
+  }
+
+
   function updateMeetingParticipants(uint meetingId, uint8 cluster, uint bitmap) public {
     require(meetingId < meetings.length, "Meeting doesn't exist");
     Meeting storage meeting = meetings[meetingId];
     require(addressToMember[_msgSender()] == meeting.supervisor, "Only supervisor can set participants");
     require(meeting.end < block.timestamp, "Meeting is not finished");
     require(!meeting.done, "Meeting is done already");
+    require(isMeetingValid(meetingId), "Meeting is not valid");
 
     // Iterate over bitmap to check if they are all members
     uint8 currentParticipants;

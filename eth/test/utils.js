@@ -11,7 +11,6 @@ function createBitmaps(list) {
   for (const element of list) {
     const cluster = Math.floor(element / 256);
     const index = element % 256;
-    console.log("bitmap", cluster, index);
     bitmaps[cluster] = (bitmaps[cluster] || ZERO).or(ONE.shl(index));
   }
   return bitmaps;

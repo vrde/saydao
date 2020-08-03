@@ -346,39 +346,6 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     }
   }
 
-  function distributeMeetingTokens2(uint meetingId, uint8 cluster) public {
-    require(meetingId < meetings.length, "Meeting doesn't exist");
-    Meeting storage meeting = meetings[meetingId];
-    require(meeting.done, "Meeting must be done before distributing tokens");
-
-    // Upper bound is 256, because we can have up to 256 clusters (but that's very unlikely).
-    uint index;
-    while (
-        index < meetingToClusters[meetingId].length &&
-        meetingToClusters[meetingId][index] != cluster) {
-      index++;
-    }
-
-    require(index < meetingToClusters[meetingId].length, "Cluster doesn't exist");
-
-    SayToken token = SayToken(tokenAddress);
-    uint bitmap = meetingToParticipants[meetingId][index];
-
-    for (uint i = 0; i < 256; i++) {
-      if ((bitmap & (1 << i)) > 0) {
-        uint16 memberId = uint16(cluster * 256 + i);
-        // distribute tokens to memberId
-        token.mint(memberId, 200e18);
-        bitmap &= NULL ^ (1 << i);
-      }
-    }
-
-    // Free some space in the blockchain.
-    meetingToClusters[meetingId][index] = meetingToClusters[meetingId][meetingToClusters[meetingId].length - 1];
-    meetingToClusters[meetingId].pop();
-    delete meetingToParticipants[meetingId][index];
-  }
-
   function countBits(uint bitmap) public pure returns(uint8 total) {
     for (uint i = 0; i < 256; i++) {
       if ((bitmap & (1 << i)) > 0) {
@@ -392,8 +359,5 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
   function setTokenAddress(address a) public {
     tokenAddress = a;
   }
-
-  //function distributeTokens(uint eventId, uint8 cluster, uint bitmap) public {
-  //}
 
 }

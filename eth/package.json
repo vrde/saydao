@@ -9,8 +9,8 @@
   "scripts": {
     "blockchain": "node run-truffle-and-gsn",
     "deploy": "node deploy ../dapp/src/contracts",
-    "test:watch": "mocha -w",
-    "test": "mocha"
+    "test:watch": "mocha -w --timeout=10000",
+    "test": "mocha --timeout=10000"
   },
   "author": "",
   "license": "ISC",

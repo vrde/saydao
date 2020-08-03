@@ -67,7 +67,7 @@ describe("SayDAO Poll", async () => {
     //console.log(poll);
     assert.equal(poll.cid.toHexString(), cid);
     assert.equal(poll.options, options);
-    assert.equal(poll.voters, 0);
+    assert(poll.tokenStaked.isZero());
     assert(poll.snapshot.eq(1));
 
     // Now Bob and Carol vote, yay!
@@ -92,9 +92,10 @@ describe("SayDAO Poll", async () => {
 
     assert.equal(pollAfterVote.cid.toHexString(), cid);
     assert.equal(pollAfterVote.options, options);
-    assert.equal(pollAfterVote.tokenStaked, 200);
-    assert(
-      pollAfterVote.supply.eq(await alice.contracts.SayToken.totalSupply())
+    assert.equal(pollAfterVote.tokenStaked.toString(), "200000000000000000000");
+    assert.equal(
+      pollAfterVote.tokenSupply.toString(),
+      (await alice.contracts.SayToken.totalSupply()).toString()
     );
     // should get last block timestamp and do the math
     //assert.equal(poll.end.toNumber(), ???);

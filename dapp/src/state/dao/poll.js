@@ -94,6 +94,7 @@ export const currentPoll = derived(
     if (!poll.meetingId.eq(NULL)) {
       const meeting = await $wallet.contracts.SayDAO.meetings(poll.meetingId);
       content.isMeeting = true;
+      content.supervisor = meeting.supervisor;
       content.meetingStart = new Date(meeting.start.toNumber() * 1000);
       content.meetingEnd = new Date(meeting.end.toNumber() * 1000);
     }

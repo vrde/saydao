@@ -96,14 +96,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     uint16 voters;
   }
 
-  struct Meeting {
-    uint start;
-    uint end;
-    uint pollId;
-  }
-
   Poll[] public polls;
-  Meeting[] public meetings;
 
   mapping(uint => uint[]) public pollToVotes;
 
@@ -135,42 +128,6 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     for (uint8 i = 0; i < options; i++) {
       pollToVotes[polls.length - 1].push(0);
     }
-    return polls.length - 1;
-  }
-
-  function createMeetingPoll(uint cid, uint secondsAfter, uint start, uint end) public returns(uint){
-    require(addressToMember[_msgSender()] != 0, "Sender is not a member");
-    // One week
-    require(secondsAfter >= 604800, "Poll too short");
-    require(start >= block.timestamp + secondsAfter, "Meeting must start after the poll ends");
-    require(start < end, "Meeting must have a positive duration");
-
-    SayToken token = SayToken(tokenAddress);
-    // Take a snapshot of the ERC20 token distribution.
-    uint snapshot = token.snapshot();
-
-    Poll memory poll = Poll(
-      cid,
-      block.timestamp + secondsAfter,
-      token.totalSupply(),
-      snapshot,
-      meetings.length,
-      2,
-      0);
-
-    Meeting memory meeting = Meeting(
-      start,
-      end,
-      polls.length
-    );
-
-    polls.push(poll);
-    meetings.push(meeting);
-
-    // Push two options, first one for yes, second one for no.
-    pollToVotes[polls.length - 1].push(0);
-    pollToVotes[polls.length - 1].push(0);
-
     return polls.length - 1;
   }
 
@@ -221,10 +178,208 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     return polls.length;
   }
 
+  /**
+   * Meeting methods
+   */
+  struct Meeting {
+    uint pollId;
+    uint start;
+    uint end;
+    uint16 supervisor;
+    uint16 totalParticipants;
+    bool done;
+  }
+
+  Meeting[] public meetings;
+  // The following data structures hold the participants to a given meetingId.
+  // Given that we might have more than 256 participants, we split them into
+  // clusters.
+  // The meetingToClusters array contains the numer of the cluster.
+  // The meetingToParticipants array contains the bitmap.
+  // Let's say member 1, 3, and 514 participate to a meeting, the structures
+  // will look like:
+  // [0, 2]
+  // [b0101, b001]
+  mapping(uint => uint8[]) public meetingToClusters;
+  mapping(uint => uint[]) public meetingToParticipants;
+
+  function createMeetingPoll(uint cid, uint secondsAfter, uint start, uint end, uint16 supervisor) public returns(uint){
+    require(addressToMember[_msgSender()] != 0, "Sender is not a member");
+    // One week
+    require(secondsAfter >= 604800, "Poll too short");
+    require(start >= block.timestamp + secondsAfter, "Meeting must start after the poll ends");
+    require(start < end, "Meeting must have a positive duration");
+    require(memberToAddress[supervisor] != address(0), "Event manager is not a member");
+
+    SayToken token = SayToken(tokenAddress);
+    // Take a snapshot of the ERC20 token distribution.
+    uint snapshot = token.snapshot();
+
+    Poll memory poll = Poll(
+      cid,
+      block.timestamp + secondsAfter,
+      token.totalSupply(),
+      snapshot,
+      meetings.length,
+      2,
+      0);
+
+    Meeting memory meeting = Meeting(
+      polls.length,
+      start,
+      end,
+      supervisor,
+      0,
+      false
+    );
+
+    polls.push(poll);
+    meetings.push(meeting);
+
+    // Push two options, first one for yes, second one for no.
+    pollToVotes[polls.length - 1].push(0);
+    pollToVotes[polls.length - 1].push(0);
+
+    return polls.length - 1;
+  }
+
+  function updateMeetingParticipants(uint meetingId, uint8 cluster, uint bitmap) public {
+    require(meetingId < meetings.length, "Meeting doesn't exist");
+    Meeting storage meeting = meetings[meetingId];
+    require(addressToMember[_msgSender()] == meeting.supervisor, "Only supervisor can set participants");
+    require(meeting.end < block.timestamp, "Meeting is not finished");
+    require(!meeting.done, "Meeting is done already");
+
+    // Iterate over bitmap to check if they are all members
+    uint8 currentParticipants;
+    for (uint i = 0; i < 256; i++) {
+      if ((bitmap & (1 << i)) > 0) {
+        uint16 memberId = uint16(cluster * 256 + i);
+        require(memberToAddress[memberId] != address(0), "Participant is not a member");
+        currentParticipants++;
+      }
+    }
+
+    // Upper bound is 256, because we can have up to 256 clusters (but that's very unlikely).
+    uint index;
+    while (
+        index < meetingToClusters[meetingId].length &&
+        meetingToClusters[meetingId][index] != cluster) {
+      index++;
+    }
+
+    if (index == meetingToClusters[meetingId].length) {
+      meetingToClusters[meetingId].push(cluster);
+      meetingToParticipants[meetingId].push(bitmap);
+      meeting.totalParticipants += currentParticipants;
+    } else {
+      uint8 previousParticipants = countBits(meetingToParticipants[meetingId][cluster]);
+      meeting.totalParticipants = (meeting.totalParticipants - previousParticipants) + currentParticipants;
+      meetingToParticipants[meetingId][index] = bitmap;
+    }
+  }
+
+  function sealMeetingParticipants(uint meetingId) public {
+    require(meetingId < meetings.length, "Meeting doesn't exist");
+    Meeting storage meeting = meetings[meetingId];
+    require(addressToMember[_msgSender()] == meeting.supervisor, "Only supervisor can seal");
+    require(meeting.end < block.timestamp, "Meeting is not finished");
+    meeting.done = true;
+  }
+
+  function getRemainingDistributionClusters(uint meetingId) public view returns(uint) {
+    return meetingToClusters[meetingId].length;
+  }
+
+  function getNextDistributionBitmap(uint meetingId) public view returns(uint) {
+    uint l = meetingToClusters[meetingId].length;
+    return meetingToParticipants[meetingId][l - 1];
+  }
+
+  // This method will run until there are no tokens left to distribute
+  function distributeMeetingTokens(uint meetingId, uint8 bound) public {
+    require(meetingId < meetings.length, "Meeting doesn't exist");
+    Meeting storage meeting = meetings[meetingId];
+    require(meeting.done, "Meeting must be done before distributing tokens");
+    uint clustersLength = meetingToClusters[meetingId].length;
+    require(clustersLength > 0, "All token has been distributed");
+
+    SayToken token = SayToken(tokenAddress);
+
+    // Extract the index of the cluster
+    uint cluster = meetingToClusters[meetingId][clustersLength - 1];
+    // Get the bitmap
+    uint bitmap = meetingToParticipants[meetingId][clustersLength - 1];
+
+    uint i;
+
+    for (i = 0; i < 256 && bound > 0; i++) {
+      if ((bitmap & (1 << i)) > 0) {
+        uint16 memberId = uint16(cluster * 256 + i);
+        // distribute tokens to memberId
+        token.mint(memberId, 200e18);
+        meetingToParticipants[meetingId][clustersLength - 1] &= NULL ^ (1 << i);
+        //bitmap &= NULL ^ (1 << i);
+        bound--;
+      }
+    }
+
+    // If we reach the bottom of the bitmap, we can free some space in the
+    // blockchain.
+    if (i == 256) {
+      meetingToClusters[meetingId].pop();
+      meetingToParticipants[meetingId].pop();
+    }
+  }
+
+  function distributeMeetingTokens2(uint meetingId, uint8 cluster) public {
+    require(meetingId < meetings.length, "Meeting doesn't exist");
+    Meeting storage meeting = meetings[meetingId];
+    require(meeting.done, "Meeting must be done before distributing tokens");
+
+    // Upper bound is 256, because we can have up to 256 clusters (but that's very unlikely).
+    uint index;
+    while (
+        index < meetingToClusters[meetingId].length &&
+        meetingToClusters[meetingId][index] != cluster) {
+      index++;
+    }
+
+    require(index < meetingToClusters[meetingId].length, "Cluster doesn't exist");
+
+    SayToken token = SayToken(tokenAddress);
+    uint bitmap = meetingToParticipants[meetingId][index];
+
+    for (uint i = 0; i < 256; i++) {
+      if ((bitmap & (1 << i)) > 0) {
+        uint16 memberId = uint16(cluster * 256 + i);
+        // distribute tokens to memberId
+        token.mint(memberId, 200e18);
+        bitmap &= NULL ^ (1 << i);
+      }
+    }
+
+    // Free some space in the blockchain.
+    meetingToClusters[meetingId][index] = meetingToClusters[meetingId][meetingToClusters[meetingId].length - 1];
+    meetingToClusters[meetingId].pop();
+    delete meetingToParticipants[meetingId][index];
+  }
+
+  function countBits(uint bitmap) public pure returns(uint8 total) {
+    for (uint i = 0; i < 256; i++) {
+      if ((bitmap & (1 << i)) > 0) {
+        total++;
+      }
+    }
+  }
+
   // ## Token methods
 
   function setTokenAddress(address a) public {
     tokenAddress = a;
   }
+
+  //function distributeTokens(uint eventId, uint8 cluster, uint bitmap) public {
+  //}
 
 }

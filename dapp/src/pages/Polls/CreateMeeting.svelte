@@ -1,4 +1,5 @@
 <script>
+  import { memberList } from "src/state/dao";
   import { wallet } from "src/state/eth";
   import Loading from "src/components/Loading.svelte";
   import baseX from "base-x";
@@ -15,6 +16,7 @@
   let question = "";
   let duration = 60*60*24*7;
   let state = "idle";
+  let supervisor;
 
   let [minStartDate, minStartTime] = splitDate(new Date(Date.now() + ONE_WEEK + ONE_HOUR));
   let [startDate, startTime] = [minStartDate, minStartTime];
@@ -103,6 +105,14 @@ textarea {
     </p>
     <p><strong>Note:</strong> you cannot create events that start sooner than one week.</p>
   </fieldset>
+
+  <label>Who is the supervisor?
+    <select bind:value={supervisor} required>
+      {#each $memberList as member}
+        <option value="{member.memberId}">Member {member.memberId}</option>
+      {/each}
+    </select>
+  </label>
 
   <label>How long should be the poll stay open?
     <select bind:value={duration}>

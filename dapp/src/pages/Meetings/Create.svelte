@@ -18,7 +18,10 @@
   let state = "idle";
   let supervisor;
 
-  let [minStartDate, minStartTime] = splitDate(new Date(Date.now() + ONE_WEEK + ONE_HOUR));
+  //let [minStartDate, minStartTime] = splitDate(new Date(Date.now() + ONE_WEEK + ONE_HOUR));
+  //TESTING
+  let [minStartDate, minStartTime] = splitDate(new Date());
+  //END TESTING
   let [startDate, startTime] = [minStartDate, minStartTime];
   let [endDate, endTime] = splitDate(new Date(Date.now() + ONE_WEEK + ONE_HOUR * 2));
   console.log(startDate, startTime);
@@ -52,7 +55,8 @@
         cidHex,
         parseInt(duration, 10),
         start,
-        end);
+        end,
+        supervisor);
       console.log("createMeetingPoll receipt", receipt);
     } catch (err) {
       console.error(err)
@@ -116,6 +120,9 @@ textarea {
 
   <label>How long should be the poll stay open?
     <select bind:value={duration}>
+      <!--TESTING-->
+      <option value="60">1 minute</option>
+      <!--END TESTING-->
       <option value="{60*60*24*7}" selected>7 days</option>
       <option value="{60*60*24*30}">30 days</option>
     </select>

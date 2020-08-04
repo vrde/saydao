@@ -17,6 +17,14 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
   address public tokenAddress;
 
+  //uint constant MIN_POLL_TIME = 3600;
+  //uint constant MIN_POLL_MEETING_TIME = 604800;
+
+  //TESTING
+  uint constant MIN_POLL_TIME = 0;
+  uint constant MIN_POLL_MEETING_TIME = 0;
+  //END TESTING
+
   // ## Members
   //
   // Each member is identified by their memberId, that is stored in an array
@@ -107,7 +115,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
   function createPoll(uint cid, uint secondsAfter, uint8 options) public returns(uint){
     require(addressToMember[_msgSender()] != 0, "Sender is not a member");
-    require(secondsAfter >= 3600, "Poll too short");
+    require(secondsAfter >= MIN_POLL_TIME, "Poll too short");
     require(options > 1, "Poll must have at least 2 options");
     require(options <= 8, "Poll must have less than 9 options");
 
@@ -207,7 +215,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
   function createMeetingPoll(uint cid, uint secondsAfter, uint start, uint end, uint16 supervisor) public returns(uint){
     require(addressToMember[_msgSender()] != 0, "Sender is not a member");
     // One week
-    require(secondsAfter >= 604800, "Poll too short");
+    require(secondsAfter >= MIN_POLL_MEETING_TIME, "Poll too short");
     require(start >= block.timestamp + secondsAfter, "Meeting must start after the poll ends");
     require(start < end, "Meeting must have a positive duration");
     require(memberToAddress[supervisor] != address(0), "Event manager is not a member");

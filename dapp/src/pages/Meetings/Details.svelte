@@ -1,5 +1,6 @@
 <script>
   import DateTime from 'src/components/DateTime.svelte';
+  import Participants from './components/Participants.svelte';
   import { wallet } from 'src/state/eth';
   import { currentPollId, refresh, currentPoll as poll } from 'src/state/dao/poll';
   import { location } from 'svelte-spa-router';
@@ -25,6 +26,10 @@
       console.error(e);
     }
     state = "idle";
+    $refresh = Date.now();
+  }
+
+  function handleParticipantListDone() {
     $refresh = Date.now();
   }
 
@@ -117,9 +122,6 @@
     and
     <DateTime date={$poll.meetingEnd} />.
   </p>
-  <p>
-    The appointed supervisor is <strong>Member #{$poll.meetingSupervisor}</strong>.
-  </p>
   {#if $poll.hasVotedFor === null && $poll.open && $poll.hasTokens}
     <form on:submit|preventDefault={handleSubmit}>
       <fieldset disabled={$poll.hasVotedFor}>
@@ -151,5 +153,10 @@
     <p><strong>Note:</strong> you cannot vote on this poll because you joined the DAO after the poll was created.</p>
     {/if}
   {/if}
+
+  {#if $poll.meetingNeedsParticipantList || $poll.meetingNeedsTokenDistribution}
+    <Participants poll={$poll} onDone={handleParticipantListDone}/>
+  {/if}
+
 
 {/if}

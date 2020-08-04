@@ -27,7 +27,7 @@
         <a href="#/polls/open">Open Polls</a>: Show polls you can vote on.
       </li>
       <li>
-        <a href="#/polls/create">Upcoming Events</a>: Show upcoming community events.
+        <a href="#/events/upcoming">Upcoming Events</a>: Show upcoming community events.
       </li>
       <li>
         <a href="#/polls/closed">Closed Polls</a>: Show closed polls.
@@ -94,7 +94,10 @@
         <a href="#/polls/open">Open Polls</a>: Show the polls you can vote in right now.
       </li>
       <li>
-        <a href="#/polls/create">Upcoming Events</a>: Show upcoming community events.
+        <a href="#/events/upcoming">Upcoming Events</a>: Show upcoming community events.
+      </li>
+      <li>
+        <a href="#/events/past">Past Events</a>: Show past community events.
       </li>
       <li>
         <a href="#/polls/closed">Closed Polls</a>: Show the polls that are now closed.
@@ -103,7 +106,7 @@
         <a href="#/polls/create">Create a Poll</a>: Open a poll for voting by the community.
       </li>
       <li>
-        <a href="#/polls/create-event">Create an Event</a>: Propose an event for the community.
+        <a href="#/events/create">Create an Event</a>: Propose an event for the community.
       </li>
     </ul>
   </div>

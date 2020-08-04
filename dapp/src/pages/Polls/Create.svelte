@@ -92,6 +92,9 @@ textarea {
 
   <label>How long should be the poll stay open?
     <select bind:value={duration}>
+      <!--TESTING-->
+      <option value="60">1 minute</option>
+      <!--END TESTING-->
       <option value="{60*60}">1 hour</option>
       <option value="{60*60*24}">1 day</option>
       <option value="{60*60*24*7}" selected>7 days</option>

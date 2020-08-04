@@ -89,7 +89,8 @@ async function loadPoll(wallet, pollId, memberId) {
   if (
     quorumReached &&
     !firstOption[0].eq(secondOption[0]) &&
-    firstOption[0].sub(secondOption[0]).gt(tokenLeft)
+    (firstOption[0].sub(secondOption[0]).gt(tokenLeft) ||
+      poll.end <= new Date())
   ) {
     finalDecision = firstOption[1];
   }

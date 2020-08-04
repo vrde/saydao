@@ -158,5 +158,4 @@
     <Participants poll={$poll} onDone={handleParticipantListDone}/>
   {/if}
 
-
 {/if}

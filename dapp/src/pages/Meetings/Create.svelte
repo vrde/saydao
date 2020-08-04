@@ -122,6 +122,7 @@ textarea {
     <select bind:value={duration}>
       <!--TESTING-->
       <option value="60">1 minute</option>
+      <option value="600">10 minutes</option>
       <!--END TESTING-->
       <option value="{60*60*24*7}" selected>7 days</option>
       <option value="{60*60*24*30}">30 days</option>

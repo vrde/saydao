@@ -122,6 +122,9 @@
     and
     <DateTime date={$poll.meetingEnd} />.
   </p>
+  <p>
+    The appointed supervisor is <strong>Member #{$poll.meetingSupervisor}</strong>.
+  </p>
   {#if $poll.hasVotedFor === null && $poll.open && $poll.hasTokens}
     <form on:submit|preventDefault={handleSubmit}>
       <fieldset disabled={$poll.hasVotedFor}>

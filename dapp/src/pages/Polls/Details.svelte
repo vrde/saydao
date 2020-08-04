@@ -111,6 +111,7 @@
 
   <p class="question">{$poll.question}</p>
 
+  {#if $poll.isMeeting}
   <p>
     The event will happen between
     <DateTime date={$poll.meetingStart} />
@@ -120,6 +121,7 @@
   <p>
     The appointed supervisor is <strong>Member #{$poll.meetingSupervisor}</strong>.
   </p>
+  {/if}
   {#if $poll.hasVotedFor === null && $poll.open && $poll.hasTokens}
     <form on:submit|preventDefault={handleSubmit}>
       <fieldset disabled={$poll.hasVotedFor}>

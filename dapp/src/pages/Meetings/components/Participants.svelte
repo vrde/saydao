@@ -31,7 +31,7 @@
       console.error(e);
     }
     state = "idle";
-    onDone();
+    await handleTokenDistribution();
   }
 
   async function handleTokenDistribution() {

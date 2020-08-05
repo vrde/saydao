@@ -3,12 +3,7 @@
   import Loading from "src/components/Loading.svelte";
   import baseX from "base-x";
   import { push } from 'svelte-spa-router'
-  import CONFIG from "src/config";
-
-  const bs58 = baseX("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
-
-  // FIXME: should not use an object from window
-  const ipfs = IpfsHttpClient(CONFIG.ipfsEndpoint);
+  import * as ipfs from "src/ipfs";
 
   let title = "";
   let question = "";
@@ -22,23 +17,13 @@
 
     // Upload to IPFS and get the CID
     const data = { title, question, choices, duration };
-    let cid;
-    try {
-      const added = await ipfs.add(JSON.stringify(data))
-      cid = added.cid.toString();
-      await ipfs.pin.add(added.cid);
-      console.log('Poll uploaded and pinned to IPFS with cid', cid);
-    } catch (err) {
-      console.error(err)
-      return;
-    }
+    const cid = await ipfs.add(data);
 
     // Create the poll in the smart contract
 
     try {
-        // First 2 bytes/4 nibbles are the id of the hash func
-      const cidHex = "0x" + (bs58.decode(cid).toString("hex")).substr(4);
-      const receipt = await $wallet.contracts.SayDAO.createPoll(cidHex, parseInt(duration, 10), choices.length);
+      const receipt = await $wallet.contracts.SayDAO.createPoll(
+        ipfs.cidToUint(cid), parseInt(duration, 10), choices.length);
       console.log("createPoll receipt", receipt);
     } catch (err) {
       console.error(err)

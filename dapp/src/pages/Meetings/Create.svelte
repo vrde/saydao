@@ -2,15 +2,10 @@
   import { memberList } from "src/state/dao";
   import { wallet } from "src/state/eth";
   import Loading from "src/components/Loading.svelte";
-  import baseX from "base-x";
   import { push } from 'svelte-spa-router'
-  import CONFIG from "src/config";
   import { ONE_HOUR, ONE_DAY, ONE_WEEK, splitDate, fromSplitToTimestamp } from "./utils";
 
-  const bs58 = baseX("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
-
-  // FIXME: should not use an object from window
-  const ipfs = IpfsHttpClient(CONFIG.ipfsEndpoint);
+  import * as ipfs from "src/ipfs";
 
   let title = "";
   let question = "";
@@ -35,24 +30,12 @@
 
     // Upload to IPFS and get the CID
     const data = { title, question, start, end, duration };
-    let cid;
-    try {
-      const added = await ipfs.add(JSON.stringify(data))
-      cid = added.cid.toString();
-      await ipfs.pin.add(added.cid);
-      console.log('Poll uploaded and pinned to IPFS with cid', cid);
-    } catch (err) {
-      console.error(err)
-      return;
-    }
+    const cid = await ipfs.add(data);
 
     // Create the meeting poll in the smart contract
-
     try {
-        // First 2 bytes/4 nibbles are the id of the hash func
-      const cidHex = "0x" + (bs58.decode(cid).toString("hex")).substr(4);
       const receipt = await $wallet.contracts.SayDAO.createMeetingPoll(
-        cidHex,
+        ipfs.cidToUint(cid),
         parseInt(duration, 10),
         start,
         end,
@@ -112,7 +95,8 @@ textarea {
 
   <label>Who is the supervisor?
     <select bind:value={supervisor} required>
-      {#each $memberList as member}
+      <option value="">Select a Member</option>
+      {#each $memberList as member, i}
         <option value="{member.memberId}">Member {member.memberId}</option>
       {/each}
     </select>

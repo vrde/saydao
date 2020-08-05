@@ -4,44 +4,19 @@ import { push } from "svelte-spa-router";
 import { wallet } from "src/state/eth";
 import { Buffer } from "buffer";
 import { memberId } from "./";
-import ehterea from "etherea";
-import CONFIG from "src/config";
+import etherea from "etherea";
+import * as ipfs from "src/ipfs";
 
 const NULL = etherea.BigNumber.from(
   "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 );
-
-const bs58 = baseX(
-  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-);
-
-// FIXME: should not use an object from window
-const ipfs = IpfsHttpClient(CONFIG.ipfsEndpoint);
-
-async function getPollFromIpfs(cid) {
-  // FIXME: make sure it's future proof
-  const realCid = bs58.encode(Buffer.from("1220" + cid.substr(2), "hex"));
-  let data = new Uint8Array();
-  let dataRead = 0;
-  const chunks = [];
-  for await (const chunk of ipfs.cat(realCid)) {
-    chunks.push(chunk);
-    const tmp = new Uint8Array(data.byteLength + chunk.byteLength);
-    tmp.set(chunk, data.byteLength);
-    data = tmp;
-    dataRead += chunk.byteLength;
-  }
-  const raw = new TextDecoder("utf-8").decode(data);
-  const content = JSON.parse(raw);
-  return content;
-}
 
 async function loadPoll(wallet, pollId, memberId) {
   const now = new Date();
 
   // Load data from Ethereum and IPFS
   const poll = await wallet.contracts.SayDAO.polls(pollId);
-  const content = await getPollFromIpfs(poll.cid.toHexString());
+  const content = await ipfs.get(ipfs.uintToCid(poll.cid.toHexString()));
 
   let hasVotedFor = 255;
   if (memberId) {

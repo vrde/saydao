@@ -51,7 +51,7 @@
 
     {:else}
 
-    <p>To log in please enter your 12 magic words.</p>
+    <p>Please enter your 12 magic words.</p>
 
     <fieldset>
       <legend>
@@ -65,7 +65,7 @@
         <button type="submit">Log in</button>
       </form>
     </fieldset>
-    <a href="mailto:agranzot@mailbox.org?subject=I forgot my 12 magic words">Recover your member account</a>.
+    <a href="mailto:agranzot@mailbox.org?subject=I forgot my 12 magic words">Recover your account</a>.
 
     {/if}
   </div>

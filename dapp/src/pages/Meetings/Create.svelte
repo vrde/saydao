@@ -30,7 +30,7 @@
   async function handleSubmit(e) {
     const start = fromSplitToTimestamp(startDate, startTime);
     const end = fromSplitToTimestamp(endDate, endTime);
-    if (!confirm("Are you sure? You won't be able to edit it later")) return;
+    if (!confirm("Are you sure? You won't be able to edit this later.")) return;
     state = "working"
 
     // Upload to IPFS and get the CID
@@ -77,8 +77,8 @@ textarea {
 
 {#if state !== "idle"}
   <Loading>
-    <h1>Submitting your poll</h1>
-    <p>Please wait, this is slow as hell.</p>
+    <h1>Creating your poll</h1>
+    <p>Please be patient. This will be a slow process!</p>
   </Loading>
 {/if}
 
@@ -94,7 +94,7 @@ textarea {
   </label>
 
   <fieldset>
-    <legend>When will the event happen?</legend>
+    <legend>When is the event?</legend>
     <p>
       <label>Start<br/>
         <input bind:value={startDate} on:change={()=>(endDate=startDate)} type="date" min={minStartDate} required />
@@ -107,7 +107,7 @@ textarea {
         <input bind:value={endTime} type="time" min={startDate === endDate ? startTime : ""} required />
       </label>
     </p>
-    <p><strong>Note:</strong> you cannot create events that start sooner than one week.</p>
+    <p><strong>Note:</strong> Events must begin at least one week from now.</p>
   </fieldset>
 
   <label>Who is the supervisor?
@@ -118,7 +118,7 @@ textarea {
     </select>
   </label>
 
-  <label>How long should be the poll stay open?
+  <label>How long should the poll stay open?
     <select bind:value={duration}>
       <!--TESTING-->
       <option value="60">1 minute</option>
@@ -129,5 +129,5 @@ textarea {
     </select>
   </label>
 
-  <button type="submit">Launch poll</button>
+  <button type="submit">Create poll</button>
 </form>

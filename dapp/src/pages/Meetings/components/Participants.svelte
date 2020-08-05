@@ -60,11 +60,11 @@
 
 
 {#if poll.meetingNeedsParticipantList}
-  <h2>Fill the participant lists</h2>
+  <h2>Select the participants</h2>
 
   <p>
-    You are the supervisor of this event. Check the members that participated
-    to the event to distribute Say tokens.
+    You are the supervisor of this event. Select the members who participated
+    in the event to award Say tokens.
   </p>
 
   <form on:submit|preventDefault={handleSubmit}>
@@ -87,9 +87,9 @@
   <h2>Distribute tokens to participants</h2>
 
   <p>
-    You are the supervisor of this event. Please distribute tokens to participants (might take some time if the participant list is long).
+    You are the supervisor of this event. Please distribute Say tokens to participants. Be patient! This might take a while if there were a lot of participants.
   </p>
   <form on:submit|preventDefault={handleTokenDistribution}>
-    <button type="submit">Start token distribution</button>
+    <button type="submit">Start distributing Say tokens</button>
   </form>
 {/if}

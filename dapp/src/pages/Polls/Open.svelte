@@ -3,7 +3,7 @@
   import DateTime from 'src/components/DateTime.svelte';
 </script>
 
-<h1>Open Polls</h1>
+<h1>Open polls</h1>
 
 {#each $openPolls as poll}
 <h2><a href="#/polls/details/{poll.id}">{poll.title}</a></h2>
@@ -12,5 +12,5 @@
 <hr />
 {:else}
   <h2>There are no open polls</h2>
-  <a href="#/polls/create">Create a Poll</a>
+  <a href="#/polls/create">Create a poll</a>
 {/each}

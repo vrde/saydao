@@ -71,7 +71,7 @@
 {#if state !== "idle"}
   <Loading>
     <h1>Submitting your vote</h1>
-    <p>Please wait, this is slow as hell.</p>
+    <p>Please wait. This will take a while.</p>
   </Loading>
 {/if}
 
@@ -86,7 +86,7 @@
   {#if $poll.open}
     <div class="details">
       <p>
-        <strong>{$poll.totalVotesPerc}%</strong> of the DAO voted on this poll.
+        <strong>{$poll.totalVotesPerc}%</strong> of ParTecK DAO voted on this poll.
         {#if $poll.quorumReached}
           <strong>Quorum has been reached</strong>.
         {:else}
@@ -119,7 +119,7 @@
     <DateTime date={$poll.meetingEnd} />.
   </p>
   <p>
-    The appointed supervisor is <strong>Member #{$poll.meetingSupervisor}</strong>.
+    The supervisor is <strong>member #{$poll.meetingSupervisor}</strong>.
   </p>
   {/if}
   {#if $poll.hasVotedFor === null && $poll.open && $poll.hasTokens}
@@ -150,7 +150,7 @@
       {/each}
     </ol>
     {#if $poll.open && $poll.hasTokens === null}
-    <p><strong>Note:</strong> you cannot vote on this poll because you joined the DAO after the poll was created.</p>
+    <p><strong>Note:</strong> you can't vote on this poll because you joined ParTecK DAO after the poll was created.</p>
     {/if}
   {/if}
 

@@ -30,21 +30,21 @@ input {
 }
 </style>
 
-<h1>Add a member to the DAO</h1>
+<h1>Add a member to ParTecK DAO</h1>
 
 <h2>How to add a member</h2>
 
-<p>To add a new member, you must generate a <strong>member invite</strong>. A <strong>member invite</strong> is a link you can share with the member you want to invite. The <strong>member invite</strong> can only be used once. Each new member needs their own invite. You can generate as many invites you need.</p>
+<p>To add a new member, you must create a <strong>member invite</strong>. A member invite is a link you can share with the person you want to invite. A member invite can only be used once, so each member needs their own invite. You can generate as many invites you need.</p>
 
 <fieldset>
-  <legend>Invite a member</legend>
+  <legend>Create a new member invite</legend>
   <form on:submit|preventDefault={createInvite}>
     <label>
       Member id to assign
       <input bind:value={memberId} type="number" name="memberId" placeholder="42" required />
     </label>
     <br />
-    <button type="submit">Create Invite</button>
+    <button type="submit">Create member invite</button>
   </form>
 </fieldset>
 
@@ -54,12 +54,12 @@ input {
   <h2>The invite you requested is ready</h2>
 
   <p>
-    Share this link with the member you want to invite. You can copy and paste it in an email or a message. Here is sample text you can use:
+    Share this member invite with the person you want to invite. You can copy and paste it in an email or instant message. Here is sample text you can use:
   </p>
-  <p>Hello friend! You are invited to join ParTecK DAO. Click the link below and
+  <p>Hello friend! You are invited to join ParTecK DAO. Click the link below to join.
   </p>
   <p>
-     <strong>Important:</strong> The DAO doesn't know the identity of the person connected to a member id. If that is important, you should keep track of what user has what member id yourself.
+     <strong>Note:</strong> ParTecK DAO doesn't collect personal information, so it does not record the identity of the person connected to a member id. If you want to know who each member is, you need to keep track yourself.
   </p>
 
   <textarea readonly>{invitation}</textarea>
@@ -67,8 +67,8 @@ input {
 {/if}
 
 <details>
-  <summary>How does an invite work?</summary>
+  <summary>How does a member invite work?</summary>
   <p>
-    An invite can only be used once. It creates one new member id for one person, and then it stops working.
+    A member invite allows one new member to join ParTecK DAO. Each member invite can only be used once. It creates one new member id for one person, and then it stops working.
   </p>
 </details>

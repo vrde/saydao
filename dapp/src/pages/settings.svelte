@@ -14,7 +14,7 @@
     <h3>Magic Word Backup</h3>
 
     <p>
-      <strong>Important!</strong> Make sure to save your <strong>12 magic words</strong> before leaving this page.You will need these magic words to log in again.  Write them down and keep them safe.</p>
+      <strong>Important!</strong> Make sure to save your <strong>12 magic words</strong> before you leave this page. You need these magic words to log in again.  Write them down and keep them safe.</p>
     <p>Your 12 magic words are:</p>
 
     <textarea readonly>{$wallet.mnemonic}</textarea>
@@ -30,20 +30,20 @@
 
     <h3>Smart Contracts Details</h3>
 
-    <h4>SayDAO Address</h4>
+    <h4>ParTecK DAO Address</h4>
 
-    <p>The smart contract that regulates participation to the DAO can be found at
+    <p>The smart contract that runs ParTecK DAO can be found at:
       <a href="https://{$wallet.networkName}.etherscan.io/address/{$wallet.contracts.SayDAO.address}" target="_blank">{$wallet.contracts.SayDAO.address}</a>.
     </p>
 
-    <h4>SayToken Address</h4>
+    <h4>Say Token Address</h4>
 
-    <p>The smart contract that represents the token can be found at
+    <p>The smart contract that represents the Say token can be found at:
       <a href="https://{$wallet.networkName}.etherscan.io/address/{$wallet.contracts.SayToken.address}" target="_blank">{$wallet.contracts.SayToken.address}</a>.
     </p>
 
     <p>
-      The total amount of SayTokens is <strong>{$totalSupply}</strong>.
+      The total number of Say tokens is: <strong>{$totalSupply}</strong>
     </p>
 
     <h3>Version</h3>

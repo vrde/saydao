@@ -4,20 +4,20 @@
 </script>
 
 {#if $actionableMeetings.length}
-<h1>Action required!</h1>
+<h1>Action required</h1>
 
-<p>You are the supervisor of the following meetings.<p>
+<p>You are the supervisor of the following events:<p>
 
 {#each $actionableMeetings as meeting}
 <h2><a href="#/events/details/{meeting.id}">{meeting.title}</a></h2>
   <p>{meeting.question}</p>
-  <p><strong>Action:</strong> <a href="#/events/details/{meeting.id}">fill the participants list.</a></p>
+  <p><strong>Action:</strong> <a href="#/events/details/{meeting.id}">Please fill in the list of participants.</a></p>
 <hr />
 {/each}
 
 {/if}
 
-<h1>Past Events</h1>
+<h1>Past events</h1>
 
 {#each $pastMeetings as meeting}
 <h2><a href="#/events/details/{meeting.id}">{meeting.title}</a></h2>
@@ -25,5 +25,5 @@
 <hr />
 {:else}
   <h2>There are no past events</h2>
-  <a href="#/events/create">Propose an Event</a>
+  <a href="#/events/create">Propose an event</a>
 {/each}

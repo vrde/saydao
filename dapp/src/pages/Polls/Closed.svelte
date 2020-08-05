@@ -12,5 +12,5 @@
 <hr />
 {:else}
   <h2>There are no closed polls</h2>
-  <a href="#/polls/create">Create a Poll</a>
+  <a href="#/polls/create">Create a poll</a>
 {/each}

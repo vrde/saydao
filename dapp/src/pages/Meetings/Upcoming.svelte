@@ -3,7 +3,7 @@
   import DateTime from 'src/components/DateTime.svelte';
 </script>
 
-<h1>Upcoming Events</h1>
+<h1>Upcoming events</h1>
 
 {#each $upcomingMeetings as meeting}
 <h2><a href="#/events/details/{meeting.id}">{meeting.title}</a></h2>
@@ -11,5 +11,5 @@
 <hr />
 {:else}
   <h2>There are no upcoming events</h2>
-  <a href="#/events/create">Propose an Event</a>
+  <a href="#/events/create">Propose an event</a>
 {/each}

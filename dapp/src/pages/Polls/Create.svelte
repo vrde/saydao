@@ -64,7 +64,7 @@ textarea {
   </Loading>
 {/if}
 
-<h1>Create a Poll</h1>
+<h1>Create a poll</h1>
 
 <form on:submit|preventDefault={handleSubmit}>
   <label>What is the title of the poll?
@@ -76,7 +76,7 @@ textarea {
   </label>
 
   <fieldset>
-    <legend>What are the choices in the poll? Enter at least two.</legend>
+    <legend>What are the options to choose between? Enter at least two.</legend>
     <ol>
       {#each choices as choice, i}
       <li>
@@ -90,7 +90,7 @@ textarea {
     {/if}
   </fieldset>
 
-  <label>How long should be the poll stay open?
+  <label>How long should the poll stay open?
     <select bind:value={duration}>
       <!--TESTING-->
       <option value="60">1 minute</option>
@@ -103,5 +103,5 @@ textarea {
     </select>
   </label>
 
-  <button type="submit">Launch poll</button>
+  <button type="submit">Open the poll</button>
 </form>

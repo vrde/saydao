@@ -3,4 +3,4 @@
 </script>
 
 <h1>File not Found!</h1>
-<p>We cannot find {$location}. Please try again.</p>
+<p>We can't find {$location}. Please try again.</p>

@@ -161,7 +161,7 @@ export const refresh = writable();
 export const pollList = derived(
   [wallet, memberId],
   async ([$wallet, $memberId], set) => {
-    if (!$wallet) return;
+    if (!$wallet || $memberId === undefined) return;
     const now = new Date();
     const totalPolls = await $wallet.contracts.SayDAO.totalPolls();
     const list = [];

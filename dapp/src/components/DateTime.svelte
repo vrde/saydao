@@ -1,9 +1,10 @@
 <script>
   import { onMount } from "svelte";
 
-  export let date = new Date();
+  export let date = new Date().getTime();
   export let countdown = false;
 
+  let dateObj = date instanceof Date ? date : new Date(date);
   let timeLeft;
 
   const options = {
@@ -37,7 +38,7 @@
 
   onMount(() => {
     function tick() {
-      const total = (date - new Date()) / 1000;
+      const total = (dateObj - new Date()) / 1000;
       timeLeft = Math.round(total);
     }
 
@@ -51,7 +52,7 @@
 
 </script>
 
-{format(date)}
+{format(dateObj)}
 {#if countdown}
   (time left: {secondsToDHMS(timeLeft)})
 {/if}

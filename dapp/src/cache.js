@@ -1,9 +1,15 @@
+const PREFIX = "saydao:cache:";
+
 export function set(key, value) {
-  localStorage.setItem("saydao:cache:" + key, JSON.stringify(value));
+  localStorage.setItem(PREFIX + key, JSON.stringify(value));
 }
 
 export function get(key) {
-  return JSON.parse(localStorage.getItem("saydao:cache:" + key));
+  return JSON.parse(localStorage.getItem(PREFIX + key));
+}
+
+export function del(key) {
+  localStorage.removeItem(PREFIX + key);
 }
 
 // Yes this works for funcs with one arg only.

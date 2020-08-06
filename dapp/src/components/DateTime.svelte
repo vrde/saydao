@@ -4,7 +4,8 @@
   export let date = new Date().getTime();
   export let countdown = false;
 
-  let dateObj = date instanceof Date ? date : new Date(date);
+
+  $: dateObj = date instanceof Date ? date : new Date(date);
   let timeLeft;
 
   const options = {
@@ -40,6 +41,9 @@
     function tick() {
       const total = (dateObj - new Date()) / 1000;
       timeLeft = Math.round(total);
+      if (timeLeft < 0) {
+        clearInterval(timerId);
+      }
     }
 
     let timerId;
@@ -53,6 +57,6 @@
 </script>
 
 {format(dateObj)}
-{#if countdown}
+{#if countdown && timeLeft > 0}
   (time left: {secondsToDHMS(timeLeft)})
 {/if}

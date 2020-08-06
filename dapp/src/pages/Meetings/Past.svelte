@@ -21,7 +21,13 @@
 
 {#each $pastMeetings as meeting}
 <h2><a href="#/events/details/{meeting.id}">{meeting.title}</a></h2>
-  <p>{meeting.question}</p>
+<p>
+  The event happened between
+  <DateTime date={meeting.meetingStart} />
+  and
+  <DateTime date={meeting.meetingEnd} />.
+</p>
+<p>{meeting.question}</p>
 <hr />
 {:else}
   <h2>There are no past events</h2>

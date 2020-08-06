@@ -175,7 +175,7 @@ export const pollList = derived(
     // Backwards because the most recent polls are likey to be the last ones.
     for (let i = totalPolls - 1; i >= 0; i--) {
       list.push(await loadPoll($wallet, i, $memberId));
-      list.sort((a, b) => a.end - b.end);
+      list.sort((a, b) => b.end - a.end);
       set(list);
     }
   },

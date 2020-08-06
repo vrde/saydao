@@ -7,7 +7,7 @@
 
 {#each $closedPolls as poll}
 <h2><a href="#/polls/details/{poll.id}">{poll.title}</a></h2>
-  <p><em>Voting closes on <DateTime date={poll.end} /></em></p>
+  <p><em>Voting closed on <DateTime date={poll.end} /></em></p>
   <p>{poll.question}</p>
 <hr />
 {:else}

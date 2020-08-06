@@ -10,23 +10,36 @@
   let title = "";
   let question = "";
   let duration = 60*60*24*7;
-  let state = "idle";
   let supervisor;
+  let activity = {
+    state: "idle",
+    error: null
+  }
 
-  //let [minStartDate, minStartTime] = splitDate(new Date(Date.now() + ONE_WEEK + ONE_HOUR));
-  //TESTING
   let [minStartDate, minStartTime] = splitDate(new Date());
-  //END TESTING
   let [startDate, startTime] = [minStartDate, minStartTime];
-  let [endDate, endTime] = splitDate(new Date(Date.now() + ONE_WEEK + ONE_HOUR * 2));
-  console.log(startDate, startTime);
-  console.log(fromSplitToTimestamp(startDate, startTime));
+  let [endDate, endTime] = [startDate, startTime];
+
+  $: {
+  //  const max = Math.max(duration * 1000, ONE_WEEK + ONE_HOUR);
+    //TESTING
+    const max = Math.max(duration * 1000);
+    //END TESTING
+    [minStartDate, minStartTime] = splitDate(new Date(Date.now() + max));
+  }
 
   async function handleSubmit(e) {
     const start = fromSplitToTimestamp(startDate, startTime);
     const end = fromSplitToTimestamp(endDate, endTime);
+    // Event must start after the poll ends, and if those two dates are too close
+    // (like in the same minute) the transaction is likely to fail.
+    const durationDate = new Date(Date.now() + duration * 1000).getTime() / 1000;
+    if (start - durationDate < 60) {
+      alert('The end of the poll and the beginning of the event are too close, change one of the two.');
+      return;
+    }
     if (!confirm("Are you sure? You won't be able to edit this later.")) return;
-    state = "working"
+    activity.state = "working"
 
     // Upload to IPFS and get the CID
     const data = { title, question, start, end, duration };
@@ -43,12 +56,14 @@
       console.log("createMeetingPoll receipt", receipt);
     } catch (err) {
       console.error(err)
+      activity.state = "error";
+      activity.error = err;
       return;
     }
 
     push("/polls/open");
 
-    state = "idle";
+    activity.state = "idle";
   }
 </script>
 
@@ -58,10 +73,15 @@ textarea {
 }
 </style>
 
-{#if state !== "idle"}
+{#if activity.state === "working"}
   <Loading>
     <h1>Creating your poll</h1>
     <p>Please be patient. This will be a slow process!</p>
+  </Loading>
+{:else if activity.state === "error"}
+  <Loading>
+    <h1>Oops, someting went wrong</h1>
+    <p>{activity.error}</p>
   </Loading>
 {/if}
 

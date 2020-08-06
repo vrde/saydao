@@ -279,7 +279,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     // One week
     require(secondsAfter >= MIN_POLL_MEETING_TIME, "Poll too short");
     require(start >= block.timestamp + secondsAfter, "Meeting must start after the poll ends");
-    require(start < end, "Meeting must have a positive duration");
+    require(start <= end, "Meeting must have a positive duration");
     require(memberToAddress[supervisor] != address(0), "Event manager is not a member");
 
     SayToken token = SayToken(tokenAddress);

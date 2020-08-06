@@ -32,7 +32,8 @@ async function loadPoll(wallet, pollId, memberId) {
   // Do we have new votes?
   if (
     cachedPartial &&
-    cachedPartial.tokenStaked === poll.tokenStaked.toString()
+    cachedPartial.tokenStaked === poll.tokenStaked.toString() &&
+    cachedPartial.end < now
   ) {
     console.log("cache hit", keyPartial);
     content = cachedPartial;
@@ -147,8 +148,20 @@ async function loadPoll(wallet, pollId, memberId) {
     }
   }
 
+  console.log(
+    "cache",
+    content.end,
+    content.end < now,
+    !content.meetingNeedsTokenDistribution,
+    !content.meetingNeedsParticipantList
+  );
+
   // Poll ended, we can safely cache it for later use.
-  if (content.end < now) {
+  if (
+    content.end < now &&
+    !content.meetingNeedsTokenDistribution &&
+    !content.meetingNeedsParticipantList
+  ) {
     console.log("delete key", keyPartial);
     cache.del(keyPartial);
     cache.set(key, content);

@@ -17,13 +17,16 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
   address public tokenAddress;
 
-  //uint constant MIN_POLL_TIME = 3600;
-  //uint constant MIN_POLL_MEETING_TIME = 604800;
+  /*
+  uint constant MIN_POLL_TIME = 3600;
+  uint constant MIN_POLL_MEETING_TIME = 604800;
+  uint constant TIME_UNIT = 60 * 60 * 24;
+  */
 
   //TESTING
   uint constant MIN_POLL_TIME = 0;
   uint constant MIN_POLL_MEETING_TIME = 0;
-  uint constant TIME_UNIT = 60 * 60 * 24;
+  uint constant TIME_UNIT = 1;
   //END TESTING
 
   uint public genesis;
@@ -48,9 +51,63 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     return BaseRelayRecipient._msgSender();
   }
 
+  // https://github.com/provable-things/ethereum-api/blob/9f34daaa550202c44f48cdee7754245074bde65d/oraclizeAPI_0.5.sol#L1045
+  function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
+    if (_i == 0) {
+        return "0";
+    }
+    uint j = _i;
+    uint len;
+    while (j != 0) {
+        len++;
+        j /= 10;
+    }
+    bytes memory bstr = new bytes(len);
+    uint k = len - 1;
+    while (_i != 0) {
+        bstr[k--] = byte(uint8(48 + _i % 10));
+        _i /= 10;
+    }
+    return string(bstr);
+  }
+
+  function address2hex(address a) public view returns (string memory) {
+    bytes32 value = bytes32(uint256(a));
+    bytes memory alphabet = "0123456789abcdef";
+
+    bytes memory str = new bytes(42);
+    str[0] = "0";
+    str[1] = "x";
+    for (uint i = 0; i < 20; i++) {
+        str[2+i*2] = alphabet[uint(uint8(value[i + 12] >> 4))];
+        str[3+i*2] = alphabet[uint(uint8(value[i + 12] & 0x0f))];
+    }
+    return string(str);
+  }
+
+
   function join(uint16 memberId, uint8 v, bytes32 r, bytes32 s) public {
     require(memberToAddress[memberId] == address(0), "Invite used already");
-    bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n2", memberId));
+    // The invite string is something like:
+    //
+    // Member: 11
+    // Contract: 0x....
+    bytes memory message = abi.encodePacked(
+      "Member: ",
+      uint2str(memberId),
+      "\n",
+      "Contract: ",
+      address2hex(address(this))
+    );
+
+    bytes32 messageHash = keccak256(
+      abi.encodePacked(
+        "\x19Ethereum Signed Message:\n",
+        uint2str(message.length),
+        message
+      )
+    );
+
     address signer = ecrecover(messageHash, v, r, s);
     require(hasRole(MANAGER_ROLE, signer), "Invite not valid.");
     memberToAddress[memberId] = _msgSender();

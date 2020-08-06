@@ -7,6 +7,7 @@ const {
   takeSnapshot,
   revertSnapshot,
   toBinary,
+  add,
 } = require("./utils");
 
 const ONE_DAY = 60 * 60 * 24;
@@ -14,12 +15,6 @@ const ONE_WEEK = ONE_DAY * 7;
 const ONE_MONTH = ONE_DAY * 30;
 
 const now = () => Math.round(Date.now() / 1000);
-
-async function add(from, to, id) {
-  const invite = await from.signMessage(etherea.to.array.uint16(id));
-  const { r, s, v } = etherea.signature.split(invite);
-  await to.contracts.SayDAO.join(id, v, r, s);
-}
 
 describe("SayDAO Meeting Poll", async () => {
   let snapshotId;

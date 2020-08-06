@@ -36,10 +36,12 @@ describe("SayDAO", async () => {
 
   it("has an owner", async () => {});
 
-  it("allow invites", async () => {
+  it("allows invites", async () => {
     // Alice is the owner of the DAO, and she wants to invite Bob.
     // She creates an invite as a signed message with Bob's member id.
-    const aliceInvite = await alice.signMessage(etherea.to.array.uint16(42));
+    const aliceInvite = await alice.signMessage(
+      "Member: 42\nContract: " + alice.contracts.SayDAO.address.toLowerCase()
+    );
 
     // Bob receives the invitation and splits the signature before
     // sending it to the smart contract to join the DAO.
@@ -60,7 +62,7 @@ describe("SayDAO", async () => {
 
     // Mallory tries again self-signing an invite, but she fails.
     const malloryInvite = await mallory.signMessage(
-      etherea.to.array.uint16(101)
+      "Member: 101\nContract: " + alice.contracts.SayDAO.address
     );
     let { r: malloryR, s: malloryS, v: malloryV } = etherea.signature.split(
       malloryInvite

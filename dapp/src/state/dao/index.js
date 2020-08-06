@@ -10,12 +10,16 @@ function prettyShares(raw) {
   const factor = etherea.BigNumber.from(1000);
   const owned = raw.value.mul(factor);
   // This is a bit redundant, but hey.
-  const perc = (100 * owned.div(raw.total).toNumber()) / 1000;
+  const perc =
+    raw.total > 0 ? (100 * owned.div(raw.total).toNumber()) / 1000 : 0;
   return perc.toString() + "%";
 }
 
 export async function invite(wallet, memberId) {
-  return await wallet.signMessage(etherea.to.array.uint16(memberId));
+  const contractAddress = wallet.contracts.SayDAO.address.toLowerCase();
+  const message = `Member: ${memberId}\nContract: ${contractAddress}`;
+  const invite = await wallet.signMessage(message);
+  return invite;
 }
 
 export const role = derived(

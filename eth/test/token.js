@@ -1,6 +1,6 @@
 const assert = require("assert").strict;
 const etherea = require("etherea");
-const { deployAll } = require("./utils");
+const { deployAll, add } = require("./utils");
 
 describe("SayToken", async () => {
   let alice;
@@ -52,13 +52,7 @@ describe("SayToken", async () => {
   });
 
   it("returns the 'balanceOf' a member", async () => {
-    const invite = await alice.signMessage(etherea.to.array.uint16(42));
-
-    // Bob receives the invitation and splits the signature before
-    // sending it to the smart contract to join the DAO.
-    const { r, s, v } = etherea.signature.split(invite);
-    await bob.contracts.SayDAO.join(42, v, r, s);
-    // Bob should be now registered as a member with id 42
+    await add(alice, bob, 42);
     const balance = await bob.contracts.SayToken.balanceOf(bob.address);
     assert.equal(balance.toString(), "100000000000000000000");
   });

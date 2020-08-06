@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "blockchain": "node run-truffle-and-gsn",
+    "blockchain": "node run-ganache-and-gsn",
     "deploy": "node deploy ../dapp/src/contracts",
     "test:watch": "mocha -w --timeout=10000",
     "test": "mocha --timeout=10000"

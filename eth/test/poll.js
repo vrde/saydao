@@ -1,12 +1,6 @@
 const assert = require("assert").strict;
 const etherea = require("etherea");
-const { deployAll } = require("./utils");
-
-async function add(from, to, id) {
-  const invite = await from.signMessage(etherea.to.array.uint16(id));
-  const { r, s, v } = etherea.signature.split(invite);
-  await to.contracts.SayDAO.join(id, v, r, s);
-}
+const { deployAll, add } = require("./utils");
 
 describe("SayDAO Poll", async () => {
   let alice;

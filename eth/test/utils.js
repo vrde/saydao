@@ -1,4 +1,5 @@
 const ethers = require("ethers");
+const etherea = require("etherea");
 const { compile, deploy } = require("etherea/lib/solidity");
 
 const { BigNumber } = require("etherea");
@@ -70,6 +71,14 @@ function toBinary(bn, bits = 256) {
   return result.padStart(256, "0");
 }
 
+async function add(from, to, id) {
+  const contractAddress = from.contracts.SayDAO.address.toLowerCase();
+  const message = `Member: ${id}\nContract: ${contractAddress}`;
+  const invite = await from.signMessage(message);
+  const { r, s, v } = etherea.signature.split(invite);
+  await to.contracts.SayDAO.join(id, v, r, s);
+}
+
 module.exports = {
   createBitmaps,
   deployAll,
@@ -77,4 +86,5 @@ module.exports = {
   takeSnapshot,
   revertSnapshot,
   toBinary,
+  add,
 };

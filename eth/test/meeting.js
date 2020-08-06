@@ -192,6 +192,41 @@ describe("SayDAO Meeting Poll", async () => {
     }
   });
 
+  it("calculates an exponential token allocation", async () => {
+    const formula = (delta, participation) =>
+      ((delta / ONE_DAY) * (1 + participation)) ** 2;
+    const round = (v) => v.div(etherea.BigNumber.from(10).pow(18)).toNumber();
+    const verify = async (secondsSinceGenesis, participants, total) => {
+      const expected = Math.floor(
+        formula(secondsSinceGenesis, participants / total)
+      );
+      console.log(
+        "Delta",
+        secondsSinceGenesis,
+        "participants",
+        participants,
+        "total",
+        total,
+        "tokens",
+        expected
+      );
+      assert.equal(
+        round(
+          await alice.contracts.SayDAO.calculateTokenAllocation(
+            secondsSinceGenesis,
+            participants,
+            total
+          )
+        ),
+        expected
+      );
+    };
+
+    await verify(ONE_DAY, 8, 10);
+    await verify(ONE_MONTH, 30, 50);
+    await verify(2 * ONE_MONTH, 10, 50);
+  });
+
   it("allows the supervisor to create a participant list", async () => {
     const balanceOf = async (account) =>
       (await alice.contracts.SayToken.balanceOf(account))
@@ -243,11 +278,11 @@ describe("SayDAO Meeting Poll", async () => {
       (await alice.contracts.SayDAO.meetings(0)).tokenAllocation.toString()
     );
 
-    assert.equal(await balanceOf(alice.address), 3417);
-    assert.equal(await balanceOf(bob.address), 3417);
+    assert.equal(await balanceOf(alice.address), 100);
+    assert.equal(await balanceOf(bob.address), 100);
     assert.equal(await balanceOf(carol.address), 100);
-    assert.equal(await balanceOf(dan.address), 3417);
-    assert.equal(await balanceOf(erin.address), 3417);
+    assert.equal(await balanceOf(dan.address), 100);
+    assert.equal(await balanceOf(erin.address), 100);
 
     //console.log(
     //  "Distribution bitmap",
@@ -273,7 +308,7 @@ describe("SayDAO Meeting Poll", async () => {
     assert.equal(await balanceOf(carol.address), 100);
     assert.equal(await balanceOf(dan.address), 100);
     // We processed the last cluster that contained Erin's participation
-    assert.equal(await balanceOf(erin.address), 300);
+    assert.equal(await balanceOf(erin.address), 3417);
 
     //console.log(
     //  "Distribution bitmap",
@@ -283,11 +318,11 @@ describe("SayDAO Meeting Poll", async () => {
     // Alice goes for the second round.
     await alice.contracts.SayDAO.distributeMeetingTokens(0, 32);
 
-    assert.equal(await balanceOf(alice.address), 300);
-    assert.equal(await balanceOf(bob.address), 300);
+    assert.equal(await balanceOf(alice.address), 3417);
+    assert.equal(await balanceOf(bob.address), 3417);
     assert.equal(await balanceOf(carol.address), 100);
-    assert.equal(await balanceOf(dan.address), 300);
-    assert.equal(await balanceOf(erin.address), 300);
+    assert.equal(await balanceOf(dan.address), 3417);
+    assert.equal(await balanceOf(erin.address), 3417);
 
     assert.equal(
       (

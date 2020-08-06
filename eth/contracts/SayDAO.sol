@@ -307,14 +307,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     }
   }
 
-  function sealMeetingParticipants(uint meetingId) public {
-    require(meetingId < meetings.length, "Meeting doesn't exist");
-    Meeting storage meeting = meetings[meetingId];
-    require(addressToMember[_msgSender()] == meeting.supervisor, "Only supervisor can seal");
-    require(meeting.end < block.timestamp, "Meeting is not finished");
-    meeting.done = true;
-    uint microTicks = (block.timestamp - genesis) * 1e6 / TIME_UNIT;
-    uint microFactor = 1e6 + (meeting.totalParticipants * 1e6) / members.length;
+  function calculateTokenAllocation(uint secondsSinceGenesis, uint participants, uint total) public pure returns (uint) {
     // This should be overflow safe... let's say the dao is running in 100 years,
     // that is ~3153600000 seconds < 1e10, and TIME_UNIT is 1, we would have:
     // microTicks < 1e10 * 1e6 ≡ microTicks < 1e(10+6) ≡ microTicks < 1e16
@@ -326,7 +319,21 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     // (1e6 * 1e6) ** 2 ≡ 1e12 ** 2 ≡ 1e24
     // SayToken decimals are 18, so we need to remove 6 orders of magnitude
     // from the calculated value... I guess :P
-    meeting.tokenAllocation = ((microTicks * microFactor) ** 2) / 1e6;
+    uint microTicks = (secondsSinceGenesis * 1e6) / TIME_UNIT;
+    uint microFactor = 1e6 + (participants * 1e6) / total;
+    return ((microTicks * microFactor) ** 2) / 1e6;
+  }
+
+  function sealMeetingParticipants(uint meetingId) public {
+    require(meetingId < meetings.length, "Meeting doesn't exist");
+    Meeting storage meeting = meetings[meetingId];
+    require(addressToMember[_msgSender()] == meeting.supervisor, "Only supervisor can seal");
+    require(meeting.end < block.timestamp, "Meeting is not finished");
+    meeting.done = true;
+    meeting.tokenAllocation = calculateTokenAllocation(
+      block.timestamp - genesis,
+      meeting.totalParticipants,
+      members.length);
   }
 
   function getRemainingDistributionClusters(uint meetingId) public view returns(uint) {

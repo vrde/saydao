@@ -102,6 +102,10 @@ abstract contract ERC20Snapshot is ERC20 {
         return balanceOf(account);
     }
 
+    function currentSnapshotId() public view returns(uint256) {
+      return _currentSnapshotId.current();
+    }
+
     /**
      * @dev Retrieves the total supply at the time `snapshotId` was created.
      */

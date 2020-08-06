@@ -23,7 +23,10 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
   //TESTING
   uint constant MIN_POLL_TIME = 0;
   uint constant MIN_POLL_MEETING_TIME = 0;
+  uint constant TIME_UNIT = 60 * 60 * 24;
   //END TESTING
+
+  uint public genesis;
 
   // ## Members
   //
@@ -35,6 +38,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
   mapping (address => uint16) public addressToMember;
 
   constructor(address _forwarder) public {
+    genesis = block.timestamp;
     trustedForwarder = _forwarder;
     _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     _setupRole(MANAGER_ROLE, _msgSender());
@@ -194,6 +198,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     uint pollId;
     uint start;
     uint end;
+    uint tokenAllocation;
     uint16 supervisor;
     uint16 totalParticipants;
     bool done;
@@ -237,6 +242,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
       polls.length,
       start,
       end,
+      0,
       supervisor,
       0,
       false
@@ -307,6 +313,20 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     require(addressToMember[_msgSender()] == meeting.supervisor, "Only supervisor can seal");
     require(meeting.end < block.timestamp, "Meeting is not finished");
     meeting.done = true;
+    uint microTicks = (block.timestamp - genesis) * 1e6 / TIME_UNIT;
+    uint microFactor = 1e6 + (meeting.totalParticipants * 1e6) / members.length;
+    // This should be overflow safe... let's say the dao is running in 100 years,
+    // that is ~3153600000 seconds < 1e10, and TIME_UNIT is 1, we would have:
+    // microTicks < 1e10 * 1e6 ≡ microTicks < 1e(10+6) ≡ microTicks < 1e16
+    // microFactor < 2e6 < 1e7 (switch to 1eN to simplify)
+    // microTicks * microFactor < 1e16 * 1e7 ≡ microTicks * microFactor < 1e23
+    // ans ** 2 < 1e23 ** 2 ≡ ans < 1e46 that is within the limit of ~1e77 of a uint.
+    //
+    // All that said, tokens allocated are:
+    // (1e6 * 1e6) ** 2 ≡ 1e12 ** 2 ≡ 1e24
+    // SayToken decimals are 18, so we need to remove 6 orders of magnitude
+    // from the calculated value... I guess :P
+    meeting.tokenAllocation = ((microTicks * microFactor) ** 2) / 1e6;
   }
 
   function getRemainingDistributionClusters(uint meetingId) public view returns(uint) {
@@ -339,7 +359,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
       if ((bitmap & (1 << i)) > 0) {
         uint16 memberId = uint16(cluster * 256 + i);
         // distribute tokens to memberId
-        token.mint(memberId, 200e18);
+        token.mint(memberId, meeting.tokenAllocation);
         meetingToParticipants[meetingId][clustersLength - 1] &= NULL ^ (1 << i);
         //bitmap &= NULL ^ (1 << i);
         bound--;

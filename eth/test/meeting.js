@@ -13,7 +13,7 @@ const ONE_DAY = 60 * 60 * 24;
 const ONE_WEEK = ONE_DAY * 7;
 const ONE_MONTH = ONE_DAY * 30;
 
-const now = () => Math.round(Date.now());
+const now = () => Math.round(Date.now() / 1000);
 
 async function add(from, to, id) {
   const invite = await from.signMessage(etherea.to.array.uint16(id));
@@ -218,7 +218,7 @@ describe("SayDAO Meeting Poll", async () => {
     await carol.contracts.SayDAO.vote(0, 0);
 
     // Let's do the time warp again
-    increaseTime(end + ONE_DAY);
+    increaseTime(ONE_MONTH + 2 * ONE_DAY);
 
     // alice, bob, dan, erin
     const participantsBitmap = createBitmaps([1, 2, 4, 666]);
@@ -238,11 +238,16 @@ describe("SayDAO Meeting Poll", async () => {
     // The list of participants has been finalized, Alice seals the list
     await alice.contracts.SayDAO.sealMeetingParticipants(0);
 
-    assert.equal(await balanceOf(alice.address), 100);
-    assert.equal(await balanceOf(bob.address), 100);
+    console.log(
+      "token allocation is",
+      (await alice.contracts.SayDAO.meetings(0)).tokenAllocation.toString()
+    );
+
+    assert.equal(await balanceOf(alice.address), 3417);
+    assert.equal(await balanceOf(bob.address), 3417);
     assert.equal(await balanceOf(carol.address), 100);
-    assert.equal(await balanceOf(dan.address), 100);
-    assert.equal(await balanceOf(erin.address), 100);
+    assert.equal(await balanceOf(dan.address), 3417);
+    assert.equal(await balanceOf(erin.address), 3417);
 
     //console.log(
     //  "Distribution bitmap",

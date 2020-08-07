@@ -2,22 +2,27 @@
   import CONFIG from "src/config";
   import { wallet } from "src/state/eth";
   import { totalSupply } from "src/state/dao";
+
+  let reveal = false;
 </script>
 
 {#if $wallet}
 <section>
 
     {#if $wallet.mnemonic}
-  <h2>Magic Word Backup</h2>
 
-
-    <h3>Magic Word Backup</h3>
+    <h2>Magic Word Backup</h2>
 
     <p>
       <strong>Important!</strong> Make sure to save your <strong>12 magic words</strong> before you leave this page. You need these magic words to log in again.  Write them down and keep them safe.</p>
     <p>Your 12 magic words are:</p>
 
-    <textarea readonly>{$wallet.mnemonic}</textarea>
+      {#if reveal}
+        <p><button on:click={()=>reveal = false}>Hide your 12 magic words</button></p>
+        <textarea readonly>{$wallet.mnemonic}</textarea>
+      {:else}
+        <button on:click={()=>reveal = true}>Reveal your 12 magic words</button>
+      {/if}
     {/if}
 
     <h2>Settings</h2>

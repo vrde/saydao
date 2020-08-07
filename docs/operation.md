@@ -12,7 +12,7 @@
 - **Poll** means a question put to the Members of the Community for a Vote using Say. A Poll can be initiated by any Member of the Community with Say.
 - **Quorum** means the number of Members or amount of Say required for the result of a Poll to be accepted as valid. A Quorum is achieved when one third of the Members or one third of the Say has cast a Vote.
 - **Revision** means a change to the List by the Supervisor.
-- **Revoke** means a decision by the Community to take away a Member's Say.  
+- **Revoke** means a decision by the Community to take away a Member's Say.
 - **Say** means a cryptographic token awarded to Members for participation in a Community's Events. Say indicates a Member's influence in Votes held by a Community. Each Member's Say is associated with their ID. Each Community has its own distinct Say tokens.
 - **Supermajority** means greater than 66% of Say behind Votes in a Poll.
 - **Supervisor** means the Member responsible for recording participation at an Event.
@@ -31,7 +31,7 @@
 ## Events and Say
 - Participation in Events is rewarded with Say.
 - Each Event held by a Community rewards participation with more Say than the last Event, according to a formula determined by the Community.
-  - *See inflation charts - https://docs.google.com/spreadsheets/d/1pEkx2UZKIDKZs9_eY0snoXh6tkB28-YjLGvqLJD9HSs/edit#gid=0*
+  - *See [inflation charts](https://docs.google.com/spreadsheets/d/1ej6kdNGx0olk0aXxyt-F_8lItaIWPtOwfm-aii7ChIY/edit#gid=1416743652).*
 - Any Member with Say can propose an Event by initiating a Poll.
 - The Supervisor will post a draft List within 24 hours of the conclusion of an Event. Members can review the draft List and request changes.
 - After 72 hours, the Supervisor posts a final List and Say is awarded to Members on the List.

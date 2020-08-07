@@ -26,7 +26,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
   //TESTING
   uint constant MIN_POLL_TIME = 0;
   uint constant MIN_POLL_MEETING_TIME = 0;
-  uint constant TIME_UNIT = 1;
+  uint constant TIME_UNIT = 60 * 60;
   //END TESTING
 
   uint public genesis;

@@ -1,5 +1,6 @@
 <script>
 import { networkMismatch } from 'src/state/eth';
+import { role, memberId, balance, shares, totalMembers } from "src/state/dao";
 </script>
 
 <style>
@@ -24,5 +25,9 @@ import { networkMismatch } from 'src/state/eth';
     <h1>
       <a href="#">ParTecK DAO</a>
     </h1>
+
+    {#if $memberId}
+      <p>You are <strong>member {$memberId}</strong>.</p>
+    {/if}
   </div>
 </header>

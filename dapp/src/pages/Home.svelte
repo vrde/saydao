@@ -39,7 +39,7 @@
 {#if $role.member}
   <div>
     <h2>About you</h2>
-    <p>You are <strong>member {$memberId}</strong>.</p>
+    <p>You are <strong>Member {$memberId}</strong>.</p>
     <p>You have <strong>{$balance}</strong> Say. That is <em>{$shares}</em> of the total Say in ParTecK DAO.</p>
     <ul>
       <li>

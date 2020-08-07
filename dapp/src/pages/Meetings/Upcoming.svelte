@@ -8,7 +8,6 @@
 {#if $upcomingMeetings}
   {#each $upcomingMeetings as meeting}
   <h2><a href="#/events/details/{meeting.id}">{meeting.title}</a></h2>
-  <p>{meeting.question}</p>
   <p>
     The event will happen between
     <DateTime date={meeting.meetingStart} />

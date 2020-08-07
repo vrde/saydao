@@ -9,7 +9,6 @@
   {#each $openPolls as poll}
   <h2><a href="#/polls/details/{poll.id}">{poll.title}</a></h2>
     <p><em>Voting closes on <DateTime date={poll.end} /></em></p>
-    <p>{poll.question}</p>
   <hr />
   {:else}
     <h2>There are no open polls</h2>

@@ -1,4 +1,6 @@
 <script>
+  import DOMPurify from "dompurify";
+  import marked from "marked";
   import DateTime from 'src/components/DateTime.svelte';
   import Participants from './components/Participants.svelte';
   import { wallet } from 'src/state/eth';
@@ -10,9 +12,9 @@
   let vote = null;
   let state = "idle";
 
-  $currentPollId = params.id;
 
   $: {
+    $currentPollId = params.id;
     if ($poll && $poll.hasVotedFor) {
       vote = $poll.hasVotedFor;
     }
@@ -82,13 +84,6 @@
 
 {#if $poll}
   {#if $poll.open}
-    <a href="#/polls/open">Go to open polls</a>
-  {:else}
-    <a href="#/polls/closed">Go to closed polls</a>
-  {/if}
-
-  <h1>{$poll.title}</h1>
-  {#if $poll.open}
     <div class="details">
       <p>
         <strong>{$poll.totalVotesPerc}%</strong> of ParTecK DAO voted on this poll.
@@ -113,8 +108,13 @@
       <p><em>Voting ended on <DateTime date={$poll.end} /></em></p>
     </div>
   {/if}
+  <hr/>
 
-  <p class="question">{$poll.question}</p>
+  <h1>{$poll.title}</h1>
+
+  <div class="question">
+    {@html DOMPurify.sanitize(marked($poll.question))}
+  </div>
 
   <p>
     The event will happen between
@@ -159,6 +159,12 @@
 
   {#if $poll.meetingNeedsParticipantList || $poll.meetingNeedsTokenDistribution}
     <Participants poll={$poll} onDone={handleParticipantListDone}/>
+  {/if}
+
+  {#if $poll.open}
+    <a href="#/polls/open">Go to open polls</a>
+  {:else}
+    <a href="#/polls/closed">Go to closed polls</a>
   {/if}
 
 {/if}

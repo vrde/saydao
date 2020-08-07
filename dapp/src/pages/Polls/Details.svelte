@@ -1,4 +1,6 @@
 <script>
+  import DOMPurify from "dompurify";
+  import marked from "marked";
   import DateTime from 'src/components/DateTime.svelte';
   import { wallet } from 'src/state/eth';
   import { currentPollId, refresh, currentPoll as poll } from 'src/state/dao/poll';
@@ -9,9 +11,9 @@
   let vote = null;
   let state = "idle";
 
-  $currentPollId = params.id;
 
   $: {
+    $currentPollId = params.id;
     if ($poll && $poll.hasVotedFor) {
       vote = $poll.hasVotedFor;
     }
@@ -77,13 +79,6 @@
 
 {#if $poll}
   {#if $poll.open}
-    <a href="#/polls/open">Go to open polls</a>
-  {:else}
-    <a href="#/polls/closed">Go to closed polls</a>
-  {/if}
-
-  <h1>{$poll.title}</h1>
-  {#if $poll.open}
     <div class="details">
       <p>
         <strong>{$poll.totalVotesPerc}%</strong> of ParTecK DAO voted on this poll.
@@ -109,7 +104,12 @@
     </div>
   {/if}
 
-  <p class="question">{$poll.question}</p>
+  <hr />
+
+  <h1>{$poll.title}</h1>
+  <div class="question">
+    {@html DOMPurify.sanitize(marked($poll.question))}
+  </div>
 
   {#if $poll.isMeeting}
   <p>
@@ -152,6 +152,12 @@
     {#if $poll.open && $poll.hasTokens === null}
     <p><strong>Note:</strong> you can't vote on this poll because you joined ParTecK DAO after the poll was created.</p>
     {/if}
+  {/if}
+
+  {#if $poll.open}
+    <a href="#/polls/open">Go to open polls</a>
+  {:else}
+    <a href="#/polls/closed">Go to closed polls</a>
   {/if}
 
 {/if}

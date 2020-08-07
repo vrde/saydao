@@ -10,7 +10,6 @@
 
 {#each $actionableMeetings as meeting}
 <h2><a href="#/events/details/{meeting.id}">{meeting.title}</a></h2>
-  <p>{meeting.question}</p>
   <p><strong>Action:</strong> <a href="#/events/details/{meeting.id}">Please fill in the list of participants.</a></p>
 <hr />
 {/each}
@@ -28,7 +27,6 @@
     and
     <DateTime date={meeting.meetingEnd} />.
   </p>
-  <p>{meeting.question}</p>
   <hr />
   {:else}
     <h2>There are no past events</h2>

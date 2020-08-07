@@ -115,10 +115,14 @@ textarea {
 
   <label>Who is the supervisor?
     <select bind:value={supervisor} required>
-      <option value="">Select a Member</option>
-      {#each $memberList as member, i}
-        <option value="{member.memberId}">Member {member.memberId}</option>
-      {/each}
+      {#if $memberList}
+        <option value="">Select a Member</option>
+        {#each $memberList as member, i}
+          <option value="{member.memberId}">Member {member.memberId}</option>
+        {/each}
+      {:else}
+        <option value="">Wait, loading members...</option>
+      {/if}
     </select>
   </label>
 

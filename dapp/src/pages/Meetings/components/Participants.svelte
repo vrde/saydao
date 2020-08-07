@@ -71,12 +71,16 @@
 
     <formset>
       <legend>Select the participants</legend>
-      {#each $memberList as member}
-        <label>
-          <input type="checkbox" bind:group={memberIds} value="{member.memberId}">
-          Member #{member.memberId}
-        </label>
-      {/each}
+      {#if $memberList}
+        {#each $memberList as member}
+          <label>
+            <input type="checkbox" bind:group={memberIds} value="{member.memberId}">
+            Member #{member.memberId}
+          </label>
+        {/each}
+      {:else}
+        Wait, loading members...
+      {/if}
     </formset>
 
     <button type="submit">Submit</button>

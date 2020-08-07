@@ -2,7 +2,6 @@
   import DOMPurify from "dompurify";
   import marked from "marked";
   export let params = {};
-  console.log(params);
   const content = fetch("docs/" + params.name);
 </script>
 

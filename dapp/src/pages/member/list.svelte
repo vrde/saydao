@@ -3,6 +3,7 @@
 </script>
 <h1>Members</h1>
 
+{#if $memberList}
 <ul>
   {#each $memberList as member}
   <li>
@@ -10,3 +11,6 @@
   </li>
   {/each}
 </ul>
+{:else}
+  loading...
+{/if}

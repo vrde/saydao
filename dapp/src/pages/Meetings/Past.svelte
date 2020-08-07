@@ -3,7 +3,7 @@
   import DateTime from 'src/components/DateTime.svelte';
 </script>
 
-{#if $actionableMeetings.length}
+{#if $actionableMeetings && $actionableMeetings.length}
 <h1>Action required</h1>
 
 <p>You are the supervisor of the following events:<p>
@@ -19,17 +19,21 @@
 
 <h1>Past events</h1>
 
-{#each $pastMeetings as meeting}
-<h2><a href="#/events/details/{meeting.id}">{meeting.title}</a></h2>
-<p>
-  The event happened between
-  <DateTime date={meeting.meetingStart} />
-  and
-  <DateTime date={meeting.meetingEnd} />.
-</p>
-<p>{meeting.question}</p>
-<hr />
+{#if $pastMeetings}
+  {#each $pastMeetings as meeting}
+  <h2><a href="#/events/details/{meeting.id}">{meeting.title}</a></h2>
+  <p>
+    The event happened between
+    <DateTime date={meeting.meetingStart} />
+    and
+    <DateTime date={meeting.meetingEnd} />.
+  </p>
+  <p>{meeting.question}</p>
+  <hr />
+  {:else}
+    <h2>There are no past events</h2>
+    <a href="#/events/create">Propose an event</a>
+  {/each}
 {:else}
-  <h2>There are no past events</h2>
-  <a href="#/events/create">Propose an event</a>
-{/each}
+  loading...
+{/if}

@@ -37,33 +37,29 @@ export const role = derived(
   {}
 );
 
-export const memberList = derived(
-  wallet,
-  async ($wallet, set) => {
-    if (!$wallet) return;
-    const list = [];
-    // A bit redundant, can be optimized later
-    const decimals = await $wallet.contracts.SayToken.decimals();
-    const total = await $wallet.contracts.SayToken.totalSupply();
-    for (let page = 0; ; page++) {
-      const members = await $wallet.contracts.SayDAO.listMembers(page);
-      for (let member of members) {
-        if (member.isZero()) {
-          set(list);
-          return;
-        }
-        const address = member.shr(96).toHexString();
-        const memberId = member.mask(16).toNumber();
-        const rawBalance = await $wallet.contracts.SayToken.balanceOf(address);
-        const balance = prettyBalance({ value: rawBalance, total, decimals });
-        const shares = prettyShares({ value: rawBalance, total, decimals });
-        list.push({ address, memberId, balance, shares });
+export const memberList = derived(wallet, async ($wallet, set) => {
+  if (!$wallet) return;
+  const list = [];
+  // A bit redundant, can be optimized later
+  const decimals = await $wallet.contracts.SayToken.decimals();
+  const total = await $wallet.contracts.SayToken.totalSupply();
+  for (let page = 0; ; page++) {
+    const members = await $wallet.contracts.SayDAO.listMembers(page);
+    for (let member of members) {
+      if (member.isZero()) {
+        set(list);
+        return;
       }
-      set(list);
+      const address = member.shr(96).toHexString();
+      const memberId = member.mask(16).toNumber();
+      const rawBalance = await $wallet.contracts.SayToken.balanceOf(address);
+      const balance = prettyBalance({ value: rawBalance, total, decimals });
+      const shares = prettyShares({ value: rawBalance, total, decimals });
+      list.push({ address, memberId, balance, shares });
     }
-  },
-  []
-);
+    set(list);
+  }
+});
 
 export const totalMembers = derived(wallet, async ($wallet, set) => {
   if (!$wallet) return;

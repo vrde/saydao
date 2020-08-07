@@ -97,9 +97,11 @@
       <li>
         <a href="#/events/past">Past events</a>: Show past ParTecK events.
       </li>
+      {#if $role.member}
       <li>
         <a href="#/events/create">Create an event</a>: Propose a new ParTecK event.
       </li>
+      {/if}
     </ul>
     <h3>Polls</h3>
     <ul>
@@ -109,9 +111,11 @@
       <li>
         <a href="#/polls/closed">Closed polls</a>: Show polls that are now closed.
       </li>
+      {#if $role.member}
       <li>
         <a href="#/polls/create">New poll</a>: Open a poll for ParTecK to vote on.
       </li>
+      {/if}
     </ul>
   </div>
 {/if}

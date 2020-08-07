@@ -8,30 +8,35 @@
   export let onDone;
 
   let memberIds = [];
-  let state = "idle";
+  let state = {};
+
+  function handleClose() {
+    state = {};
+  }
 
   async function handleSubmit() {
+    state.action = "submit";
     console.log("Submit presence for members", memberIds);
     const bitmaps = createBitmaps(memberIds);
-    for (let cluster in bitmaps) {
-      console.log("Cluster", cluster);
-      console.log("Bitmap", toBinary(bitmaps[cluster]));
-      await $wallet.contracts.SayDAO.updateMeetingParticipants(
-        poll.meetingId,
-        cluster,
-        bitmaps[cluster]
-      );
-    }
-    console.log("Seal participant list");
-    await $wallet.contracts.SayDAO.sealMeetingParticipants(poll.meetingId);
-    state = "submit";
     try {
-      //await $wallet.contracts.SayDAO.vote($currentPollId, vote);
+      for (let cluster in bitmaps) {
+        console.log("Cluster", cluster);
+        console.log("Bitmap", toBinary(bitmaps[cluster]));
+        await $wallet.contracts.SayDAO.updateMeetingParticipants(
+          poll.meetingId,
+          cluster,
+          bitmaps[cluster]
+        );
+      }
+      console.log("Seal participant list");
+      await $wallet.contracts.SayDAO.sealMeetingParticipants(poll.meetingId);
+        //await $wallet.contracts.SayDAO.vote($currentPollId, vote);
+      await handleTokenDistribution();
+        state = {};
     } catch(e) {
       console.error(e);
+      state.error = e.toString();
     }
-    state = "idle";
-    await handleTokenDistribution();
   }
 
   async function handleTokenDistribution() {
@@ -58,6 +63,7 @@
 
 </script>
 
+<Loading {state} onClose={handleClose}/>
 
 {#if poll.meetingNeedsParticipantList}
   <h2>Select the participants</h2>

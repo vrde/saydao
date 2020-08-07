@@ -9,7 +9,7 @@
   export let params = null;
 
   let vote = null;
-  let state = "idle";
+  let state = {};
 
 
   $: {
@@ -19,14 +19,19 @@
     }
   }
 
+  function handleClose() {
+    state = {};
+  }
+
   async function handleSubmit() {
-    state = "submit";
+    state.action = "submit";
     try {
       await $wallet.contracts.SayDAO.vote($currentPollId, vote);
+      state = {}
     } catch(e) {
       console.error(e);
+      state.error = e.toString();
     }
-    state = "idle";
     $refresh = Date.now();
   }
 
@@ -70,12 +75,7 @@
 
 </style>
 
-{#if state !== "idle"}
-  <Loading>
-    <h1>Submitting your vote</h1>
-    <p>Please wait. This will take a while.</p>
-  </Loading>
-{/if}
+<Loading {state} onClose={handleClose}/>
 
 {#if $poll}
   {#if $poll.open}

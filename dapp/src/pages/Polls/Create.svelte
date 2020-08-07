@@ -9,24 +9,30 @@
   let question = "";
   let choices = ["", ""];
   let duration = 60*60*24*7;
-  let state = "idle";
+  let state = {};
+
+  function handleClose() {
+    state = {};
+  }
 
   async function handleSubmit(e) {
     if (!confirm("Are you sure? You won't be able to edit it later")) return;
-    state = "working"
-
-    // Upload to IPFS and get the CID
-    const data = { title, question, choices, duration };
-    const cid = await ipfs.add(data);
-
-    // Create the poll in the smart contract
+    state.action = "working"
 
     try {
+      // Upload to IPFS and get the CID
+      const data = { title, question, choices, duration };
+      const cid = await ipfs.add(data);
+
+      // Create the poll in the smart contract
+
       const receipt = await $wallet.contracts.SayDAO.createPoll(
         ipfs.cidToUint(cid), parseInt(duration, 10), choices.length);
       console.log("createPoll receipt", receipt);
+      state = {}
     } catch (err) {
       console.error(err)
+      state.error = err.toString()
       return;
     }
 
@@ -42,12 +48,7 @@ textarea {
 }
 </style>
 
-{#if state !== "idle"}
-  <Loading>
-    <h1>Submitting your poll</h1>
-    <p>Please wait, this is slow as hell.</p>
-  </Loading>
-{/if}
+<Loading {state} onClose={handleClose}/>
 
 <h1>Create a poll</h1>
 

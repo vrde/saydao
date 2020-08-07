@@ -78,7 +78,7 @@ textarea {
   width: 100%;
   height: var(--size-m);
   margin-bottom: var(--size-s);
-  resize: none;
+  resize: vertical;
 }
 
 textarea:focus,

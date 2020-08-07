@@ -11,10 +11,7 @@
   let question = "";
   let duration = 60*60*24*7;
   let supervisor;
-  let activity = {
-    state: "idle",
-    error: null
-  }
+  let state = {};
 
   let [minStartDate, minStartTime] = splitDate(new Date());
   let [startDate, startTime] = [minStartDate, minStartTime];
@@ -28,6 +25,10 @@
     [minStartDate, minStartTime] = splitDate(new Date(Date.now() + max));
   }
 
+  function handleClose() {
+    state = {};
+  }
+
   async function handleSubmit(e) {
     const start = fromSplitToTimestamp(startDate, startTime);
     const end = fromSplitToTimestamp(endDate, endTime);
@@ -39,7 +40,7 @@
       return;
     }
     if (!confirm("Are you sure? You won't be able to edit this later.")) return;
-    activity.state = "working"
+    state.action = "submit";
 
     // Upload to IPFS and get the CID
     const data = { title, question, start, end, duration };
@@ -54,16 +55,14 @@
         end,
         supervisor);
       console.log("createMeetingPoll receipt", receipt);
+      state = {};
     } catch (err) {
       console.error(err)
-      activity.state = "error";
-      activity.error = err;
+      state.error = err.toString();
       return;
     }
 
     push("/polls/open");
-
-    activity.state = "idle";
   }
 </script>
 
@@ -73,17 +72,7 @@ textarea {
 }
 </style>
 
-{#if activity.state === "working"}
-  <Loading>
-    <h1>Creating your poll</h1>
-    <p>Please be patient. This will be a slow process!</p>
-  </Loading>
-{:else if activity.state === "error"}
-  <Loading>
-    <h1>Oops, someting went wrong</h1>
-    <p>{activity.error}</p>
-  </Loading>
-{/if}
+<Loading {state} onClose={handleClose}/>
 
 <h1>Propose a new Event</h1>
 

@@ -1,5 +1,7 @@
 <script>
   import { slide } from "svelte/transition";
+  export let state;
+  export let onClose;
 </script>
 
 <style type="text/scss">
@@ -15,10 +17,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 1rem;
     /*backdrop-filter: blur(10px);*/
   }
 
-  div {
+  div.working {
     animation: blink 2s infinite;
   }
 
@@ -33,10 +36,19 @@
   }
 </style>
 
-<section transition:slide>
-  <div>
-    <slot>
-      Please wait
-    </slot>
-  </div>
-</section>
+{#if state.action || state.error}
+  <section transition:slide>
+    <div class:working={!state.error}>
+      {#if state.error}
+        <h2>Oops, something went wrong :(</h2>
+        <p>Please give it another try.</p>
+        <button on:click={onClose}>Close</button>
+        <details>
+          {state.error}
+        </details>
+      {:else}
+        <p>Please wait. This will take a while.</p>
+      {/if}
+    </div>
+  </section>
+{/if}

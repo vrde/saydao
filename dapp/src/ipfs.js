@@ -18,7 +18,7 @@ export async function add(data) {
     console.log("Content uploaded and pinned to IPFS with cid", cid);
   } catch (err) {
     console.error(err);
-    return;
+    throw new Error("Cannot upload to IPFS");
   }
   cache.set(cid, data);
   return cid;

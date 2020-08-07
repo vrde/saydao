@@ -10,7 +10,7 @@
   export let params = null;
 
   let vote = null;
-  let state = "idle";
+  let state = {};
 
 
   $: {
@@ -18,6 +18,10 @@
     if ($poll && $poll.hasVotedFor) {
       vote = $poll.hasVotedFor;
     }
+  }
+
+  function handleClose() {
+    state = {};
   }
 
   async function handleSubmit() {
@@ -75,12 +79,7 @@
 
 </style>
 
-{#if state !== "idle"}
-  <Loading>
-    <h1>Submitting your vote</h1>
-    <p>Please be patient. This will take a while.</p>
-  </Loading>
-{/if}
+<Loading {state} onClose={handleClose}/>
 
 {#if $poll}
   {#if $poll.open}

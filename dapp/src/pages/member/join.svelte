@@ -36,6 +36,7 @@ async function handleSubmit() {
     inviteError = e;
     console.log(e);
   }
+  await login();
   console.log(transaction);
   console.log(receipt);
   replace(`/member/welcome?memberId=${invite.memberId}&tx=${transaction.hash}`);

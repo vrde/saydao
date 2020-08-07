@@ -17,7 +17,7 @@ async function loadPoll(wallet, pollId, memberId) {
   const key = [wallet.contracts.SayDAO.address, pollId, memberId].join(":");
   const keyPartial = key + ":partial";
 
-  const cached = cache.get(key);
+  const cached = null; //cache.get(key);
   //const cachedPartial = cache.get(keyPartial);
 
   // If a poll ended already it is fully cached.
@@ -87,6 +87,14 @@ async function loadPoll(wallet, pollId, memberId) {
   //
   // Then we reached a final decision.
   let finalDecision = null;
+  console.log(
+    "mmm",
+    content,
+    quorumReached,
+    firstOption,
+    secondOption,
+    poll.end
+  );
   if (
     quorumReached &&
     !firstOption[0].eq(secondOption[0]) &&
@@ -117,8 +125,8 @@ async function loadPoll(wallet, pollId, memberId) {
     ? null
     : tokensAvailableToVote.toString();
 
-  console.log("set", keyPartial);
-  cache.set(keyPartial, content);
+  //console.log("set", keyPartial);
+  //cache.set(keyPartial, content);
 
   //}
 
@@ -160,7 +168,7 @@ async function loadPoll(wallet, pollId, memberId) {
   ) {
     console.log("Cache old poll", content);
     //cache.del(keyPartial);
-    cache.set(key, content);
+    //cache.set(key, content);
   }
 
   return content;
@@ -184,7 +192,7 @@ export const pollList = derived(
     // Backwards because the most recent polls are likey to be the last ones.
     for (let i = totalPolls - 1; i >= 0; i--) {
       list.push(await loadPoll($wallet, i, $memberId));
-      list.sort((a, b) => b.end - a.end);
+      list.sort((a, b) => a.end - b.end);
       set(list);
     }
   }

@@ -1,5 +1,5 @@
 <script>
-  import { memberList } from "src/state/dao";
+  import { list as members } from "src/state/dao/member";
   import { wallet } from "src/state/eth";
   import Loading from "src/components/Loading.svelte";
   import { push } from 'svelte-spa-router'
@@ -104,9 +104,9 @@ textarea {
 
   <label>Who is the supervisor?
     <select bind:value={supervisor} required>
-      {#if $memberList}
+      {#if $members}
         <option value="">Select a Member</option>
-        {#each $memberList as member, i}
+        {#each $members as member, i}
           <option value="{member.memberId}">Member {member.memberId}</option>
         {/each}
       {:else}

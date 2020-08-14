@@ -1,6 +1,6 @@
 <script>
   import { wallet } from 'src/state/eth';
-  import { memberList } from 'src/state/dao';
+  import { list as members} from 'src/state/dao/member';
   import Loading from "src/components/Loading.svelte";
   import { createBitmaps, toBinary } from "../utils";
 
@@ -77,8 +77,8 @@
 
     <formset>
       <legend>Select the participants</legend>
-      {#if $memberList}
-        {#each $memberList as member}
+      {#if $members}
+        {#each $members as member}
           <label>
             <input type="checkbox" bind:group={memberIds} value="{member.memberId}">
             Member #{member.memberId}

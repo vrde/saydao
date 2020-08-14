@@ -11,6 +11,8 @@ import { clock } from "./clock";
 // Autologin
 (() => db.get("saydao:autologin") && login())();
 
+export const wallet = writable();
+
 export async function login(mnemonic) {
   let w;
   if (etherea.hasNativeWallet()) {
@@ -41,14 +43,27 @@ export async function login(mnemonic) {
   return w;
 }
 
+/*
+export const currentBlockNumber = derived(wallet, ($wallet, set) => {
+  console.log("porcodio?");
+  if (!$wallet) return;
+  const callback = async () => {
+    const blockNumber = await $wallet.provider.getBlockNumber();
+    db.set("lastBlockNumber", blockNumber);
+    set(blockNumber);
+  };
+  const timerId = setInterval(callback, 5000);
+  callback();
+  return () => clearInterval(timerId);
+});
+*/
+
 export async function logout() {
   db.clear();
   wallet.set(undefined);
 }
 
 export const networkMismatch = writable();
-
-export const wallet = writable();
 
 export const addressShort = derived(wallet, async ($wallet, set) => {
   if ($wallet) {

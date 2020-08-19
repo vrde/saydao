@@ -67,7 +67,7 @@ async function load(wallet, update, cache, context) {
   else {
     // First we extract all members from the db and update the storage.
     console.log("state/dao/member: loading past events");
-    db.get("memberIds").forEach(id => update(db.get(`member:${id}`)));
+    db.get("memberIds", []).forEach(id => update(db.get(`member:${id}`)));
     const pastEvents = await wallet.contracts.SayToken.queryFilter(
       "Transfer",
       lastSyncBlockNumber

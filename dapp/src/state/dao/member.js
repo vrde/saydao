@@ -126,6 +126,7 @@ function sync(wallet, update) {
 export const objects = derived(wallet, ($wallet, set) => {
   if (!$wallet) return;
   const members = {};
+  set(members);
   const update = member => {
     members[member.id] = member;
     set(members);

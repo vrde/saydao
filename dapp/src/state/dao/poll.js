@@ -38,10 +38,9 @@ async function _get(wallet, id, memberId) {
     wallet.address,
     poll.snapshot
   );
-  const hasVotedFor =
-    memberId !== undefined
-      ? await wallet.contracts.SayDAO.hasVotedFor(id, memberId)
-      : null;
+  const hasVotedFor = memberId
+    ? await wallet.contracts.SayDAO.hasVotedFor(id, memberId)
+    : null;
 
   let extra = {};
   // Is the poll a meeting?

@@ -9,9 +9,25 @@ import db from "./db";
 import { clock } from "./clock";
 
 // Autologin
-(() => db.get("saydao:autologin") && login())();
+(() => (db.get("saydao:autologin") ? login() : loginAnon()))();
+
+login();
 
 export const wallet = writable();
+
+export async function loginAnon(mnemonic) {
+  let w;
+  w = await etherea.getLocalWallet({
+    ...CONFIG.walletOptions,
+    mnemonic: db.get("saydao:wallet:mnemonic")
+  });
+  w.loadContracts(contracts);
+  db.set("saydao:wallet:mnemonic", w.mnemonic);
+  console.log("User authenticated with wallet", w);
+  window.wallet = w;
+  wallet.set(w);
+  return w;
+}
 
 export async function login(mnemonic) {
   let w;

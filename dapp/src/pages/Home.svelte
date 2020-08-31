@@ -5,37 +5,6 @@
 
 <section>
 
-{#if !$wallet}
-  <div>
-    <h2>Log in</h2>
-    <p>To participate in ParTecK DAO, you need to log in.</p>
-    <ul>
-      <li>
-        <a href="#/login">Log in now</a> if you've already joined.
-      </li>
-      <li>
-        <a href="mailto:agranzot@mailbox.org?subject=Invite me to ParTecK DAO">Request an invite</a> if you are a ParTecK member and want to join.
-      </li>
-    </ul>
-    <p>If you're just looking around, you don't need to log in.</p>
-  </div>
-
-  <div>
-    <h2>Participate</h2>
-    <ul>
-      <li>
-        <a href="#/events/upcoming">Upcoming events</a>: Show upcoming ParTecK events.
-      </li>
-      <li>
-        <a href="#/polls/open">Open polls</a>: Show polls you can vote on.
-      </li>
-      <li>
-        <a href="#/polls/closed">Closed polls</a>: Show polls that are now closed.
-      </li>
-    </ul>
-  </div>
-{:else}
-
 {#if $role.member}
   <div>
     <h2>About you</h2>
@@ -52,16 +21,17 @@
   </div>
 {:else}
   <div>
-    <h2>About you</h2>
-    <p>You are <strong>logged in</strong> but you are not a member.</p>
+    <h2>Log in</h2>
+    <p>To participate in ParTecK DAO, you need to log in.</p>
     <ul>
+      <li>
+        <a href="#/login">Log in now</a> if you've already joined.
+      </li>
       <li>
         <a href="mailto:agranzot@mailbox.org?subject=Invite me to ParTecK DAO">Request an invite</a> if you are a ParTecK member and want to join.
       </li>
-      <li>
-        <a href="#/logout">Sign out</a>
-      </li>
     </ul>
+    <p>If you're just looking around, you don't need to log in.</p>
   </div>
 {/if}
 
@@ -118,7 +88,6 @@
       {/if}
     </ul>
   </div>
-{/if}
 
   <div>
     <h2>What is ParTecK DAO</h2>

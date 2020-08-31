@@ -70,6 +70,7 @@ export const totalMembers = derived(wallet, async ($wallet, set) => {
 export const memberId = derived(wallet, async ($wallet, set) => {
   if (!$wallet) return;
   const id = await $wallet.contracts.SayDAO.addressToMember($wallet.address);
+  console.log("member id is", id);
   set(id !== 0 ? id : null);
 });
 

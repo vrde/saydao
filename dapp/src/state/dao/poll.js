@@ -1,59 +1,22 @@
-import { writable, derived } from "svelte/store";
-import baseX from "base-x";
-import { push } from "svelte-spa-router";
+import { readable, derived } from "svelte/store";
+import db from "src/state/db";
 import { wallet } from "src/state/eth";
-import { Buffer } from "buffer";
 import { memberId } from "./";
-import etherea from "etherea";
+import { onEvent, getBlockNumber } from "src/eth";
 import * as ipfs from "src/ipfs";
-import * as cache from "src/cache";
 
 const NULL = etherea.BigNumber.from(
   "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 );
 
-async function loadPoll(wallet, pollId, memberId) {
-  const now = new Date().getTime();
-  const key = [wallet.contracts.SayDAO.address, pollId, memberId].join(":");
-  const keyPartial = key + ":partial";
-
-  const cached = null; //cache.get(key);
-  //const cachedPartial = cache.get(keyPartial);
-
-  // If a poll ended already it is fully cached.
-  if (cached) {
-    console.log("Cache hit", cached);
-    return cached;
-  }
-
-  // Load data from Ethereum
-  const poll = await wallet.contracts.SayDAO.polls(pollId);
-  let content;
-
-  // Do we have new votes?
-  /*
-  if (
-    cachedPartial &&
-    cachedPartial.tokenStaked === poll.tokenStaked.toString() &&
-    cachedPartial.end < now
-  ) {
-    console.log("cache hit", keyPartial);
-    content = cachedPartial;
-  } else {
-  */
-  // Load data from IPFS
-  content = await ipfs.get(ipfs.uintToCid(poll.cid.toHexString()));
-
-  let hasVotedFor = 255;
-  if (memberId) {
-    hasVotedFor = await wallet.contracts.SayDAO.hasVotedFor(pollId, memberId);
-  }
+async function _get(wallet, id, memberId) {
+  const poll = await wallet.contracts.SayDAO.polls(id);
+  const content = await ipfs.get(ipfs.uintToCid(poll.cid.toHexString()));
 
   const tokenSupply = poll.tokenSupply;
   const tokenStaked = poll.tokenStaked;
   const tokenLeft = tokenSupply.sub(tokenStaked);
-
-  const votes = await wallet.contracts.SayDAO.getVotes(pollId);
+  const votes = await wallet.contracts.SayDAO.getVotes(id);
   const votesPerc = votes.map(vote =>
     tokenStaked.isZero()
       ? 0
@@ -68,10 +31,82 @@ async function loadPoll(wallet, pollId, memberId) {
         .mul(10000)
         .div(tokenSupply)
         .toNumber() / 100;
-
   const quorumReached = totalVotesPerc >= 33;
   const toQuorum = 33 - totalVotesPerc;
+  // How many tokens had the member when the poll was created?
+  const tokensAvailableToVote = await wallet.contracts.SayToken.balanceOfAt(
+    wallet.address,
+    poll.snapshot
+  );
+  const hasVotedFor =
+    memberId !== undefined
+      ? await wallet.contracts.SayDAO.hasVotedFor(id, memberId)
+      : null;
 
+  let extra = {};
+  // Is the poll a meeting?
+  if (!poll.meetingId.eq(NULL)) {
+    const meeting = await wallet.contracts.SayDAO.meetings(poll.meetingId);
+    extra = {
+      meetingId: poll.meetingId,
+      isMeeting: true,
+      // Hardcode "Yes" and "No" choices.
+      choices: ["Yes", "No"],
+      meetingDone: meeting.done,
+      meetingSupervisor: meeting.supervisor,
+      meetingStart: new Date(meeting.start.toNumber() * 1000).getTime(),
+      meetingEnd: new Date(meeting.end.toNumber() * 1000).getTime()
+      // Option 0 is yes, 1 is no.
+      //meetingValid: finalDecision === 0
+    };
+  }
+
+  return {
+    id: id.toString(),
+    title: content.title,
+    question: content.question,
+    choices: content.choices,
+    duration: content.duration,
+    end: new Date(poll.end.toNumber() * 1000).getTime(),
+    meetingId: poll.meetingId.eq(NULL) ? null : poll.meetingId.toString(),
+    tokenSupply: tokenSupply.toString(),
+    tokenStaked: tokenStaked.toString(),
+    tokenLeft: tokenLeft.toString(),
+    votes,
+    votesPerc,
+    totalVotesPerc,
+    quorumReached,
+    toQuorum,
+    hasVotedFor: hasVotedFor === 255 ? null : hasVotedFor,
+    hasTokens: tokensAvailableToVote.isZero()
+      ? null
+      : tokensAvailableToVote.toString(),
+    ...extra
+  };
+}
+
+export async function getMeetingState(wallet, poll, memberId) {
+  const state = {};
+  if (
+    poll.meetingValid &&
+    poll.meetingSupervisor === memberId &&
+    poll.meetingEnd < Date.now()
+  ) {
+    if (poll.meetingDone) {
+      state.meetingNeedsTokenDistribution = !(
+        await wallet.contracts.SayDAO.getRemainingDistributionClusters(
+          etherea.BigNumber.from(poll.meetingId)
+        )
+      ).isZero();
+    } else {
+      state.meetingNeedsParticipantList = true;
+    }
+  }
+  return state;
+}
+
+function updatePollDynamicFields(poll) {
+  const votes = poll.votes.map(v => etherea.BigNumber.from(v));
   // We need to check if there are multiple winning options.
   // This temporary data structure is [ vote (big number), position (int) ]
   const [firstOption, secondOption] = votes
@@ -87,163 +122,167 @@ async function loadPoll(wallet, pollId, memberId) {
   //
   // Then we reached a final decision.
   let finalDecision = null;
-  console.log(
-    "mmm",
-    content,
-    quorumReached,
-    firstOption,
-    secondOption,
-    poll.end
-  );
   if (
-    quorumReached &&
+    poll.quorumReached &&
     !firstOption[0].eq(secondOption[0]) &&
-    (firstOption[0].sub(secondOption[0]).gt(tokenLeft) ||
-      poll.end <= new Date())
+    (firstOption[0]
+      .sub(secondOption[0])
+      .gt(etherea.BigNumber.from(poll.tokenLeft)) ||
+      poll.end <= Date.now())
   ) {
     finalDecision = firstOption[1];
   }
 
-  // How many tokens had the member when the poll was created?
-  const tokensAvailableToVote = await wallet.contracts.SayToken.balanceOfAt(
+  poll.open = Date.now() < poll.end;
+
+  poll.finalDecision = finalDecision;
+  if (poll.isMeeting) {
+    poll.meetingValid = poll.finalDecision === 0;
+  }
+}
+
+function getPollKey(wallet, id) {
+  return [
     wallet.address,
-    poll.snapshot
-  );
+    "contract",
+    wallet.contracts.SayDAO.address,
+    "poll",
+    id
+  ].join(":");
+}
 
-  content.id = pollId;
-  content.end = utcTimestampToDate(poll.end.toNumber()).getTime();
-  content.open = now < content.end;
-  content.tokenSupply = tokenSupply.toString();
-  content.tokenStaked = tokenStaked.toString();
-  content.hasVotedFor = hasVotedFor === 255 ? null : hasVotedFor;
-  content.votesPerc = votesPerc;
-  content.totalVotesPerc = totalVotesPerc;
-  content.quorumReached = quorumReached;
-  content.toQuorum = toQuorum;
-  content.finalDecision = finalDecision;
-  content.hasTokens = tokensAvailableToVote.isZero()
-    ? null
-    : tokensAvailableToVote.toString();
+const OBJECTS = {};
 
-  //console.log("set", keyPartial);
-  //cache.set(keyPartial, content);
+export function get(id, onUpdate) {
+  if (OBJECTS[id] === undefined) {
+    OBJECTS[id] = derived(
+      [wallet, memberId],
+      async ([$wallet, $memberId], set) => {
+        if (!$wallet || $memberId === undefined) return;
+        const key = getPollKey($wallet, id);
+        const blockNumber = await getBlockNumber($wallet.provider);
 
-  //}
+        let poll = db.get(key);
 
-  // Is the poll a meeting?
-  if (!poll.meetingId.eq(NULL)) {
-    const meeting = await wallet.contracts.SayDAO.meetings(poll.meetingId);
-    content.meetingId = poll.meetingId;
-    content.isMeeting = true;
-    // Hardcode "Yes" and "No" choices.
-    content.choices = ["Yes", "No"];
-    content.meetingDone = meeting.done;
-    content.meetingSupervisor = meeting.supervisor;
-    content.meetingStart = new Date(meeting.start.toNumber() * 1000).getTime();
-    content.meetingEnd = new Date(meeting.end.toNumber() * 1000).getTime();
-    // Option 0 is yes, 1 is no.
-    content.meetingValid = content.finalDecision === 0;
-    if (
-      content.meetingValid &&
-      content.meetingSupervisor === memberId &&
-      content.meetingEnd < now
-    ) {
-      if (content.meetingDone) {
-        content.meetingNeedsTokenDistribution = !(
-          await wallet.contracts.SayDAO.getRemainingDistributionClusters(
-            content.meetingId
-          )
-        ).isZero();
-      } else {
-        content.meetingNeedsParticipantList = true;
+        if (!poll || blockNumber - poll._blockNumber > 1024) {
+          poll = await _get($wallet, id, $memberId);
+          poll._blockNumber = blockNumber;
+          db.set(key, poll);
+        }
+
+        updatePollDynamicFields(poll);
+        onUpdate && onUpdate(poll);
+        set(poll);
+
+        const filter = $wallet.contracts.SayDAO.filters.Vote();
+        filter.fromBlock = blockNumber + 1;
+
+        return onEvent(
+          $wallet.provider,
+          $wallet.contracts.SayDAO,
+          filter,
+          async event => {
+            if (event.pollId.toString() === id) {
+              poll = await _get($wallet, id, $memberId);
+              poll._blockNumber = blockNumber;
+              updatePollDynamicFields(poll);
+              onUpdate && onUpdate(poll);
+              db.set(key, poll);
+              set(poll);
+            } else {
+              poll = db.get(key);
+              poll._blockNumber = blockNumber;
+              db.set(key, poll);
+            }
+          }
+        );
       }
-    }
+    );
   }
-
-  // Poll ended, we can safely cache it for later use.
-  if (
-    !content.open &&
-    !content.meetingNeedsTokenDistribution &&
-    !content.meetingNeedsParticipantList
-  ) {
-    console.log("Cache old poll", content);
-    //cache.del(keyPartial);
-    //cache.set(key, content);
-  }
-
-  return content;
+  return OBJECTS[id];
 }
 
-function utcTimestampToDate(timestamp) {
-  //const offset = new Date().getTimezoneOffset() * 60;
-  //return new Date((timestamp + offset) * 1000);
-  return new Date(timestamp * 1000);
+function getPollsKey(wallet) {
+  return [
+    wallet.address,
+    "contract",
+    wallet.contracts.SayDAO.address,
+    "polls"
+  ].join(":");
 }
 
-export const currentPollId = writable();
-export const refresh = writable();
-
-export const pollList = derived(
-  [wallet, memberId],
-  async ([$wallet, $memberId], set) => {
-    if (!$wallet || $memberId === undefined) return;
-    const totalPolls = await $wallet.contracts.SayDAO.totalPolls();
-    const list = [];
-    // Backwards because the most recent polls are likey to be the last ones.
-    for (let i = totalPolls - 1; i >= 0; i--) {
-      list.push(await loadPoll($wallet, i, $memberId));
-      list.sort((a, b) => a.end - b.end);
-      set(list);
-    }
+async function _getAll(wallet, set) {
+  const totalPolls = await wallet.contracts.SayDAO.totalPolls();
+  // Backwards because the most recent polls are likey to be the last ones.
+  for (let i = totalPolls - 1; i >= 0; i--) {
+    const id = i.toString();
+    get(id).subscribe(poll => {
+      if (poll === undefined) return;
+      set(poll);
+    });
   }
+}
+
+const objects = derived(wallet, async ($wallet, set) => {
+  if (!$wallet) return;
+  const store = {};
+  const _set = poll => {
+    store[poll.id] = poll;
+    set(store);
+  };
+  const blockNumber = await getBlockNumber($wallet.provider);
+  const filter = $wallet.contracts.SayDAO.filters.CreatePoll();
+  filter.fromBlock = blockNumber + 1;
+  _getAll($wallet, _set);
+
+  return onEvent(
+    $wallet.provider,
+    $wallet.contracts.SayDAO,
+    filter,
+    async event => {
+      _getAll($wallet, _set);
+    }
+  );
+});
+
+export const open = derived(
+  objects,
+  $objects =>
+    $objects && Object.values($objects).filter(poll => poll && poll.open)
 );
 
-export const upcomingMeetings = derived(pollList, $pollList => {
-  const now = new Date().getTime();
+export const closed = derived(
+  objects,
+  $objects =>
+    $objects && Object.values($objects).filter(poll => poll && !poll.open)
+);
+
+export const upcomingMeetings = derived(objects, $objects => {
+  const now = Date.now();
   return (
-    $pollList &&
-    $pollList.filter(
+    $objects &&
+    Object.values($objects).filter(
       poll => poll.isMeeting && poll.meetingValid && now < poll.meetingEnd
     )
   );
 });
 
-export const pastMeetings = derived(pollList, $pollList => {
+export const pastMeetings = derived(objects, $objects => {
   const now = new Date().getTime();
   return (
-    $pollList &&
-    $pollList.filter(
+    $objects &&
+    Object.values($objects).filter(
       poll => poll.isMeeting && poll.meetingValid && poll.meetingEnd <= now
     )
   );
 });
 
 export const actionableMeetings = derived(
-  pollList,
-  $pollList =>
-    $pollList &&
-    $pollList.filter(
+  objects,
+  $objects =>
+    $objects &&
+    Object.values($objects).filter(
       poll =>
         poll.meetingNeedsTokenDistribution || poll.meetingNeedsParticipantList
     )
-);
-
-export const openPolls = derived(
-  pollList,
-  $pollList => $pollList && $pollList.filter(poll => poll.open)
-);
-
-export const closedPolls = derived(
-  pollList,
-  $pollList => $pollList && $pollList.filter(poll => !poll.open)
-);
-
-export const currentPoll = derived(
-  [wallet, currentPollId, memberId, refresh],
-  async ([$wallet, $currentPollId, $memberId, $refresh], set) => {
-    if (!$wallet || $currentPollId === undefined || $memberId === undefined)
-      return;
-    set(undefined);
-    set(await loadPoll($wallet, $currentPollId, $memberId));
-  }
 );

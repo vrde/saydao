@@ -43,21 +43,6 @@ export async function login(mnemonic) {
   return w;
 }
 
-/*
-export const currentBlockNumber = derived(wallet, ($wallet, set) => {
-  console.log("porcodio?");
-  if (!$wallet) return;
-  const callback = async () => {
-    const blockNumber = await $wallet.provider.getBlockNumber();
-    db.set("lastBlockNumber", blockNumber);
-    set(blockNumber);
-  };
-  const timerId = setInterval(callback, 5000);
-  callback();
-  return () => clearInterval(timerId);
-});
-*/
-
 export async function logout() {
   db.clear();
   wallet.set(undefined);

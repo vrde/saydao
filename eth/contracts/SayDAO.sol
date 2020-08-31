@@ -11,6 +11,9 @@ import "./SayToken.sol";
 
 contract SayDAO is BaseRelayRecipient, AccessControl {
 
+  event CreatePoll(uint pollId);
+  event Vote(uint pollId);
+
   bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
   uint public constant PAGE_SIZE = 32;
   uint public constant NULL = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
@@ -197,6 +200,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     for (uint8 i = 0; i < options; i++) {
       pollToVotes[polls.length - 1].push(0);
     }
+    emit CreatePoll(polls.length - 1);
     return polls.length - 1;
   }
 
@@ -235,6 +239,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
     // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
     pollToVoters[uint(keccak256(abi.encodePacked(pollId, option)))][uint8(memberId / 256)] |= 1 << (memberId % 256);
+    emit Vote(pollId);
   }
 
   function getVotes(uint pollId) view public returns(uint[8] memory result) {
@@ -312,6 +317,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     pollToVotes[polls.length - 1].push(0);
     pollToVotes[polls.length - 1].push(0);
 
+    emit CreatePoll(polls.length - 1);
     return polls.length - 1;
   }
 

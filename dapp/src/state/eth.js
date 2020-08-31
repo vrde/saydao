@@ -51,6 +51,11 @@ export async function login(mnemonic) {
     });
   }
   w.loadContracts(contracts);
+
+  if (db.get("saydao:wallet:mnemonic") !== w.mnemonic) {
+    localStorage.clear();
+  }
+
   db.set("saydao:wallet:mnemonic", w.mnemonic);
   db.set("saydao:autologin", true);
   console.log("User authenticated with wallet", w);

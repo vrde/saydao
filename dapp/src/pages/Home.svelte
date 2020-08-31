@@ -1,15 +1,18 @@
 <script>
   import { wallet } from "src/state/eth";
-  import { role, memberId, balance, shares, totalMembers } from "src/state/dao";
+  import { get as getMember, totalMembers, me } from "src/state/dao/member";
+  import { role, memberId } from "src/state/dao";
+
+  window.me = me;
 </script>
 
 <section>
 
-{#if $role.member}
+{#if $me}
   <div>
     <h2>About you</h2>
-    <p>You are <strong>Member {$memberId}</strong>.</p>
-    <p>You have <strong>{$balance}</strong> Say. That is <em>{$shares}</em> of the total Say in ParTecK DAO.</p>
+    <p>You are <strong>Member {$me.id}</strong>.</p>
+    <p>You have <strong>{$me.balance}</strong> Say. That is <em>{$me.shares}</em> of the total Say in ParTecK DAO.</p>
     <ul>
       <li>
         <a href="#/settings">Settings</a>

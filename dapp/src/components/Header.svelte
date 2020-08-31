@@ -1,6 +1,6 @@
 <script>
 import { networkMismatch } from 'src/state/eth';
-import { role, memberId, balance, shares, totalMembers } from "src/state/dao";
+import { role, memberId } from "src/state/dao";
 </script>
 
 <style>

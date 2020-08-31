@@ -37,45 +37,9 @@ export const role = derived(
   {}
 );
 
-export const totalMembers = derived(wallet, async ($wallet, set) => {
-  if (!$wallet) return;
-  const total = await $wallet.contracts.SayDAO.totalMembers();
-  set(total.toNumber());
-});
-
 export const memberId = derived(wallet, async ($wallet, set) => {
   if (!$wallet) return;
   const id = await $wallet.contracts.SayDAO.addressToMember($wallet.address);
   console.log("member id is", id);
   set(id !== 0 ? id : null);
 });
-
-export const rawBalance = derived(
-  [wallet, memberId],
-  async ([$wallet, $memberId], set) => {
-    if (!$wallet || $memberId === undefined) return;
-    const value = await $wallet.contracts.SayToken.balanceOf($wallet.address);
-    const decimals = await $wallet.contracts.SayToken.decimals();
-    const total = await $wallet.contracts.SayToken.totalSupply();
-    set({ value, decimals, total });
-  }
-);
-
-export const balance = derived(
-  rawBalance,
-  $rawBalance => $rawBalance && prettyBalance($rawBalance)
-);
-
-export const totalSupply = derived(
-  rawBalance,
-  $rawBalance =>
-    $rawBalance &&
-    $rawBalance.total
-      .div(etherea.BigNumber.from(10).pow($rawBalance.decimals))
-      .toString()
-);
-
-export const shares = derived(
-  rawBalance,
-  $rawBalance => $rawBalance && prettyShares($rawBalance)
-);

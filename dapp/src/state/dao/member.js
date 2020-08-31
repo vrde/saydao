@@ -2,6 +2,7 @@ import { readable, derived } from "svelte/store";
 import db from "src/state/db";
 import { wallet } from "src/state/eth";
 import { onEvent, getBlockNumber } from "src/eth";
+import { memberId } from "./";
 
 const OBJECTS = {};
 
@@ -80,7 +81,7 @@ export function get(id, onUpdate) {
   return OBJECTS[id];
 }
 
-async function _getAll(wallet, set) {
+async function _getAll2(wallet, set) {
   const totalObjects = (
     await wallet.contracts.SayDAO.totalMembers()
   ).toNumber();
@@ -90,6 +91,24 @@ async function _getAll(wallet, set) {
       if (object === undefined) return;
       set(object);
     });
+  }
+}
+
+async function _getAll(wallet, set) {
+  for (let page = 0; ; page++) {
+    const members = await wallet.contracts.SayDAO.listMembers(page);
+    for (let member of members) {
+      if (member.isZero()) {
+        return;
+      }
+      const address = member.shr(96).toHexString();
+      const id = member.mask(16).toNumber();
+      // const rawBalance = await wallet.contracts.SayToken.balanceOf(address);
+      get(id).subscribe(object => {
+        if (object === undefined) return;
+        set(object);
+      });
+    }
   }
 }
 
@@ -148,19 +167,20 @@ export const list = derived(
     }))
 );
 
-/*
-async function _getAll(wallet, set) {
-  for (let page = 0; ; page++) {
-    const members = await wallet.contracts.SayDAO.listMembers(page);
-    for (let member of members) {
-      if (member.isZero()) {
-        return;
-      }
-      const address = member.shr(96).toHexString();
-      const memberId = member.mask(16).toNumber();
-      const rawBalance = await wallet.contracts.SayToken.balanceOf(address);
-      { id: memberId, address, balance: rawBalance.toString() };
-    }
-  }
-}
-*/
+export const totalMembers = derived(list, $list => $list && $list.length);
+
+export const me = derived(
+  [memberId, totalSay],
+  ([$memberId, $totalSay], set) =>
+    $memberId &&
+    $totalSay &&
+    get($memberId).subscribe(
+      v =>
+        v &&
+        set({
+          id: v.id,
+          balance: prettyBalance(v.balance),
+          shares: prettyShares(v.balance, $totalSay)
+        })
+    )
+);

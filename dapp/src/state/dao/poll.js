@@ -202,15 +202,6 @@ export function get(id, onUpdate) {
   return OBJECTS[id];
 }
 
-function getPollsKey(wallet) {
-  return [
-    wallet.address,
-    "contract",
-    wallet.contracts.SayDAO.address,
-    "polls"
-  ].join(":");
-}
-
 async function _getAll(wallet, set) {
   const totalPolls = await wallet.contracts.SayDAO.totalPolls();
   // Backwards because the most recent polls are likey to be the last ones.

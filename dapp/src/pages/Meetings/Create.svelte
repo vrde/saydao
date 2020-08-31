@@ -13,6 +13,7 @@
   let supervisor;
   let state = {};
 
+  let [nowDate, nowTime] = splitDate(new Date());
   let [minStartDate, minStartTime] = splitDate(new Date());
   let [startDate, startTime] = [minStartDate, minStartTime];
   let [endDate, endTime] = [startDate, startTime];
@@ -90,7 +91,7 @@ textarea {
     <p>
       <label>Start<br/>
         <input bind:value={startDate} on:change={()=>(endDate=startDate)} type="date" min={minStartDate} required />
-        <input bind:value={startTime} on:change={()=>(endTime=startTime)} type="time" min={minStartTime} required />
+        <input bind:value={startTime} on:change={()=>(endTime=startTime)} type="time" min={startDate === nowDate ? minStartTime : ""} required />
       </label>
     </p>
     <p>
@@ -107,7 +108,7 @@ textarea {
       {#if $members}
         <option value="">Select a Member</option>
         {#each $members as member, i}
-          <option value="{member.memberId}">Member {member.memberId}</option>
+          <option value="{member.id}">Member {member.id}</option>
         {/each}
       {:else}
         <option value="">Wait, loading members...</option>

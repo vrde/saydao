@@ -1,6 +1,6 @@
 <script>
   import { wallet } from 'src/state/eth';
-  import { list as members} from 'src/state/dao/member';
+  import { list as members } from "src/state/dao/member";
   import Loading from "src/components/Loading.svelte";
   import { createBitmaps, toBinary } from "../utils";
 

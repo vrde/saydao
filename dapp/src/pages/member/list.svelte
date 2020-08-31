@@ -1,7 +1,5 @@
 <script>
   import { list as members } from "src/state/dao/member";
-  import { memberList } from "src/state/dao";
-  import "src/state/dao/member2";
 </script>
 
 <h1>Members</h1>

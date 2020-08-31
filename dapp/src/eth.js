@@ -235,7 +235,6 @@ export function onEvent(provider, contract, filter, callback) {
   async function _checkBlock() {
     const blockNumber = await getBlockNumber(provider);
     if (obj.lastBlockNumber < blockNumber) {
-      console.log("Query", obj.lastBlockNumber + 1, blockNumber);
       getLogs(
         provider,
         {
@@ -244,7 +243,7 @@ export function onEvent(provider, contract, filter, callback) {
           toBlock: blockNumber
         },
         contract
-      ).forEach(events => callback(events));
+      ).forEach(events => Object.values(obj.callbacks).forEach(c => c(events)));
       obj.lastBlockNumber = blockNumber;
     }
     window.setTimeout(_checkBlock, 5000);

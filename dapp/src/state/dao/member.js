@@ -1,7 +1,9 @@
 import { readable, derived } from "svelte/store";
-import { wallet } from "src/state/eth";
 import db from "src/state/db";
-import etherea from "etherea";
+import { wallet } from "src/state/eth";
+import { onEvent, getBlockNumber } from "src/eth";
+
+const OBJECTS = {};
 
 function prettyBalance(tokens) {
   return etherea.BigNumber.from(tokens)
@@ -18,13 +20,136 @@ function prettyShares(tokens, total) {
   return perc.toString() + "%";
 }
 
-async function get(wallet, id) {
+async function _get(wallet, id) {
   const address = await wallet.contracts.SayDAO.memberToAddress(id);
-  const rawBalance = await wallet.contracts.SayToken.balanceOf(address);
-  return { id, address, balance: rawBalance.toString() };
+  const balance = await wallet.contracts.SayToken.balanceOf(address);
+  return { id, address, balance };
 }
 
-async function* getAll(wallet) {
+function getMemberKey(wallet, id) {
+  return [
+    wallet.address,
+    "contract",
+    wallet.contracts.SayToken.address,
+    "members",
+    id
+  ].join(":");
+}
+
+export function get(id, onUpdate) {
+  if (OBJECTS[id] === undefined) {
+    OBJECTS[id] = derived(wallet, async ($wallet, set) => {
+      if (!$wallet) return;
+      const key = getMemberKey($wallet, id);
+      const blockNumber = await getBlockNumber($wallet.provider);
+
+      let object = db.get(key);
+
+      if (!object || blockNumber - object._blockNumber > 1024) {
+        object = await _get($wallet, id);
+        object._blockNumber = blockNumber;
+        db.set(key, object);
+      }
+
+      onUpdate && onUpdate(object);
+      set(object);
+
+      const filter = $wallet.contracts.SayToken.filters.Transfer();
+      filter.fromBlock = blockNumber + 1;
+
+      return onEvent(
+        $wallet.provider,
+        $wallet.contracts.SayToken,
+        filter,
+        async event => {
+          if (event.to.toString() === id) {
+            object = await _get($wallet, id);
+            object._blockNumber = blockNumber;
+            onUpdate && onUpdate(object);
+            db.set(key, object);
+            set(object);
+          } else {
+            object = db.get(key);
+            object._blockNumber = blockNumber;
+            db.set(key, object);
+          }
+        }
+      );
+    });
+  }
+  return OBJECTS[id];
+}
+
+async function _getAll(wallet, set) {
+  const totalObjects = (
+    await wallet.contracts.SayDAO.totalMembers()
+  ).toNumber();
+  for (let i = 1; i < totalObjects + 1; i++) {
+    const id = i.toString();
+    get(id).subscribe(object => {
+      if (object === undefined) return;
+      set(object);
+    });
+  }
+}
+
+const objects = derived(wallet, async ($wallet, set) => {
+  if (!$wallet) return;
+  const store = {};
+  const _set = object => {
+    store[object.id] = object;
+    set(store);
+  };
+  const blockNumber = await getBlockNumber($wallet.provider);
+  const filter = $wallet.contracts.SayToken.filters.Transfer();
+  filter.fromBlock = blockNumber + 1;
+  _getAll($wallet, _set);
+
+  return onEvent(
+    $wallet.provider,
+    $wallet.contracts.SayToken,
+    filter,
+    async event => {
+      _getAll($wallet, _set);
+    }
+  );
+});
+
+// FIXME: should not be hardcoded.
+export const decimals = 18;
+
+export const totalSay = derived(wallet, async ($wallet, set) => {
+  if (!$wallet) return;
+  const blockNumber = await getBlockNumber($wallet.provider);
+  const filter = $wallet.contracts.SayToken.filters.Transfer();
+  filter.fromBlock = blockNumber + 1;
+  set(await $wallet.contracts.SayToken.totalSupply());
+
+  return onEvent(
+    $wallet.provider,
+    $wallet.contracts.SayToken,
+    filter,
+    async event => {
+      set(await $wallet.contracts.SayToken.totalSupply());
+    }
+  );
+});
+
+export const list = derived(
+  [objects, totalSay],
+  ([$objects, $totalSay]) =>
+    $objects &&
+    $totalSay &&
+    Object.values($objects).map(object => ({
+      ...object,
+      id: etherea.BigNumber.from(object.id).toNumber(),
+      balance: prettyBalance(object.balance),
+      shares: prettyShares(object.balance, $totalSay)
+    }))
+);
+
+/*
+async function _getAll(wallet, set) {
   for (let page = 0; ; page++) {
     const members = await wallet.contracts.SayDAO.listMembers(page);
     for (let member of members) {
@@ -34,130 +159,8 @@ async function* getAll(wallet) {
       const address = member.shr(96).toHexString();
       const memberId = member.mask(16).toNumber();
       const rawBalance = await wallet.contracts.SayToken.balanceOf(address);
-      yield { id: memberId, address, balance: rawBalance.toString() };
+      { id: memberId, address, balance: rawBalance.toString() };
     }
   }
 }
-
-async function load(wallet, update, cache, context) {
-  const currentBlockNumber = await wallet.provider.getBlockNumber();
-  const lastSyncBlockNumber = db.get("member:lastSyncBlockNumber", 0);
-
-  console.log(
-    "state/dao/member: current block",
-    currentBlockNumber,
-    "last synced block",
-    lastSyncBlockNumber
-  );
-  // If we are lagging behind, we iterate over all members in the
-  // smart contract and update the store.
-  if (currentBlockNumber - lastSyncBlockNumber > 1024) {
-    console.log("state/dao/member: data is stale, flush and reload cache");
-    // First we flush the cache
-    db.get("memberIds", []).forEach(id => db.remove(`member:${id}`));
-    db.remove("memberIds");
-    for await (let member of getAll(wallet)) {
-      if (!context.running) return;
-      cache(member);
-      update(member);
-    }
-  }
-  // Otherwise we query all past events and update only the records that
-  // changed.
-  else {
-    // First we extract all members from the db and update the storage.
-    console.log("state/dao/member: loading past events");
-    db.get("memberIds", []).forEach(id => update(db.get(`member:${id}`)));
-    const pastEvents = await wallet.contracts.SayToken.queryFilter(
-      "Transfer",
-      lastSyncBlockNumber
-    );
-    const toUpdate = new Set();
-
-    // Put all objects to update in a set to avoid updating the same
-    // object multiple times.
-    for (let e of pastEvents) {
-      toUpdate.add(e.args.to);
-    }
-
-    for (let id of toUpdate) {
-      if (!context.running) return;
-      const member = await get(wallet, id);
-      cache(member);
-      update(member);
-    }
-  }
-  db.set("member:lastSyncBlockNumber", x => Math.max(currentBlockNumber, x));
-}
-
-function sync(wallet, update) {
-  console.log("state/dao/member: Start sync");
-
-  const context = { running: true };
-
-  const cache = member => {
-    db.set(`member:${member.id}`, member);
-    db.set(`memberIds`, ids => Array.from(new Set(ids).add(member.id)));
-  };
-
-  async function onTransfer(from, to, amount, event) {
-    const member = await get(wallet, to);
-    console.log("state/dao/member: new event", event, "update member", member);
-    cache(member);
-    update(member);
-    db.set("member:lastSyncBlockNumber", x => Math.max(event.blockNumber, x));
-  }
-
-  // Each transfer will trigger an update. Everything here is idempotent,
-  // so it's not a huge deal if something is updated twice.
-  // few HTTP calls to have a simpler code.
-  wallet.contracts.SayToken.on("Transfer", onTransfer);
-
-  // Load is async but we don't wait for it.
-  load(wallet, update, cache, context);
-
-  // Return the unsubscribe function.
-  return () => {
-    context.running = false;
-    wallet.contracts.SayToken.off("Transfer", onTransfer);
-  };
-}
-
-export const objects = derived(wallet, ($wallet, set) => {
-  if (!$wallet) return;
-  const members = {};
-  set(members);
-  const update = member => {
-    members[member.id] = member;
-    set(members);
-  };
-  const unsubscribe = sync($wallet, update);
-  return unsubscribe;
-});
-
-export const totalSay = derived(wallet, ($wallet, set) => {
-  if (!$wallet) return;
-  $wallet.contracts.SayToken.totalSupply().then(v => set(v.toString()));
-  async function onTransfer(from, to, amount, event) {
-    console.log("state/dao/member: new event", event, "update totalSupply");
-    const supply = await $wallet.contracts.SayToken.totalSupply();
-    set(supply.toString());
-  }
-  $wallet.contracts.SayToken.on("Transfer", onTransfer);
-  return () => $wallet.contracts.SayToken.off("Transfer", onTransfer);
-});
-
-export const decimals = 18;
-
-export const list = derived(
-  [objects, totalSay],
-  ([$objects, $totalSay]) =>
-    $objects &&
-    $totalSay &&
-    Object.values($objects).map(member => ({
-      ...member,
-      id: etherea.BigNumber.from(member.id).toNumber(),
-      balance: prettyBalance(member.balance),
-      shares: prettyShares(member.balance, $totalSay)
-    }))
-);
+*/

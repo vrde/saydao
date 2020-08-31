@@ -171,16 +171,20 @@ export const totalMembers = derived(list, $list => $list && $list.length);
 
 export const me = derived(
   [memberId, totalSay],
-  ([$memberId, $totalSay], set) =>
-    $memberId &&
-    $totalSay &&
-    get($memberId).subscribe(
-      v =>
-        v &&
-        set({
-          id: v.id,
-          balance: prettyBalance(v.balance),
-          shares: prettyShares(v.balance, $totalSay)
-        })
-    )
+  ([$memberId, $totalSay], set) => {
+    if (!$totalSay) return;
+    if ($memberId) {
+      get($memberId).subscribe(
+        v =>
+          v &&
+          set({
+            id: v.id,
+            balance: prettyBalance(v.balance),
+            shares: prettyShares(v.balance, $totalSay)
+          })
+      );
+    } else {
+      set(undefined);
+    }
+  }
 );

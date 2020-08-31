@@ -66,7 +66,7 @@ export async function login(mnemonic) {
 
 export async function logout() {
   db.clear();
-  wallet.set(undefined);
+  loginAnon();
 }
 
 export const networkMismatch = writable();

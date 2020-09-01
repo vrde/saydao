@@ -9,6 +9,8 @@ const NULL = etherea.BigNumber.from(
   "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 );
 
+const MEETING_STATES = ["initial", "sealed", "finalized"];
+
 async function _get(wallet, id, memberId) {
   const poll = await wallet.contracts.SayDAO.polls(id);
   const content = await ipfs.get(ipfs.uintToCid(poll.cid.toHexString()));
@@ -51,6 +53,7 @@ async function _get(wallet, id, memberId) {
       isMeeting: true,
       // Hardcode "Yes" and "No" choices.
       choices: ["Yes", "No"],
+      meetingState: MEETING_STATES[meeting.state],
       meetingDone: meeting.done,
       meetingSupervisor: meeting.supervisor,
       meetingStart: new Date(meeting.start.toNumber() * 1000).getTime(),
@@ -84,27 +87,7 @@ async function _get(wallet, id, memberId) {
   };
 }
 
-export async function getMeetingState(wallet, poll, memberId) {
-  const state = {};
-  if (
-    poll.meetingValid &&
-    poll.meetingSupervisor === memberId &&
-    poll.meetingEnd < Date.now()
-  ) {
-    if (poll.meetingDone) {
-      state.meetingNeedsTokenDistribution = !(
-        await wallet.contracts.SayDAO.getRemainingDistributionClusters(
-          etherea.BigNumber.from(poll.meetingId)
-        )
-      ).isZero();
-    } else {
-      state.meetingNeedsParticipantList = true;
-    }
-  }
-  return state;
-}
-
-function updatePollDynamicFields(poll) {
+function updatePollDynamicFields(poll, memberId) {
   const votes = poll.votes.map(v => etherea.BigNumber.from(v));
   // We need to check if there are multiple winning options.
   // This temporary data structure is [ vote (big number), position (int) ]
@@ -137,6 +120,14 @@ function updatePollDynamicFields(poll) {
   poll.finalDecision = finalDecision;
   if (poll.isMeeting) {
     poll.meetingValid = poll.finalDecision === 0;
+    if (
+      poll.meetingValid &&
+      poll.meetingSupervisor === memberId &&
+      poll.meetingState !== "finalized" &&
+      poll.meetingEnd < Date.now()
+    ) {
+      poll.actionRequired = true;
+    }
   }
 }
 
@@ -169,32 +160,53 @@ export function get(id, onUpdate) {
           db.set(key, poll);
         }
 
-        updatePollDynamicFields(poll);
+        updatePollDynamicFields(poll, $memberId);
         onUpdate && onUpdate(poll);
         set(poll);
 
-        const filter = $wallet.contracts.SayDAO.filters.Vote();
-        filter.fromBlock = blockNumber + 1;
-
-        return onEvent(
-          $wallet.provider,
-          $wallet.contracts.SayDAO,
-          filter,
-          async event => {
-            if (event.pollId.toString() === id) {
-              poll = await _get($wallet, id, $memberId);
-              poll._blockNumber = blockNumber;
-              updatePollDynamicFields(poll);
-              onUpdate && onUpdate(poll);
-              db.set(key, poll);
-              set(poll);
-            } else {
-              poll = db.get(key);
-              poll._blockNumber = blockNumber;
-              db.set(key, poll);
-            }
+        const onEventCallback = async event => {
+          if (event.pollId.toString() === id) {
+            poll = await _get($wallet, id, $memberId);
+            poll._blockNumber = blockNumber;
+            updatePollDynamicFields(poll);
+            onUpdate && onUpdate(poll);
+            db.set(key, poll);
+            set(poll);
+          } else {
+            poll = db.get(key);
+            poll._blockNumber = blockNumber;
+            db.set(key, poll);
           }
-        );
+        };
+
+        const filterVote = $wallet.contracts.SayDAO.filters.Vote();
+        filterVote.fromBlock = blockNumber + 1;
+        const filterSeal = $wallet.contracts.SayDAO.filters.Seal();
+        filterSeal.fromBlock = blockNumber + 1;
+        const filterAllocationDone = $wallet.contracts.SayDAO.filters.AllocationDone();
+        filterAllocationDone.fromBlock = blockNumber + 1;
+
+        const unsubscribeFuncs = [
+          onEvent(
+            $wallet.provider,
+            $wallet.contracts.SayDAO,
+            filterVote,
+            onEventCallback
+          ),
+          onEvent(
+            $wallet.provider,
+            $wallet.contracts.SayDAO,
+            filterSeal,
+            onEventCallback
+          ),
+          onEvent(
+            $wallet.provider,
+            $wallet.contracts.SayDAO,
+            filterAllocationDone,
+            onEventCallback
+          )
+        ];
+        return () => unsubscribeFuncs.forEach(func => func());
       }
     );
   }
@@ -270,9 +282,5 @@ export const pastMeetings = derived(objects, $objects => {
 export const actionableMeetings = derived(
   objects,
   $objects =>
-    $objects &&
-    Object.values($objects).filter(
-      poll =>
-        poll.meetingNeedsTokenDistribution || poll.meetingNeedsParticipantList
-    )
+    $objects && Object.values($objects).filter(poll => poll.actionRequired)
 );

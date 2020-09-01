@@ -102,6 +102,7 @@ describe("SayDAO Meeting Poll", async () => {
     assert.equal(meeting.supervisor, 1);
     assert.equal(meeting.start.toNumber(), start);
     assert.equal(meeting.end.toNumber(), end);
+    assert.equal(meeting.state, 0);
 
     // Now Bob and Carol vote, yay!
     await bob.contracts.SayDAO.vote(0, 1);
@@ -242,6 +243,8 @@ describe("SayDAO Meeting Poll", async () => {
       1
     );
 
+    let meeting = await alice.contracts.SayDAO.meetings(0);
+    assert.equal(meeting.state, 0);
     // Alice, Bob and Carol vote "no"
     await alice.contracts.SayDAO.vote(0, 0);
     await bob.contracts.SayDAO.vote(0, 0);
@@ -262,11 +265,15 @@ describe("SayDAO Meeting Poll", async () => {
       );
     }
 
-    let meeting = await alice.contracts.SayDAO.meetings(0);
+    meeting = await alice.contracts.SayDAO.meetings(0);
     assert.equal(meeting.totalParticipants, 4);
+    assert.equal(meeting.state, 0);
 
     // The list of participants has been finalized, Alice seals the list
     await alice.contracts.SayDAO.sealMeetingParticipants(0);
+
+    meeting = await alice.contracts.SayDAO.meetings(0);
+    assert.equal(meeting.state, 1);
 
     console.log(
       "token allocation is",
@@ -290,6 +297,9 @@ describe("SayDAO Meeting Poll", async () => {
     // the batch is destroyed.
     await alice.contracts.SayDAO.distributeMeetingTokens(0, 32);
 
+    meeting = await alice.contracts.SayDAO.meetings(0);
+    assert.equal(meeting.state, 1);
+
     // We have one cluster left
     assert.equal(
       (
@@ -297,6 +307,9 @@ describe("SayDAO Meeting Poll", async () => {
       ).toNumber(),
       1
     );
+
+    meeting = await alice.contracts.SayDAO.meetings(0);
+    assert.equal(meeting.state, 1);
 
     assert.equal(await balanceOf(alice.address), 100);
     assert.equal(await balanceOf(bob.address), 100);
@@ -325,5 +338,8 @@ describe("SayDAO Meeting Poll", async () => {
       ).toNumber(),
       0
     );
+
+    meeting = await alice.contracts.SayDAO.meetings(0);
+    assert.equal(meeting.state, 2);
   });
 });

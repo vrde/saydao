@@ -24,6 +24,8 @@ function prettyShares(tokens, total) {
 async function _get(wallet, id) {
   const address = await wallet.contracts.SayDAO.memberToAddress(id);
   const balance = await wallet.contracts.SayToken.balanceOf(address);
+
+  console.log("_get", address, balance.toString());
   return { id, address, balance };
 }
 
@@ -63,7 +65,8 @@ export function get(id, onUpdate) {
         $wallet.contracts.SayToken,
         filter,
         async event => {
-          if (event.to.toString() === id) {
+          const to = etherea.BigNumber.from(event.to);
+          if (to.eq(id)) {
             object = await _get($wallet, id);
             object._blockNumber = blockNumber;
             onUpdate && onUpdate(object);
@@ -103,7 +106,8 @@ async function _getAll(wallet, set) {
       }
       const address = member.shr(96).toHexString();
       const id = member.mask(16).toNumber();
-      // const rawBalance = await wallet.contracts.SayToken.balanceOf(address);
+      const rawBalance = await wallet.contracts.SayToken.balanceOf(address);
+      console.log("balance", id, rawBalance.toString());
       get(id).subscribe(object => {
         if (object === undefined) return;
         set(object);

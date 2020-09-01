@@ -25,7 +25,6 @@ async function _get(wallet, id) {
   const address = await wallet.contracts.SayDAO.memberToAddress(id);
   const balance = await wallet.contracts.SayToken.balanceOf(address);
 
-  console.log("_get", address, balance.toString());
   return { id, address, balance };
 }
 
@@ -97,6 +96,9 @@ async function _getAll2(wallet, set) {
   }
 }
 
+// Subscribe to a store only once.
+const SUBSCRIPTIONS = new Set();
+
 async function _getAll(wallet, set) {
   for (let page = 0; ; page++) {
     const members = await wallet.contracts.SayDAO.listMembers(page);
@@ -106,12 +108,15 @@ async function _getAll(wallet, set) {
       }
       const address = member.shr(96).toHexString();
       const id = member.mask(16).toNumber();
-      const rawBalance = await wallet.contracts.SayToken.balanceOf(address);
-      console.log("balance", id, rawBalance.toString());
-      get(id).subscribe(object => {
-        if (object === undefined) return;
-        set(object);
-      });
+      //const rawBalance = await wallet.contracts.SayToken.balanceOf(address);
+      // That's quite bad, I'm bending spacetime too much.
+      if (!SUBSCRIPTIONS.has(id)) {
+        get(id).subscribe(object => {
+          if (object === undefined) return;
+          set(object);
+        });
+        SUBSCRIPTIONS.add(id);
+      }
     }
   }
 }
@@ -178,7 +183,7 @@ export const me = derived(
   ([$memberId, $totalSay], set) => {
     if (!$totalSay) return;
     if ($memberId) {
-      get($memberId).subscribe(
+      return get($memberId).subscribe(
         v =>
           v &&
           set({

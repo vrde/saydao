@@ -129,6 +129,7 @@ function updatePollDynamicFields(poll, memberId) {
       poll.actionRequired = true;
     }
   }
+  return poll;
 }
 
 function getPollKey(wallet, id) {
@@ -139,6 +140,31 @@ function getPollKey(wallet, id) {
     "poll",
     id
   ].join(":");
+}
+
+function onTimer(poll, memberId, set) {
+  const unsubscribeFuncs = [];
+  const refreshPoll = poll.end - Date.now();
+  console.log("refresh", poll, refreshPoll);
+  if (refreshPoll > 0) {
+    const timerId = setTimeout(
+      () => set(updatePollDynamicFields(poll, memberId)),
+      refreshPoll + 1000
+    );
+    unsubscribeFuncs.push(() => clearTimeout(timerId));
+  }
+
+  if (poll.isMeeting) {
+    const refreshMeeting = poll.meetingEnd - Date.now();
+    if (refreshMeeting > 0) {
+      const timerId = setTimeout(
+        () => set(updatePollDynamicFields(poll, memberId)),
+        refreshMeeting + 1000
+      );
+      unsubscribeFuncs.push(() => clearTimeout(timerId));
+    }
+  }
+  return () => unsubscribeFuncs.forEach(func => func());
 }
 
 const OBJECTS = {};
@@ -204,7 +230,8 @@ export function get(id, onUpdate) {
             $wallet.contracts.SayDAO,
             filterAllocationDone,
             onEventCallback
-          )
+          ),
+          onTimer(poll, $memberId, set)
         ];
         return () => unsubscribeFuncs.forEach(func => func());
       }
@@ -213,15 +240,22 @@ export function get(id, onUpdate) {
   return OBJECTS[id];
 }
 
+// Subscribe to a store only once.
+const SUBSCRIPTIONS = new Set();
+
 async function _getAll(wallet, set) {
   const totalPolls = await wallet.contracts.SayDAO.totalPolls();
   // Backwards because the most recent polls are likey to be the last ones.
   for (let i = totalPolls - 1; i >= 0; i--) {
     const id = i.toString();
-    get(id).subscribe(poll => {
-      if (poll === undefined) return;
-      set(poll);
-    });
+    // That's quite bad, I'm bending spacetime too much.
+    if (!SUBSCRIPTIONS.has(id)) {
+      get(id).subscribe(poll => {
+        if (poll === undefined) return;
+        set(poll);
+      });
+      SUBSCRIPTIONS.add(id);
+    }
   }
 }
 

@@ -65,7 +65,7 @@ export async function login(mnemonic) {
 }
 
 export async function logout() {
-  db.clear();
+  localStorage.clear();
   loginAnon();
 }
 

@@ -11,8 +11,6 @@ import { clock } from "./clock";
 // Autologin
 (() => (db.get("saydao:autologin") ? login() : loginAnon()))();
 
-login();
-
 export const wallet = writable();
 
 export async function loginAnon(mnemonic) {
@@ -56,7 +54,9 @@ export async function login(mnemonic) {
     localStorage.clear();
   }
 
-  db.set("saydao:wallet:mnemonic", w.mnemonic);
+  if (w.mnemonic) {
+    db.set("saydao:wallet:mnemonic", w.mnemonic);
+  }
   db.set("saydao:autologin", true);
   console.log("User authenticated with wallet", w);
   window.wallet = w;

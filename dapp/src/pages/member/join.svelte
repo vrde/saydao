@@ -10,11 +10,13 @@ $: invite = parse($querystring);
 let state = "idle";
 let loginError;
 let inviteError;
+let loggedIn = false;
 
 async function handleLogin() {
   loginError = false;
   try {
     await login();
+    loggedIn = true;
   } catch(e) {
     console.log(e);
     loginError = true;
@@ -58,7 +60,7 @@ async function handleSubmit() {
 
   <h1>You've been invited to join ParTecK DAO</h1>
 
-  {#if !$wallet && etherea.hasNativeWallet()}
+  {#if etherea.hasNativeWallet() && !loggedIn}
 
     <p>Your browser supports Ethereum. Please log in to your Ethereum account.</p>
 

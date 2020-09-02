@@ -93,7 +93,10 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
 
   function join(uint16 memberId, uint8 v, bytes32 r, bytes32 s) public {
-    require(memberToAddress[memberId] == address(0), "Invite used already");
+    // To keep thinkgs simple but slightly wrong, an invite can be used more than
+    // once to recover the account. Not enough time to fix it properly.
+    // require(memberToAddress[memberId] == address(0), "Invite used already");
+
     // The invite string is something like:
     //
     // Member: 11

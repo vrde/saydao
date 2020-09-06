@@ -7,7 +7,8 @@ class DB {
 
   get(key, fallback) {
     const value = this.storage.getItem(key);
-    return value === undefined ? fallback : JSON.parse(value);
+    // getItem returns null if the key doesn't exist.
+    return value === null ? fallback : JSON.parse(value);
   }
 
   set(key, valueOrFunction, fallback) {

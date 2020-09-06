@@ -1,7 +1,7 @@
 <script>
   import CONFIG from "src/config";
   import { wallet } from "src/state/eth";
-  import { totalSupply } from "src/state/dao";
+  import { totalSay } from "src/state/dao/member";
 
   let reveal = false;
 </script>
@@ -48,7 +48,7 @@
     </p>
 
     <p>
-      The total number of Say tokens is: <strong>{$totalSupply}</strong>
+      The total number of Say tokens is: <strong>{$totalSay}</strong>
     </p>
 
     <h3>Version</h3>

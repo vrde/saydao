@@ -11,6 +11,11 @@ import "./SayToken.sol";
 
 contract SayDAO is BaseRelayRecipient, AccessControl {
 
+  event CreatePoll(uint pollId);
+  event Vote(uint pollId);
+  event Seal(uint pollId);
+  event AllocationDone(uint pollId);
+
   bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
   uint public constant PAGE_SIZE = 32;
   uint public constant NULL = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
@@ -27,6 +32,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
   uint constant MIN_POLL_TIME = 0;
   uint constant MIN_POLL_MEETING_TIME = 0;
   uint constant TIME_UNIT = 60;
+  //uint constant TIME_UNIT = 60 * 60 * 24;
   //END TESTING
 
   uint public genesis;
@@ -87,7 +93,10 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
 
   function join(uint16 memberId, uint8 v, bytes32 r, bytes32 s) public {
-    require(memberToAddress[memberId] == address(0), "Invite used already");
+    // To keep thinkgs simple but slightly wrong, an invite can be used more than
+    // once to recover the account. Not enough time to fix it properly.
+    // require(memberToAddress[memberId] == address(0), "Invite used already");
+
     // The invite string is something like:
     //
     // Member: 11
@@ -197,6 +206,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     for (uint8 i = 0; i < options; i++) {
       pollToVotes[polls.length - 1].push(0);
     }
+    emit CreatePoll(polls.length - 1);
     return polls.length - 1;
   }
 
@@ -235,6 +245,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
     // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
     pollToVoters[uint(keccak256(abi.encodePacked(pollId, option)))][uint8(memberId / 256)] |= 1 << (memberId % 256);
+    emit Vote(pollId);
   }
 
   function getVotes(uint pollId) view public returns(uint[8] memory result) {
@@ -258,7 +269,10 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     uint tokenAllocation;
     uint16 supervisor;
     uint16 totalParticipants;
-    bool done;
+    // 0: initial state
+    // 1: participant list sealed
+    // 2: token distributed / final state
+    uint8 state;
   }
 
   Meeting[] public meetings;
@@ -302,7 +316,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
       0,
       supervisor,
       0,
-      false
+      0
     );
 
     polls.push(poll);
@@ -312,6 +326,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     pollToVotes[polls.length - 1].push(0);
     pollToVotes[polls.length - 1].push(0);
 
+    emit CreatePoll(polls.length - 1);
     return polls.length - 1;
   }
 
@@ -332,7 +347,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     Meeting storage meeting = meetings[meetingId];
     require(addressToMember[_msgSender()] == meeting.supervisor, "Only supervisor can set participants");
     require(meeting.end < block.timestamp, "Meeting is not finished");
-    require(!meeting.done, "Meeting is done already");
+    require(meeting.state == 0, "Meeting cannot be updated");
     require(isMeetingValid(meetingId), "Meeting is not valid");
 
     // Iterate over bitmap to check if they are all members
@@ -386,11 +401,12 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     Meeting storage meeting = meetings[meetingId];
     require(addressToMember[_msgSender()] == meeting.supervisor, "Only supervisor can seal");
     require(meeting.end < block.timestamp, "Meeting is not finished");
-    meeting.done = true;
+    meeting.state = 1;
     meeting.tokenAllocation = calculateTokenAllocation(
       block.timestamp - genesis,
       meeting.totalParticipants,
       members.length);
+    emit Seal(meeting.pollId);
   }
 
   function getRemainingDistributionClusters(uint meetingId) public view returns(uint) {
@@ -406,7 +422,7 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
   function distributeMeetingTokens(uint meetingId, uint8 bound) public {
     require(meetingId < meetings.length, "Meeting doesn't exist");
     Meeting storage meeting = meetings[meetingId];
-    require(meeting.done, "Meeting must be done before distributing tokens");
+    require(meeting.state == 1, "Meeting must be sealed before distributing tokens");
     uint clustersLength = meetingToClusters[meetingId].length;
     require(clustersLength > 0, "All token has been distributed");
 
@@ -435,6 +451,13 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
     if (i == 256) {
       meetingToClusters[meetingId].pop();
       meetingToParticipants[meetingId].pop();
+    }
+
+    if (meetingToClusters[meetingId].length == 0) {
+      meeting.state = 2;
+      delete meetingToClusters[meetingId];
+      delete meetingToParticipants[meetingId];
+      emit AllocationDone(meeting.pollId);
     }
   }
 

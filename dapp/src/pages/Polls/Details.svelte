@@ -3,20 +3,17 @@
   import marked from "marked";
   import DateTime from 'src/components/DateTime.svelte';
   import { wallet } from 'src/state/eth';
-  import { currentPollId, refresh, currentPoll as poll } from 'src/state/dao/poll';
+  import { get as getPoll } from 'src/state/dao/poll';
   import { location } from 'svelte-spa-router';
   import Loading from "src/components/Loading.svelte";
   export let params = null;
 
   let vote = null;
   let state = {};
-
+  let poll = getPoll(params.id);
 
   $: {
-    $currentPollId = params.id;
-    if ($poll && $poll.hasVotedFor) {
-      vote = $poll.hasVotedFor;
-    }
+    poll = getPoll(params.id);
   }
 
   function handleClose() {
@@ -26,13 +23,12 @@
   async function handleSubmit() {
     state.action = "submit";
     try {
-      await $wallet.contracts.SayDAO.vote($currentPollId, vote);
+      await $wallet.contracts.SayDAO.vote($poll.id, vote);
       state = {}
     } catch(e) {
       console.error(e);
       state.error = e.toString();
     }
-    $refresh = Date.now();
   }
 
 </script>

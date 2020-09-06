@@ -9,7 +9,23 @@ import db from "./db";
 import { clock } from "./clock";
 
 // Autologin
-(() => db.get("saydao:autologin") && login())();
+(() => (db.get("saydao:autologin") ? login() : loginAnon()))();
+
+export const wallet = writable();
+
+export async function loginAnon(mnemonic) {
+  let w;
+  w = await etherea.getLocalWallet({
+    ...CONFIG.walletOptions,
+    mnemonic: db.get("saydao:wallet:mnemonic")
+  });
+  w.loadContracts(contracts);
+  db.set("saydao:wallet:mnemonic", w.mnemonic);
+  console.log("User authenticated with wallet", w);
+  window.wallet = w;
+  wallet.set(w);
+  return w;
+}
 
 export async function login(mnemonic) {
   let w;
@@ -33,7 +49,14 @@ export async function login(mnemonic) {
     });
   }
   w.loadContracts(contracts);
-  db.set("saydao:wallet:mnemonic", w.mnemonic);
+
+  if (db.get("saydao:wallet:mnemonic") !== w.mnemonic) {
+    localStorage.clear();
+  }
+
+  if (w.mnemonic) {
+    db.set("saydao:wallet:mnemonic", w.mnemonic);
+  }
   db.set("saydao:autologin", true);
   console.log("User authenticated with wallet", w);
   window.wallet = w;
@@ -42,13 +65,11 @@ export async function login(mnemonic) {
 }
 
 export async function logout() {
-  db.clear();
-  wallet.set(undefined);
+  localStorage.clear();
+  loginAnon();
 }
 
 export const networkMismatch = writable();
-
-export const wallet = writable();
 
 export const addressShort = derived(wallet, async ($wallet, set) => {
   if ($wallet) {

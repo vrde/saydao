@@ -1,11 +1,28 @@
 <script>
   import { wallet } from "src/state/eth";
-  import { role, memberId, balance, shares, totalMembers } from "src/state/dao";
+  import { get as getMember, totalMembers, me } from "src/state/dao/member";
+  import { role, memberId } from "src/state/dao";
+
+  window.me = me;
 </script>
 
 <section>
 
-{#if !$wallet}
+{#if $me}
+  <div>
+    <h2>About you</h2>
+    <p>You are <strong>Member {$me.id}</strong>.</p>
+    <p>You have <strong>{$me.balance}</strong> Say. That is <em>{$me.shares}</em> of the total Say in ParTecK DAO.</p>
+    <ul>
+      <li>
+        <a href="#/settings">Settings</a>
+      </li>
+      <li>
+        <a href="#/logout">Logout</a>
+      </li>
+    </ul>
+  </div>
+{:else}
   <div>
     <h2>Log in</h2>
     <p>To participate in ParTecK DAO, you need to log in.</p>
@@ -18,50 +35,6 @@
       </li>
     </ul>
     <p>If you're just looking around, you don't need to log in.</p>
-  </div>
-
-  <div>
-    <h2>Participate</h2>
-    <ul>
-      <li>
-        <a href="#/events/upcoming">Upcoming events</a>: Show upcoming ParTecK events.
-      </li>
-      <li>
-        <a href="#/polls/open">Open polls</a>: Show polls you can vote on.
-      </li>
-      <li>
-        <a href="#/polls/closed">Closed polls</a>: Show polls that are now closed.
-      </li>
-    </ul>
-  </div>
-{:else}
-
-{#if $role.member}
-  <div>
-    <h2>About you</h2>
-    <p>You are <strong>Member {$memberId}</strong>.</p>
-    <p>You have <strong>{$balance}</strong> Say. That is <em>{$shares}</em> of the total Say in ParTecK DAO.</p>
-    <ul>
-      <li>
-        <a href="#/settings">Settings</a>
-      </li>
-      <li>
-        <a href="#/logout">Logout</a>
-      </li>
-    </ul>
-  </div>
-{:else}
-  <div>
-    <h2>About you</h2>
-    <p>You are <strong>logged in</strong> but you are not a member.</p>
-    <ul>
-      <li>
-        <a href="mailto:agranzot@mailbox.org?subject=Invite me to ParTecK DAO">Request an invite</a> if you are a ParTecK member and want to join.
-      </li>
-      <li>
-        <a href="#/logout">Sign out</a>
-      </li>
-    </ul>
   </div>
 {/if}
 
@@ -118,7 +91,6 @@
       {/if}
     </ul>
   </div>
-{/if}
 
   <div>
     <h2>What is ParTecK DAO</h2>

@@ -1,12 +1,12 @@
 <script>
-  import { openPolls } from "src/state/dao/poll";
+  import { open as polls } from "src/state/dao/poll";
   import DateTime from 'src/components/DateTime.svelte';
 </script>
 
 <h1>Open polls</h1>
 
-{#if $openPolls}
-  {#each $openPolls as poll}
+{#if $polls}
+  {#each $polls as poll}
   <h2><a href="#/polls/details/{poll.id}">{poll.title}</a></h2>
     <p><em>Voting closes on <DateTime date={poll.end} /></em></p>
   <hr />

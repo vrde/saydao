@@ -4,39 +4,24 @@
   import DateTime from 'src/components/DateTime.svelte';
   import Participants from './components/Participants.svelte';
   import { wallet } from 'src/state/eth';
-  import { currentPollId, refresh, currentPoll as poll } from 'src/state/dao/poll';
+  import { get as getPoll } from 'src/state/dao/poll';
   import { location } from 'svelte-spa-router';
   import Loading from "src/components/Loading.svelte";
   export let params = null;
 
   let vote = null;
   let state = {};
-
+  let poll = getPoll(params.id);
 
   $: {
-    $currentPollId = params.id;
-    if ($poll && $poll.hasVotedFor) {
-      vote = $poll.hasVotedFor;
-    }
+    poll = getPoll(params.id);
   }
 
   function handleClose() {
     state = {};
   }
 
-  async function handleSubmit() {
-    state = "submit";
-    try {
-      await $wallet.contracts.SayDAO.vote($currentPollId, vote);
-    } catch(e) {
-      console.error(e);
-    }
-    state = "idle";
-    $refresh = Date.now();
-  }
-
   function handleParticipantListDone() {
-    $refresh = Date.now();
   }
 
 </script>
@@ -82,88 +67,49 @@
 <Loading {state} onClose={handleClose}/>
 
 {#if $poll}
-  {#if $poll.open}
+
+  {#if $poll.open && $poll.meetingValid}
     <div class="details">
       <p>
-        <strong>{$poll.totalVotesPerc}%</strong> of ParTecK DAO voted on this poll.
-        {#if $poll.quorumReached}
-          <strong>Quorum has been reached</strong>.
-        {:else}
-          <strong>{$poll.toQuorum}%</strong> more votes are needed for quorum.
-        {/if}
+        <strong>Poll is still open</strong>, no decision has been made yet.
+        <a href="#/polls/details/{$poll.id}">Go to Poll #{$poll.id}</a>.
       </p>
-      <p><em>Voting closes on <DateTime date={$poll.end} countdown={true} /></em></p>
     </div>
-  {:else}
+  {/if}
+  {#if !$poll.open && !$poll.meetingValid}
     <div class="details">
       <p>
-        <strong>{$poll.totalVotesPerc}%</strong> of ParTecK DAO voted on this poll.
-        {#if $poll.quorumReached}
-          <strong>Quorum has been reached</strong>.
-        {:else}
-          <strong>Quorum has not been reached</strong>.
-        {/if}
+        This event won't take place.
+        <a href="#/polls/details/{$poll.id}">Go to Poll #{$poll.id}</a>.
       </p>
-      <p><em>Voting ended on <DateTime date={$poll.end} /></em></p>
+    </div>
+  {/if}
+  {#if $poll.meetingValid}
+    <div class="details">
+      <p>
+        This event has been decided in <a href="#/polls/details/{$poll.id}">Poll #{$poll.id}</a>.
+      </p>
     </div>
   {/if}
   <hr/>
 
   <h1>{$poll.title}</h1>
 
+  {#if $poll.meetingValid}
+    <p>
+      The event happens between
+      <strong><DateTime date={$poll.meetingStart} /></strong>
+      and
+      <strong><DateTime date={$poll.meetingEnd} /></strong>
+    </p>
+  {/if}
+
   <div class="question">
     {@html DOMPurify.sanitize(marked($poll.question))}
   </div>
 
-  <p>
-    The event will happen between
-    <DateTime date={$poll.meetingStart} />
-    and
-    <DateTime date={$poll.meetingEnd} />.
-  </p>
-  <p>
-    The supervisor is <strong>Member #{$poll.meetingSupervisor}</strong>.
-  </p>
-  {#if $poll.hasVotedFor === null && $poll.open && $poll.hasTokens}
-    <form on:submit|preventDefault={handleSubmit}>
-      <fieldset disabled={$poll.hasVotedFor}>
-        <legend>Make your choice</legend>
-        {#each $poll.choices as choice, i}
-          <label class:active={vote===i}>
-            <input type="radio" bind:group={vote} value={i} />
-            {choice}
-          </label>
-        {/each}
-        <button disabled={vote===null}>Vote!</button>
-      </fieldset>
-    </form>
-  {:else}
-    <ol>
-      {#each $poll.choices as choice, i}
-        <li>
-          <p><strong>{choice}</strong></p>
-          <p>
-            Votes: {$poll.votesPerc[i]}%
-            {#if $poll.hasVotedFor === i}
-              (You voted for this)
-            {/if}
-          </p>
-        </li>
-      {/each}
-    </ol>
-    {#if $poll.open && $poll.hasTokens === null}
-    <p><strong>Note:</strong> You can't vote on this poll because you joined ParTecK DAO after the poll was created.</p>
-    {/if}
-  {/if}
-
-  {#if $poll.meetingNeedsParticipantList || $poll.meetingNeedsTokenDistribution}
+  {#if $poll.meetingValid && $poll.actionRequired}
     <Participants poll={$poll} onDone={handleParticipantListDone}/>
-  {/if}
-
-  {#if $poll.open}
-    <a href="#/polls/open">Go to open polls</a>
-  {:else}
-    <a href="#/polls/closed">Go to closed polls</a>
   {/if}
 
 {/if}

@@ -1,6 +1,6 @@
 <script>
   import { wallet } from 'src/state/eth';
-  import { memberList } from 'src/state/dao';
+  import { list as members } from "src/state/dao/member";
   import Loading from "src/components/Loading.svelte";
   import { createBitmaps, toBinary } from "../utils";
 
@@ -30,9 +30,8 @@
       }
       console.log("Seal participant list");
       await $wallet.contracts.SayDAO.sealMeetingParticipants(poll.meetingId);
-        //await $wallet.contracts.SayDAO.vote($currentPollId, vote);
       await handleTokenDistribution();
-        state = {};
+      state = {};
     } catch(e) {
       console.error(e);
       state.error = e.toString();
@@ -65,7 +64,7 @@
 
 <Loading {state} onClose={handleClose}/>
 
-{#if poll.meetingNeedsParticipantList}
+{#if poll.meetingState === "initial"}
   <h2>Select the participants</h2>
 
   <p>
@@ -77,11 +76,11 @@
 
     <formset>
       <legend>Select the participants</legend>
-      {#if $memberList}
-        {#each $memberList as member}
+      {#if $members}
+        {#each $members as member}
           <label>
-            <input type="checkbox" bind:group={memberIds} value="{member.memberId}">
-            Member #{member.memberId}
+            <input type="checkbox" bind:group={memberIds} value="{member.id}">
+            Member #{member.id}
           </label>
         {/each}
       {:else}
@@ -93,7 +92,7 @@
   </form>
 {/if}
 
-{#if poll.meetingNeedsTokenDistribution}
+{#if poll.meetingState === "sealed"}
   <h2>Distribute tokens to participants</h2>
 
   <p>

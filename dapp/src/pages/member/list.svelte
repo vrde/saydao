@@ -1,13 +1,14 @@
 <script>
-  import { memberList } from "src/state/dao";
+  import { list as members } from "src/state/dao/member";
 </script>
+
 <h1>Members</h1>
 
-{#if $memberList}
+{#if $members}
 <ul>
-  {#each $memberList as member}
+  {#each $members as member}
   <li>
-    #{member.memberId}: {member.balance} SAY tokens ({member.shares})
+    #{member.id}: {member.balance} SAY tokens ({member.shares})
   </li>
   {/each}
 </ul>

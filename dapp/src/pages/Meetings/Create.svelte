@@ -1,5 +1,5 @@
 <script>
-  import { memberList } from "src/state/dao";
+  import { list as members } from "src/state/dao/member";
   import { wallet } from "src/state/eth";
   import Loading from "src/components/Loading.svelte";
   import { push } from 'svelte-spa-router'
@@ -13,6 +13,7 @@
   let supervisor;
   let state = {};
 
+  let [nowDate, nowTime] = splitDate(new Date());
   let [minStartDate, minStartTime] = splitDate(new Date());
   let [startDate, startTime] = [minStartDate, minStartTime];
   let [endDate, endTime] = [startDate, startTime];
@@ -90,7 +91,7 @@ textarea {
     <p>
       <label>Start<br/>
         <input bind:value={startDate} on:change={()=>(endDate=startDate)} type="date" min={minStartDate} required />
-        <input bind:value={startTime} on:change={()=>(endTime=startTime)} type="time" min={minStartTime} required />
+        <input bind:value={startTime} on:change={()=>(endTime=startTime)} type="time" min={startDate === nowDate ? minStartTime : ""} required />
       </label>
     </p>
     <p>
@@ -104,10 +105,10 @@ textarea {
 
   <label>Who is the supervisor?
     <select bind:value={supervisor} required>
-      {#if $memberList}
+      {#if $members}
         <option value="">Select a Member</option>
-        {#each $memberList as member, i}
-          <option value="{member.memberId}">Member {member.memberId}</option>
+        {#each $members as member, i}
+          <option value="{member.id}">Member {member.id}</option>
         {/each}
       {:else}
         <option value="">Wait, loading members...</option>

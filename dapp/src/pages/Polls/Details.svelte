@@ -121,7 +121,11 @@
   {#if $poll.hasVotedFor === null && $poll.open && $poll.hasTokens}
     <form on:submit|preventDefault={handleSubmit}>
       <fieldset disabled={$poll.hasVotedFor}>
-        <legend>Make your choice</legend>
+      {#if $poll.isMeeting}
+      <legend>Do you want to approve this Event?</legend>
+        {:else}
+      <legend>Make your choice</legend>
+      {/if}
         {#each $poll.choices as choice, i}
           <label class:active={vote===i}>
             <input type="radio" bind:group={vote} value={i} />

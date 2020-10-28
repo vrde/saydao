@@ -22,16 +22,17 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
   address public tokenAddress;
 
+  /*
   uint constant MIN_POLL_TIME = 3600;
   uint constant MIN_POLL_MEETING_TIME = 604800;
   uint constant TIME_UNIT = 60 * 60 * 24;
+  */
 
   //TESTING
-  /*
   uint constant MIN_POLL_TIME = 0;
   uint constant MIN_POLL_MEETING_TIME = 0;
   uint constant TIME_UNIT = 60;
-  */
+  //uint constant TIME_UNIT = 60 * 60 * 24;
   //END TESTING
 
   uint public genesis;

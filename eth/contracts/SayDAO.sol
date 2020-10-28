@@ -7,9 +7,10 @@ pragma solidity ^0.6.0;
 import "@openzeppelin/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@opengsn/gsn/contracts/BaseRelayRecipient.sol";
+import "@opengsn/gsn/contracts/interfaces/IKnowForwarderAddress.sol";
 import "./SayToken.sol";
 
-contract SayDAO is BaseRelayRecipient, AccessControl {
+contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
 
   event CreatePoll(uint pollId);
   event Vote(uint pollId);
@@ -21,6 +22,14 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
   uint public constant NULL = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
   address public tokenAddress;
+
+
+  // OPENGSN
+  string public override versionRecipient = "2.0.0";
+  function getTrustedForwarder() public view override returns(address) {
+		return trustedForwarder;
+	}
+  // END OPENGSN
 
   /*
   uint constant MIN_POLL_TIME = 3600;
@@ -55,6 +64,10 @@ contract SayDAO is BaseRelayRecipient, AccessControl {
 
   function _msgSender() internal view override(BaseRelayRecipient, Context) returns (address payable) {
     return BaseRelayRecipient._msgSender();
+  }
+
+  function _msgData() internal view override(BaseRelayRecipient, Context) returns (bytes memory) {
+    return BaseRelayRecipient._msgData();
   }
 
   // https://github.com/provable-things/ethereum-api/blob/9f34daaa550202c44f48cdee7754245074bde65d/oraclizeAPI_0.5.sol#L1045

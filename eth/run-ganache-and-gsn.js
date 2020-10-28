@@ -4,7 +4,7 @@ const { dirname } = require("path");
 const { writeFile } = require("fs").promises;
 const { mkdir } = require("fs").promises;
 const ganache = require("ganache-core");
-const gsnTestEnv = require("@opengsn/gsn/dist/GsnTestEnvironment").default;
+const { GsnTestEnvironment } = require("@opengsn/gsn/dist/GsnTestEnvironment");
 
 const outfile = process.argv[2] || "gsn.json";
 const outdir = dirname(outfile);
@@ -25,7 +25,7 @@ async function startGanache() {
 
 async function startGsn() {
   await mkdir(outdir, { recursive: true });
-  const gsnInstance = await gsnTestEnv.startGsn("localhost");
+  const gsnInstance = await GsnTestEnvironment.startGsn("localhost");
   await writeFile(
     outfile,
     JSON.stringify(gsnInstance.deploymentResult, null, 2)

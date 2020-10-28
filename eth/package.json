@@ -20,10 +20,10 @@
     "etherea": "0.0.1"
   },
   "devDependencies": {
-    "@opengsn/gsn": "^0.9.0",
+    "@opengsn/gsn": "^2.0.1",
     "ethers": "^5.0.7",
-    "ganache-cli": "^6.9.1",
-    "ganache-core": "^2.10.2",
+    "ganache-cli": "^6.12.1",
+    "ganache-core": "^2.13.1",
     "mocha": "^7.2.0"
   }
 }

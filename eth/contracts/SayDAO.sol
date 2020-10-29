@@ -366,7 +366,7 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
     // Iterate over bitmap to check if they are all members
     uint8 currentParticipants;
     for (uint i = 0; i < 256; i++) {
-      if ((bitmap & (1 << i)) > 0) {
+      if ((bitmap & (uint(1) << i)) > 0) {
         uint16 memberId = uint16(cluster * 256 + i);
         require(memberToAddress[memberId] != address(0), "Participant is not a member");
         currentParticipants++;
@@ -449,11 +449,11 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
     uint i;
 
     for (i = 0; i < 256 && bound > 0; i++) {
-      if ((bitmap & (1 << i)) > 0) {
+      if ((bitmap & (uint(1) << i)) > 0) {
         uint16 memberId = uint16(cluster * 256 + i);
         // distribute tokens to memberId
         token.mint(memberId, meeting.tokenAllocation);
-        meetingToParticipants[meetingId][clustersLength - 1] &= NULL ^ (1 << i);
+        meetingToParticipants[meetingId][clustersLength - 1] &= NULL ^ (uint(1) << i);
         //bitmap &= NULL ^ (1 << i);
         bound--;
       }
@@ -476,7 +476,7 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
 
   function countBits(uint bitmap) public pure returns(uint8 total) {
     for (uint i = 0; i < 256; i++) {
-      if ((bitmap & (1 << i)) > 0) {
+      if ((bitmap & (uint(1) << i)) > 0) {
         total++;
       }
     }

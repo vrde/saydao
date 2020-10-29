@@ -241,7 +241,7 @@ export function get(id, onUpdate) {
 }
 
 // Subscribe to a store only once.
-const SUBSCRIPTIONS = new Set();
+const SUBSCRIPTIONS = {};
 
 async function _getAll(wallet, set) {
   const totalPolls = await wallet.contracts.SayDAO.totalPolls();
@@ -249,13 +249,14 @@ async function _getAll(wallet, set) {
   for (let i = totalPolls - 1; i >= 0; i--) {
     const id = i.toString();
     // That's quite bad, I'm bending spacetime too much.
-    if (!SUBSCRIPTIONS.has(id)) {
-      get(id).subscribe(poll => {
-        if (poll === undefined) return;
-        set(poll);
-      });
-      SUBSCRIPTIONS.add(id);
+    if (SUBSCRIPTIONS[id]) {
+      // Unsubscribe
+      SUBSCRIPTIONS[id]();
     }
+    SUBSCRIPTIONS[id] = get(id).subscribe(poll => {
+      if (poll === undefined) return;
+      set(poll);
+    });
   }
 }
 

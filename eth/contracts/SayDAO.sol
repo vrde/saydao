@@ -227,7 +227,7 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
     // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
     for (uint8 i = 0; i < 8; i++) {
       uint bitmap = pollToVoters[uint(keccak256(abi.encodePacked(pollId, i)))][uint8(memberId / 256)];
-      if((bitmap & (1 << (memberId % 256))) > 0) {
+      if((bitmap & (uint(1) << (memberId % 256))) > 0) {
         return i;
       }
     }
@@ -257,7 +257,7 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
     pollToVotes[pollId][option] += stake;
 
     // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
-    pollToVoters[uint(keccak256(abi.encodePacked(pollId, option)))][uint8(memberId / 256)] |= 1 << (memberId % 256);
+    pollToVoters[uint(keccak256(abi.encodePacked(pollId, option)))][uint8(memberId / 256)] |= uint(1) << (memberId % 256);
     emit Vote(pollId);
   }
 

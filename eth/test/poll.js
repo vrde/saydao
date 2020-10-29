@@ -10,6 +10,13 @@ describe("SayDAO Poll", async () => {
   let erin;
   let mallory;
 
+  let aliceId;
+  let bobId = 155;
+  let carolId = 30;
+  let danId = 40;
+  let erinId;
+  let malloryId;
+
   before(async () => {
     alice = await etherea.wallet({ endpoint: "localhost" });
     bob = await etherea.wallet({
@@ -43,9 +50,9 @@ describe("SayDAO Poll", async () => {
     erin.loadContracts(contracts);
     mallory.loadContracts(contracts);
 
-    await add(alice, bob, 1);
-    await add(alice, carol, 2);
-    await add(alice, dan, 3);
+    await add(alice, bob, bobId);
+    await add(alice, carol, carolId);
+    await add(alice, dan, danId);
   });
 
   it("allow a member to create a poll and vote", async () => {
@@ -66,7 +73,9 @@ describe("SayDAO Poll", async () => {
 
     // Now Bob and Carol vote, yay!
     await bob.contracts.SayDAO.vote(0, 1);
+    assert.equal(await bob.contracts.SayDAO.hasVotedFor(0, bobId), 1);
     await carol.contracts.SayDAO.vote(0, 0);
+    assert.equal(await carol.contracts.SayDAO.hasVotedFor(0, carolId), 0);
 
     const votes = await bob.contracts.SayDAO.getVotes(0);
 
@@ -79,8 +88,8 @@ describe("SayDAO Poll", async () => {
     await assert.rejects(bob.contracts.SayDAO.vote(0, 1));
     await assert.rejects(bob.contracts.SayDAO.vote(0, 2));
 
-    assert.equal(await bob.contracts.SayDAO.hasVotedFor(0, 1), 1);
-    assert.equal(await carol.contracts.SayDAO.hasVotedFor(0, 2), 0);
+    assert.equal(await bob.contracts.SayDAO.hasVotedFor(0, bobId), 1);
+    assert.equal(await carol.contracts.SayDAO.hasVotedFor(0, carolId), 0);
 
     const pollAfterVote = await alice.contracts.SayDAO.polls(0);
 

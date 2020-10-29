@@ -191,7 +191,7 @@ export function get(id, onUpdate) {
         set(poll);
 
         const onEventCallback = async event => {
-          if (event.pollId.toString() === id) {
+          if (event.pollId && event.pollId.toString() === id) {
             poll = await _get($wallet, id, $memberId);
             poll._blockNumber = blockNumber;
             updatePollDynamicFields(poll);

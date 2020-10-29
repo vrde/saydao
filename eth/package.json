@@ -17,7 +17,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^3.0.1",
     "dotenv": "^8.2.0",
-    "etherea": "0.0.1"
+    "etherea": "0.0.12"
   },
   "devDependencies": {
     "@opengsn/gsn": "^2.0.1",

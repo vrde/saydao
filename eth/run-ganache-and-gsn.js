@@ -26,18 +26,17 @@ async function startGanache() {
 async function startGsn() {
   await mkdir(outdir, { recursive: true });
   const gsnInstance = await GsnTestEnvironment.startGsn("localhost");
-  await writeFile(
-    outfile,
-    JSON.stringify(gsnInstance.deploymentResult, null, 2)
-  );
+  const config = gsnInstance.deploymentResult;
+  config.paymasterAddress = config.naivePaymasterAddress;
+  await writeFile(outfile, JSON.stringify(config, null, 2));
   return gsnInstance.deploymentResult;
 }
 
 async function start() {
-  console.log("Start ganache server");
-  const blockchain = await startGanache();
-  console.log("Mnemonic:", blockchain.mnemonic);
-  console.log("Start Gas Station Relay");
+  //console.log("Start ganache server");
+  //const blockchain = await startGanache();
+  //console.log("Mnemonic:", blockchain.mnemonic);
+  //console.log("Start Gas Station Relay");
   const gsn = await startGsn();
   console.log("GSN configuration", gsn);
 }

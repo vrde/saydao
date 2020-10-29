@@ -19,7 +19,7 @@ async function getTrustedForwarder() {
     return JSON.parse(await readFile("./gsn.json"))["forwarderAddress"];
   } else if (NETWORK === "kovan") {
     // Address from https://docs.opengsn.org/gsn-provider/networks.html
-    return "0x6453D37248Ab2C16eBd1A8f782a2CBC65860E60B";
+    return "0x0842Ad6B8cb64364761C7c170D0002CC56b1c498";
   }
 }
 

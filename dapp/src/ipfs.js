@@ -46,13 +46,7 @@ export const get = cache.wrap(_get);
 
 // FIXME: make sure it's future proof
 export function cidToUint(cid) {
-  return (
-    "0x" +
-    bs58
-      .decode(cid)
-      .toString("hex")
-      .substr(4)
-  );
+  return "0x" + bs58.decode(cid).toString("hex").substr(4);
 }
 
 export function uintToCid(uint) {

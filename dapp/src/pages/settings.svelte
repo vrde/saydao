@@ -7,21 +7,28 @@
 </script>
 
 {#if $wallet}
-<section>
-
+  <section>
     {#if $wallet.mnemonic}
+      <h2>Magic Word Backup</h2>
 
-    <h2>Magic Word Backup</h2>
-
-    <p>
-      <strong>Important!</strong> Make sure to save your <strong>12 magic words</strong> before you leave this page. You need these magic words to log in again.  Write them down and keep them safe.</p>
-    <p>Your 12 magic words are:</p>
+      <p>
+        <strong>Important!</strong> Make sure to save your
+        <strong>12 magic words</strong> before you leave this page. You need these
+        magic words to log in again. Write them down and keep them safe.
+      </p>
+      <p>Your 12 magic words are:</p>
 
       {#if reveal}
-        <p><button on:click={()=>reveal = false}>Hide your 12 magic words</button></p>
+        <p>
+          <button on:click={() => (reveal = false)}
+            >Hide your 12 magic words</button
+          >
+        </p>
         <textarea readonly>{$wallet.mnemonic}</textarea>
       {:else}
-        <button on:click={()=>reveal = true}>Reveal your 12 magic words</button>
+        <button on:click={() => (reveal = true)}
+          >Reveal your 12 magic words</button
+        >
       {/if}
     {/if}
 
@@ -35,16 +42,26 @@
 
     <h3>Smart Contracts Details</h3>
 
-    <h4>ParTecK DAO Address</h4>
+    <h4>{CONFIG.name} Address</h4>
 
-    <p>The smart contract that runs ParTecK DAO can be found at:
-      <a href="https://{$wallet.networkName}.etherscan.io/address/{$wallet.contracts.SayDAO.address}" target="_blank">{$wallet.contracts.SayDAO.address}</a>.
+    <p>
+      The smart contract that runs {CONFIG.name} can be found at:
+      <a
+        href="https://{$wallet.networkName}.etherscan.io/address/{$wallet
+          .contracts.SayDAO.address}"
+        target="_blank">{$wallet.contracts.SayDAO.address}</a
+      >.
     </p>
 
     <h4>Say Token Address</h4>
 
-    <p>The smart contract that represents the Say token can be found at:
-      <a href="https://{$wallet.networkName}.etherscan.io/address/{$wallet.contracts.SayToken.address}" target="_blank">{$wallet.contracts.SayToken.address}</a>.
+    <p>
+      The smart contract that represents the Say token can be found at:
+      <a
+        href="https://{$wallet.networkName}.etherscan.io/address/{$wallet
+          .contracts.SayToken.address}"
+        target="_blank">{$wallet.contracts.SayToken.address}</a
+      >.
     </p>
 
     <p>
@@ -57,10 +74,12 @@
 
     <h3>Source Code</h3>
 
-    <p><a href="https://github.com/vrde/saydao" target="_blank">SayDAO source code</a>.</p>
-
-</section>
-
+    <p>
+      <a href="https://github.com/vrde/saydao" target="_blank"
+        >SayDAO source code</a
+      >.
+    </p>
+  </section>
 {:else}
   <h1>Forbidden!</h1>
   <p>You need to be logged in to see this page.</p>

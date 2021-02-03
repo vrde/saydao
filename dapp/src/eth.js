@@ -99,7 +99,7 @@ function stripEvent(event, contract) {
   }
   const e = {
     blockNumber: event.blockNumber,
-    logIndex: event.logIndex
+    logIndex: event.logIndex,
   };
   for (let key of Object.keys(args)) {
     if (!key.match(/^\d+$/)) {
@@ -126,7 +126,7 @@ export function getLogs(provider, filter, contract) {
       ],
       events: [
         /* A promise for events */
-      ]
+      ],
     };
     set(key, obj);
   }
@@ -138,10 +138,10 @@ export function getLogs(provider, filter, contract) {
       .getLogs({
         ...filter,
         fromBlock,
-        toBlock: toBlock - 1
+        toBlock: toBlock - 1,
       })
-      .then(events => events.map(e => stripEvent(e, contract)));
-    position = obj.ranges.findIndex(element => fromBlock < element[1]);
+      .then((events) => events.map((e) => stripEvent(e, contract)));
+    position = obj.ranges.findIndex((element) => fromBlock < element[1]);
     if (position === -1) {
       position = obj.ranges.length;
     }
@@ -171,7 +171,7 @@ export async function getBlockNumber(provider) {
           return blockNumber;
         } catch (e) {
           console.error("Error getting block number");
-          await new Promise(r => setTimeout(r, 1000));
+          await new Promise((r) => setTimeout(r, 1000));
         }
       }
     })();
@@ -184,7 +184,7 @@ const FILTER_TO_CALLBACKS = {};
 function callbackWorker(callback) {
   let running = false;
   let queue = [];
-  return async param => {
+  return async (param) => {
     queue.push(param);
     if (running) return;
     running = true;
@@ -204,7 +204,7 @@ export function onEvent(provider, contract, filter, callback) {
     FILTER_TO_CALLBACKS[key] = {
       nextId: 0,
       callbacks: {},
-      lastBlockNumber: null
+      lastBlockNumber: null,
     };
   }
   const obj = FILTER_TO_CALLBACKS[key];
@@ -226,10 +226,10 @@ export function onEvent(provider, contract, filter, callback) {
       provider,
       {
         ...filter,
-        toBlock: blockNumber
+        toBlock: blockNumber,
       },
       contract
-    ).forEach(events => callback(events));
+    ).forEach((events) => callback(events));
   }
 
   async function _checkBlock() {
@@ -240,10 +240,12 @@ export function onEvent(provider, contract, filter, callback) {
         {
           ...filter,
           fromBlock: obj.lastBlockNumber + 1,
-          toBlock: blockNumber
+          toBlock: blockNumber,
         },
         contract
-      ).forEach(events => Object.values(obj.callbacks).forEach(c => c(events)));
+      ).forEach((events) =>
+        Object.values(obj.callbacks).forEach((c) => c(events))
+      );
       obj.lastBlockNumber = blockNumber;
     }
     window.setTimeout(_checkBlock, 5000);

@@ -20,7 +20,7 @@ export function splitDate(date) {
     [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join(
       "-"
     ),
-    [pad(date.getHours()), pad(date.getMinutes())].join(":")
+    [pad(date.getHours()), pad(date.getMinutes())].join(":"),
   ];
 }
 

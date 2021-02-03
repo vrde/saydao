@@ -34,7 +34,7 @@ function getMemberKey(wallet, id) {
     "contract",
     wallet.contracts.SayToken.address,
     "members",
-    id
+    id,
   ].join(":");
 }
 
@@ -63,7 +63,7 @@ export function get(id, onUpdate) {
         $wallet.provider,
         $wallet.contracts.SayToken,
         filter,
-        async event => {
+        async (event) => {
           const to = etherea.BigNumber.from(event.to);
           if (to.eq(id)) {
             object = await _get($wallet, id);
@@ -89,7 +89,7 @@ async function _getAll2(wallet, set) {
   ).toNumber();
   for (let i = 1; i < totalObjects + 1; i++) {
     const id = i.toString();
-    get(id).subscribe(object => {
+    get(id).subscribe((object) => {
       if (object === undefined) return;
       set(object);
     });
@@ -111,7 +111,7 @@ async function _getAll(wallet, set) {
       //const rawBalance = await wallet.contracts.SayToken.balanceOf(address);
       // That's quite bad, I'm bending spacetime too much.
       if (!SUBSCRIPTIONS.has(id)) {
-        get(id).subscribe(object => {
+        get(id).subscribe((object) => {
           if (object === undefined) return;
           set(object);
         });
@@ -124,7 +124,7 @@ async function _getAll(wallet, set) {
 const objects = derived(wallet, async ($wallet, set) => {
   if (!$wallet) return;
   const store = {};
-  const _set = object => {
+  const _set = (object) => {
     store[object.id] = object;
     set(store);
   };
@@ -137,7 +137,7 @@ const objects = derived(wallet, async ($wallet, set) => {
     $wallet.provider,
     $wallet.contracts.SayToken,
     filter,
-    async event => {
+    async (event) => {
       _getAll($wallet, _set);
     }
   );
@@ -157,7 +157,7 @@ export const totalSay = derived(wallet, async ($wallet, set) => {
     $wallet.provider,
     $wallet.contracts.SayToken,
     filter,
-    async event => {
+    async (event) => {
       set(await $wallet.contracts.SayToken.totalSupply());
     }
   );
@@ -168,15 +168,15 @@ export const list = derived(
   ([$objects, $totalSay]) =>
     $objects &&
     $totalSay &&
-    Object.values($objects).map(object => ({
+    Object.values($objects).map((object) => ({
       ...object,
       id: etherea.BigNumber.from(object.id).toNumber(),
       balance: prettyBalance(object.balance),
-      shares: prettyShares(object.balance, $totalSay)
+      shares: prettyShares(object.balance, $totalSay),
     }))
 );
 
-export const totalMembers = derived(list, $list => $list && $list.length);
+export const totalMembers = derived(list, ($list) => $list && $list.length);
 
 export const me = derived(
   [memberId, totalSay],
@@ -184,12 +184,12 @@ export const me = derived(
     if (!$totalSay) return;
     if ($memberId) {
       return get($memberId).subscribe(
-        v =>
+        (v) =>
           v &&
           set({
             id: v.id,
             balance: prettyBalance(v.balance),
-            shares: prettyShares(v.balance, $totalSay)
+            shares: prettyShares(v.balance, $totalSay),
           })
       );
     } else {

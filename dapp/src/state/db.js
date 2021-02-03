@@ -44,7 +44,7 @@ class DB {
 
   writable(key, valueOrFunction) {
     const value = writable(this.getsert(key, valueOrFunction));
-    value.subscribe(current => {
+    value.subscribe((current) => {
       this.set(key, current);
     });
     return value;

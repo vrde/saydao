@@ -19,20 +19,12 @@ async function _get(wallet, id, memberId) {
   const tokenStaked = poll.tokenStaked;
   const tokenLeft = tokenSupply.sub(tokenStaked);
   const votes = await wallet.contracts.SayDAO.getVotes(id);
-  const votesPerc = votes.map(vote =>
-    tokenStaked.isZero()
-      ? 0
-      : vote
-          .mul(10000)
-          .div(tokenStaked)
-          .toNumber() / 100
+  const votesPerc = votes.map((vote) =>
+    tokenStaked.isZero() ? 0 : vote.mul(10000).div(tokenStaked).toNumber() / 100
   );
   const totalVotesPerc = tokenStaked.isZero()
     ? 0
-    : tokenStaked
-        .mul(10000)
-        .div(tokenSupply)
-        .toNumber() / 100;
+    : tokenStaked.mul(10000).div(tokenSupply).toNumber() / 100;
   const quorumReached = totalVotesPerc >= 33;
   const toQuorum = 33 - totalVotesPerc;
   // How many tokens had the member when the poll was created?
@@ -57,7 +49,7 @@ async function _get(wallet, id, memberId) {
       meetingDone: meeting.done,
       meetingSupervisor: meeting.supervisor,
       meetingStart: new Date(meeting.start.toNumber() * 1000).getTime(),
-      meetingEnd: new Date(meeting.end.toNumber() * 1000).getTime()
+      meetingEnd: new Date(meeting.end.toNumber() * 1000).getTime(),
       // Option 0 is yes, 1 is no.
       //meetingValid: finalDecision === 0
     };
@@ -83,12 +75,12 @@ async function _get(wallet, id, memberId) {
     hasTokens: tokensAvailableToVote.isZero()
       ? null
       : tokensAvailableToVote.toString(),
-    ...extra
+    ...extra,
   };
 }
 
 function updatePollDynamicFields(poll, memberId) {
-  const votes = poll.votes.map(v => etherea.BigNumber.from(v));
+  const votes = poll.votes.map((v) => etherea.BigNumber.from(v));
   // We need to check if there are multiple winning options.
   // This temporary data structure is [ vote (big number), position (int) ]
   const [firstOption, secondOption] = votes
@@ -138,7 +130,7 @@ function getPollKey(wallet, id) {
     "contract",
     wallet.contracts.SayDAO.address,
     "poll",
-    id
+    id,
   ].join(":");
 }
 
@@ -164,7 +156,7 @@ function onTimer(poll, memberId, set) {
       unsubscribeFuncs.push(() => clearTimeout(timerId));
     }
   }
-  return () => unsubscribeFuncs.forEach(func => func());
+  return () => unsubscribeFuncs.forEach((func) => func());
 }
 
 const OBJECTS = {};
@@ -190,7 +182,7 @@ export function get(id, onUpdate) {
         onUpdate && onUpdate(poll);
         set(poll);
 
-        const onEventCallback = async event => {
+        const onEventCallback = async (event) => {
           if (event.pollId && event.pollId.toString() === id) {
             poll = await _get($wallet, id, $memberId);
             poll._blockNumber = blockNumber;
@@ -231,9 +223,9 @@ export function get(id, onUpdate) {
             filterAllocationDone,
             onEventCallback
           ),
-          onTimer(poll, $memberId, set)
+          onTimer(poll, $memberId, set),
         ];
-        return () => unsubscribeFuncs.forEach(func => func());
+        return () => unsubscribeFuncs.forEach((func) => func());
       }
     );
   }
@@ -253,7 +245,7 @@ async function _getAll(wallet, set) {
       // Unsubscribe
       SUBSCRIPTIONS[id]();
     }
-    SUBSCRIPTIONS[id] = get(id).subscribe(poll => {
+    SUBSCRIPTIONS[id] = get(id).subscribe((poll) => {
       if (poll === undefined) return;
       set(poll);
     });
@@ -263,7 +255,7 @@ async function _getAll(wallet, set) {
 const objects = derived(wallet, async ($wallet, set) => {
   if (!$wallet) return;
   const store = {};
-  const _set = poll => {
+  const _set = (poll) => {
     store[poll.id] = poll;
     set(store);
   };
@@ -276,7 +268,7 @@ const objects = derived(wallet, async ($wallet, set) => {
     $wallet.provider,
     $wallet.contracts.SayDAO,
     filter,
-    async event => {
+    async (event) => {
       _getAll($wallet, _set);
     }
   );
@@ -284,38 +276,38 @@ const objects = derived(wallet, async ($wallet, set) => {
 
 export const open = derived(
   objects,
-  $objects =>
-    $objects && Object.values($objects).filter(poll => poll && poll.open)
+  ($objects) =>
+    $objects && Object.values($objects).filter((poll) => poll && poll.open)
 );
 
 export const closed = derived(
   objects,
-  $objects =>
-    $objects && Object.values($objects).filter(poll => poll && !poll.open)
+  ($objects) =>
+    $objects && Object.values($objects).filter((poll) => poll && !poll.open)
 );
 
-export const upcomingMeetings = derived(objects, $objects => {
+export const upcomingMeetings = derived(objects, ($objects) => {
   const now = Date.now();
   return (
     $objects &&
     Object.values($objects).filter(
-      poll => poll.isMeeting && poll.meetingValid && now < poll.meetingEnd
+      (poll) => poll.isMeeting && poll.meetingValid && now < poll.meetingEnd
     )
   );
 });
 
-export const pastMeetings = derived(objects, $objects => {
+export const pastMeetings = derived(objects, ($objects) => {
   const now = new Date().getTime();
   return (
     $objects &&
     Object.values($objects).filter(
-      poll => poll.isMeeting && poll.meetingValid && poll.meetingEnd <= now
+      (poll) => poll.isMeeting && poll.meetingValid && poll.meetingEnd <= now
     )
   );
 });
 
 export const actionableMeetings = derived(
   objects,
-  $objects =>
-    $objects && Object.values($objects).filter(poll => poll.actionRequired)
+  ($objects) =>
+    $objects && Object.values($objects).filter((poll) => poll.actionRequired)
 );

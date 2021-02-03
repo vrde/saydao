@@ -1,68 +1,74 @@
 <script>
-import etherea from "etherea";
-import { login, wallet } from "src/state/eth"
-import { role } from "src/state/dao"
-import { parse } from 'qs'
-import { querystring, replace, push } from 'svelte-spa-router'
+  import etherea from "etherea";
+  import { login, wallet } from "src/state/eth";
+  import { role } from "src/state/dao";
+  import { parse } from "qs";
+  import { querystring, replace, push } from "svelte-spa-router";
+  import CONFIG from "src/config";
 
-$: invite = parse($querystring);
+  $: invite = parse($querystring);
 
-let state = "idle";
-let loginError;
-let inviteError;
-let loggedIn = false;
+  let state = "idle";
+  let loginError;
+  let inviteError;
+  let loggedIn = false;
 
-async function handleLogin() {
-  loginError = false;
-  try {
+  async function handleLogin() {
+    loginError = false;
+    try {
+      await login();
+      loggedIn = true;
+    } catch (e) {
+      console.log(e);
+      loginError = true;
+    }
+  }
+
+  async function handleSubmit() {
+    state = "working";
+    let transaction;
+    let receipt;
     await login();
-    loggedIn = true;
-  } catch(e) {
-    console.log(e);
-    loginError = true;
+    try {
+      const { r, s, v } = etherea.signature.split(invite.signature);
+      console.log(r, s, v);
+      transaction = await $wallet.contracts.SayDAO.join(
+        invite.memberId,
+        v,
+        r,
+        s
+      );
+      receipt = await $wallet.provider.waitForTransaction(transaction.hash);
+    } catch (e) {
+      state = "error";
+      inviteError = e;
+      console.log(e);
+    }
+    await login();
+    console.log(transaction);
+    console.log(receipt);
+    replace(
+      `/member/welcome?memberId=${invite.memberId}&tx=${transaction.hash}`
+    );
+    //const transaction = await $wallet.contracts.SayDAO.foo();
+    //hash = transaction.hash;
+    //console.log('transaction hash is', transaction.hash);
+    //const receipt = await $wallet.provider.waitForTransaction(transaction.hash);
+    //blockNumber = receipt.blockNumber;
+    //console.log(`Mined in block: ${receipt.blockNumber}`);
   }
-}
-
-async function handleSubmit() {
-  state = 'working';
-  let transaction;
-  let receipt;
-  await login();
-  try {
-    const { r, s, v} = etherea.signature.split(invite.signature);
-    console.log(r, s, v);
-    transaction = await $wallet.contracts.SayDAO.join(invite.memberId, v, r, s);
-    receipt = await $wallet.provider.waitForTransaction(transaction.hash);
-  } catch(e) {
-    state = 'error';
-    inviteError = e;
-    console.log(e);
-  }
-  await login();
-  console.log(transaction);
-  console.log(receipt);
-  replace(`/member/welcome?memberId=${invite.memberId}&tx=${transaction.hash}`);
-  //const transaction = await $wallet.contracts.SayDAO.foo();
-  //hash = transaction.hash;
-  //console.log('transaction hash is', transaction.hash);
-  //const receipt = await $wallet.provider.waitForTransaction(transaction.hash);
-  //blockNumber = receipt.blockNumber;
-  //console.log(`Mined in block: ${receipt.blockNumber}`);
-}
 </script>
 
 {#if $wallet && $role.member}
-
   <h1>Error</h1>
-  <p>You are already a member of ParTecK DAO.</p>
-
+  <p>You are already a member of {CONFIG.name}.</p>
 {:else}
-
-  <h1>You've been invited to join ParTecK DAO</h1>
+  <h1>You've been invited to join {CONFIG.name}</h1>
 
   {#if etherea.hasNativeWallet() && !loggedIn}
-
-    <p>Your browser supports Ethereum. Please log in to your Ethereum account.</p>
+    <p>
+      Your browser supports Ethereum. Please log in to your Ethereum account.
+    </p>
 
     {#if loginError}
       <p class="error">That didn't work. Please try again.</p>
@@ -70,30 +76,34 @@ async function handleSubmit() {
 
     <ul>
       <li>
-        <button on:click={handleLogin} href="#">Log in with your Ethereum account</button>
+        <button on:click={handleLogin} href="#"
+          >Log in with your Ethereum account</button
+        >
       </li>
     </ul>
-
   {:else}
-
     <form on:submit|preventDefault={handleSubmit}>
-      <p>I want to join ParTecK DAO with <strong>member id {invite.memberId}</strong>.</p>
-      <button disabled={state!=="idle"} type="submit">Confirm</button>
+      <p>
+        I want to join {CONFIG.name} with
+        <strong>member id {invite.memberId}</strong>.
+      </p>
+      <button disabled={state !== "idle"} type="submit">Confirm</button>
     </form>
 
     {#if state === "working"}
-
-      <p>Please wait while your account is created. This may take up to 30 seconds. Be patient!</p>
-
+      <p>
+        Please wait while your account is created. This may take up to 30
+        seconds. Be patient!
+      </p>
     {:else if state === "error"}
-
-      <p class="error">There was an error joining ParTecK DAO. Please try again. If this is the second time you've tried, please tell the person who invited you. You might need a new member invite.</p>
+      <p class="error">
+        There was an error joining {CONFIG.name}. Please try again. If this is
+        the second time you've tried, please tell the person who invited you.
+        You might need a new member invite.
+      </p>
       <details>
         {inviteError.toString()}
       </details>
-
     {/if}
-
   {/if}
-
 {/if}

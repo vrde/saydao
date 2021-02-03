@@ -4,18 +4,17 @@
   export let date = new Date().getTime();
   export let countdown = false;
 
-
   $: dateObj = date instanceof Date ? date : new Date(date);
   let timeLeft;
 
   const options = {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
     hour: "numeric",
     minute: "2-digit",
-    second: "2-digit"
+    second: "2-digit",
   };
 
   function format(date) {
@@ -24,9 +23,9 @@
 
   // Thanks: https://stackoverflow.com/a/52387803
   function secondsToDHMS(seconds) {
-    var d = Math.floor(seconds / (3600*24));
-    var h = Math.floor(seconds % (3600*24) / 3600);
-    var m = Math.floor(seconds % 3600 / 60);
+    var d = Math.floor(seconds / (3600 * 24));
+    var h = Math.floor((seconds % (3600 * 24)) / 3600);
+    var m = Math.floor((seconds % 3600) / 60);
     var s = Math.floor(seconds % 60);
 
     var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
@@ -35,7 +34,6 @@
     var sDisplay = s + (s == 1 ? " second" : " seconds");
     return dDisplay + hDisplay + mDisplay + sDisplay;
   }
-
 
   onMount(() => {
     function tick() {
@@ -53,7 +51,6 @@
     }
     return () => timerId !== undefined && clearInterval(timerId);
   });
-
 </script>
 
 {format(dateObj)}

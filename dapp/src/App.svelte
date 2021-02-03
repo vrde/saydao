@@ -25,8 +25,6 @@
   import Docs from "./pages/Docs.svelte";
   import NotFound from "./pages/NotFound.svelte";
 
-  import { clock } from "./state";
-
   const routes = {
     "/": Home,
     "/settings": settings,
@@ -49,13 +47,9 @@
     "/polls/details/:id": PollsDetails,
 
     "/docs/:name": Docs,
-    "*": NotFound
+    "*": NotFound,
   };
 </script>
-
-<style>
-
-</style>
 
 <Header />
 
@@ -64,4 +58,7 @@
     <Router {routes} />
   </section>
 </main>
-<footer></footer>
+<footer />
+
+<style>
+</style>

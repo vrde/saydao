@@ -30,7 +30,7 @@ export const role = derived(
       const defaultAdminRole = await contract.DEFAULT_ADMIN_ROLE();
       set({
         owner: await contract.hasRole(defaultAdminRole, $wallet.address),
-        member: (await contract.addressToMember($wallet.address)) !== 0
+        member: (await contract.addressToMember($wallet.address)) !== 0,
       });
     }
   },

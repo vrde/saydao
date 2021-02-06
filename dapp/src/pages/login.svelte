@@ -40,13 +40,9 @@
         <p class="error">It didn't work out. Try again please.</p>
       {/if}
 
-      <ul>
-        <li>
-          <button on:click={handleLogin} href="#"
-            >Log in with your Ethereum account</button
-          >
-        </li>
-      </ul>
+      <button class="button-shadow" on:click={handleLogin} href="#"
+        ><span>Log in with your Ethereum account</span></button
+      >
     {:else}
       <p>Please enter your 12 magic words.</p>
 

@@ -1,7 +1,7 @@
 <script>
   import { networkMismatch } from "src/state/eth";
-  import { role, memberId } from "src/state/dao";
-  import CONFIG from "src/config";
+
+  export let level = "warning"
 </script>
 
 {#if $networkMismatch}
@@ -12,18 +12,6 @@
     <strong>{$networkMismatch.expected} network</strong>.
   </p>
 {/if}
-
-<header role="banner">
-  <div>
-    <h1>
-      <a href="#">{CONFIG.name}</a>
-    </h1>
-
-    {#if $memberId}
-      <p>You are <strong>member {$memberId}</strong>.</p>
-    {/if}
-  </div>
-</header>
 
 <style>
   .error {

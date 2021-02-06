@@ -2,10 +2,13 @@
   import { wallet } from "src/state/eth";
   import { get as getMember, totalMembers, me } from "src/state/dao/member";
   import { role, memberId } from "src/state/dao";
+  import Banner from "src/components/banner";
   import CONFIG from "src/config";
 
   window.me = me;
 </script>
+
+<Banner />
 
 <section>
   {#if $me}
@@ -46,7 +49,7 @@
     </div>
   {/if}
 
-  {#if $role.owner}
+  {#if $role.admin || $role.manager}
     <div>
       <h2>Administration</h2>
       <p>

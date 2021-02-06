@@ -1,7 +1,9 @@
 <script>
   import Router from "svelte-spa-router";
-  import Header from "./components/Header.svelte";
+  import Notification from "src/components/notification";
+  import Header from "./components/header";
 
+  import StyleGuide from "./pages/styleguide";
   import Home from "./pages/Home.svelte";
   import settings from "./pages/settings.svelte";
   import login from "./pages/login.svelte";
@@ -27,6 +29,7 @@
 
   const routes = {
     "/": Home,
+    "/styleguide": StyleGuide,
     "/settings": settings,
     "/login": login,
     "/logout": logout,
@@ -51,14 +54,6 @@
   };
 </script>
 
+<Notification />
 <Header />
-
-<main>
-  <section>
-    <Router {routes} />
-  </section>
-</main>
-<footer />
-
-<style>
-</style>
+<Router {routes} />

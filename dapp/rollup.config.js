@@ -126,7 +126,7 @@ export default {
     svelte({
       dev: !PRODUCTION,
     }),
-    css({ output: "build/bundle.css" }),
+    css({ output: "bundle.css" }),
     builtins(),
     globals(),
     setAlias(),

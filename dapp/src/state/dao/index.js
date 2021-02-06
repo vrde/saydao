@@ -28,8 +28,10 @@ export const role = derived(
     if ($wallet) {
       const contract = $wallet.contracts.SayDAO;
       const defaultAdminRole = await contract.DEFAULT_ADMIN_ROLE();
+      const managerRole = await contract.MANAGER_ROLE();
       set({
-        owner: await contract.hasRole(defaultAdminRole, $wallet.address),
+        admin: await contract.hasRole(defaultAdminRole, $wallet.address),
+        manager: await contract.hasRole(managerRole, $wallet.address),
         member: (await contract.addressToMember($wallet.address)) !== 0,
       });
     }

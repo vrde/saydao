@@ -1,6 +1,6 @@
 <script>
   import Widget from "./Widget.svelte";
-  import { role, memberId } from "src/state/dao";
+  import { memberId } from "src/state/dao";
   import { me } from "src/state/dao/member";
   import CONFIG from "src/config";
 </script>

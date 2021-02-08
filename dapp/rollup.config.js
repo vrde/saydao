@@ -67,6 +67,7 @@ function getConfig(production) {
     walletOptions = {
       endpoint: "localhost",
       disableNativeAgent: true,
+      environment: production ? "production" : "development",
     };
     try {
       gsn = JSON.parse(fs.readFileSync("../eth/gsn.json"));

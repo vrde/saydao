@@ -1,5 +1,5 @@
 <script>
-  import Router from "svelte-spa-router";
+  import Router, { location } from "svelte-spa-router";
   import Notification from "src/components/notification";
   import Header from "./components/header";
 
@@ -9,8 +9,8 @@
   import login from "./pages/login.svelte";
   import logout from "./pages/logout.svelte";
 
-  import memberJoin from "./pages/member/join.svelte";
-  import memberWelcome from "./pages/member/welcome.svelte";
+  import memberJoin from "./pages/member/join";
+  import memberWelcome from "./pages/member/welcome";
   import memberInvite from "./pages/member/invite.svelte";
   import memberList from "./pages/member/list.svelte";
 
@@ -26,6 +26,8 @@
 
   import Docs from "./pages/Docs.svelte";
   import NotFound from "./pages/NotFound.svelte";
+
+  $: showHeader = !["/member/join", "/member/welcome"].some(path => $location.startsWith(path));
 
   const routes = {
     "/": Home,
@@ -55,5 +57,7 @@
 </script>
 
 <Notification />
-<Header />
+{#if showHeader}
+  <Header />
+{/if}
 <Router {routes} />

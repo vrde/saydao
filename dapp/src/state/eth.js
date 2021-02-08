@@ -1,12 +1,10 @@
 import { writable, derived } from "svelte/store";
-import { get } from "svelte/store";
 
 import etherea from "etherea";
 
 import contracts from "src/contracts/contracts.json";
 import CONFIG from "src/config";
 import db from "./db";
-import { clock } from "./clock";
 
 // Autologin
 (() => (db.get("saydao:autologin") ? login() : loginAnon()))();

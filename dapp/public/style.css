@@ -16,9 +16,12 @@
   --size-xxxxl: 12rem;
   --max-width: 1024px;
 
-  --color-light: beige;
-  --color-dark: #424456;
   --f: 1;
+
+  --join--color-idle: #03a9f4;
+  --join--color-working: #ffc107;
+  --join--color-success: #a6ff58;
+  --join--color-error: #ff432a;
 }
 
 @media (max-width: 768px) {
@@ -51,6 +54,7 @@ body {
 }
 
 section {
+  width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 var(--size);
@@ -63,6 +67,10 @@ a:visited {
 
 h1 {
   font-size: var(--size-xl);
+}
+
+p {
+  line-height: 1.5;
 }
 
 /* Styles */
@@ -110,12 +118,16 @@ button.button-shadow {
   transform: translate(0, 0);
 }
 
+.button-shadow:disabled span,
+.button-shadow:disabled span:hover,
+.button-shadow:disabled span:active {
+  cursor: not-allowed;
+  transform: translate(-2px, -2px);
+}
+
 /**
  * Form
  */
-
-form {
-}
 
 label,
 .label,
@@ -135,9 +147,6 @@ form div {
   margin-bottom: var(--size-xxl);
 }
 
-form .parallel {
-}
-
 label,
 .label {
   display: block;
@@ -149,6 +158,8 @@ label,
 input,
 textarea,
 select {
+  background: white;
+  border: var(--size-px) solid black;
   padding: var(--size-xxs) var(--size-xxs);
 }
 
@@ -166,5 +177,40 @@ textarea {
 }
 
 button[type="submit"] {
+  font-size: var(--size-l);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled,
+button:disabled {
+  cursor: not-allowed;
+}
+
+button:disabled,
+.button-shadow:disabled span {
+  text-decoration: line-through;
+}
+
+/**
+ * Fullpage omg
+ */
+
+.fullpage {
+  width: 100%;
+  max-width: 100%;
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffc107;
+}
+
+.fullpage h1 {
+  font-size: var(--size-xl);
+}
+
+.fullpage p {
   font-size: var(--size-l);
 }

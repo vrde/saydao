@@ -4,24 +4,7 @@
   export let onClose;
 </script>
 
-{#if state.action || state.error}
-  <section transition:slide>
-    <div class:working={!state.error}>
-      {#if state.error}
-        <h2>Oops, something went wrong :(</h2>
-        <p>Please give it another try.</p>
-        <button on:click={onClose}>Close</button>
-        <details>
-          {state.error}
-        </details>
-      {:else}
-        <p>Please wait. This will take a while.</p>
-      {/if}
-    </div>
-  </section>
-{/if}
-
-<style type="text/scss">
+<style>
   section {
     position: fixed;
     top: 0;
@@ -52,3 +35,20 @@
     }
   }
 </style>
+
+{#if state.action || state.error}
+  <section transition:slide>
+    <div class:working={!state.error}>
+      {#if state.error}
+        <h2>Oops, something went wrong :(</h2>
+        <p>Please give it another try.</p>
+        <button on:click={onClose}>Close</button>
+        <details>
+          {state.error}
+        </details>
+      {:else}
+        <p>Please wait. This will take a while.</p>
+      {/if}
+    </div>
+  </section>
+{/if}

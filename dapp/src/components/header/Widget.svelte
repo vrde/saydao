@@ -6,29 +6,6 @@
   export let name;
 </script>
 
-<section>
-  <header role="banner">
-    <h1>
-      <a href="#/">{name}</a>
-    </h1>
-
-    {#if memberId}
-      <p>
-        You are <strong>{role} {memberId}</strong><br />
-        You have <strong>{balance} Say ({shares})</strong>
-      </p>
-    {:else}
-      <ul>
-        <li>
-          <a class="button-shadow" href="#/login">
-            <span>Login</span>
-          </a>
-        </li>
-      </ul>
-    {/if}
-  </header>
-</section>
-
 <style>
   header {
     display: flex;
@@ -49,3 +26,26 @@
     color: inherit;
   }
 </style>
+
+<section>
+  <header role="banner">
+    <h1>
+      <a href="#/">{name}</a>
+    </h1>
+
+    {#if memberId}
+      <p>
+        You are <strong>{role} {memberId}</strong><br />
+        You have <strong>{balance} Say ({shares})</strong>
+      </p>
+    {:else}
+      <ul>
+        <li>
+          <a class="button-shadow" href="#/login">
+            <span>Log in</span>
+          </a>
+        </li>
+      </ul>
+    {/if}
+  </header>
+</section>

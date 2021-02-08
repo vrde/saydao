@@ -21,6 +21,12 @@ async function deployAll(wallet) {
   const sayDao = await deploy(
     await compile("./contracts/SayDAO.sol"),
     wallet,
+    // min poll duration: one hour
+    0,
+    // min poll meeting duration: one week
+    0,
+    // time unit: one day
+    1,
     "0x0000000000000000000000000000000000000000"
   );
   wallet.loadContracts(sayDao);

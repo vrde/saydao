@@ -35,6 +35,12 @@ async function compile(outdir = "./dist") {
     "./contracts/SayDAO.sol",
     outdir,
     wallet,
+    // min poll duration: one hour
+    60 * 60,
+    // min poll meeting duration: one week
+    60 * 60 * 24 * 7,
+    // time unit: one day
+    60 * 60 * 24,
     await getTrustedForwarder()
   );
 

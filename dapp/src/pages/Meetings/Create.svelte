@@ -79,86 +79,115 @@
 
 <Loading {state} onClose={handleClose} />
 
-<h1>Propose a new Event</h1>
+<section>
+  <h1>Propose a new Event</h1>
 
-<form on:submit|preventDefault={handleSubmit}>
-  <label
-    >What is the title of the event?
-    <input type="text" bind:value={title} required />
-  </label>
+  <p>
+    Events keep the DAO active. Members participating to an event are rewarded
+    with <strong>Say tokens</strong>. This form allows you to propose a new
+    event. If the DAO approves your proposal, then the event will become reality
+    and members will be able to attend it.
+  </p>
 
-  <label
-    >What is the topic of the event?
-    <textarea bind:value={question} required />
-  </label>
+  <form on:submit|preventDefault={handleSubmit}>
+    <div>
+      <label for="event-title">What is the title of the event?</label>
+      <input
+        id="event-title"
+        type="text"
+        bind:value={title}
+        required
+        autocomplete="off"
+      />
+    </div>
 
-  <fieldset>
-    <legend>When is the event?</legend>
-    <p>
-      <label
-        >Start<br />
-        <input
-          bind:value={startDate}
-          on:change={() => (endDate = startDate)}
-          type="date"
-          min={minStartDate}
-          required
-        />
-        <input
-          bind:value={startTime}
-          on:change={() => (endTime = startTime)}
-          type="time"
-          min={startDate === nowDate ? minStartTime : ""}
-          required
-        />
-      </label>
-    </p>
-    <p>
-      <label
-        >End<br />
-        <input bind:value={endDate} type="date" min={startDate} required />
-        <input
-          bind:value={endTime}
-          type="time"
-          min={startDate === endDate ? startTime : ""}
-          required
-        />
-      </label>
-    </p>
-    <p><strong>Note:</strong> Events must begin at least one week from now.</p>
-  </fieldset>
+    <div>
+      <label for="event-topic">What is the topic of the event?</label>
+      <p class="note">
+        You can use
+        <a
+          href="https://guides.github.com/features/mastering-markdown/#syntax"
+          target="_blank">markdown</a
+        > to format the text.
+      </p>
+      <textarea id="event-topic" bind:value={question} required />
+    </div>
 
-  <label
-    >Who is the supervisor?
-    <select bind:value={supervisor} required>
-      {#if $members}
-        <option value="">Select a Member</option>
-        {#each $members as member, i}
-          <option value={member.id}>Member {member.id}</option>
-        {/each}
-      {:else}
-        <option value="">Wait, loading members...</option>
-      {/if}
-    </select>
-  </label>
+    <div>
+      <label for="event-start">When does the event start?</label>
+      <p class="note">
+        Events must begin at least one week from now so members have time to
+        vote.
+      </p>
+      <input
+        id="event-start"
+        bind:value={startDate}
+        on:change={() => (endDate = startDate)}
+        type="date"
+        min={minStartDate}
+        required
+      />
+      <input
+        bind:value={startTime}
+        on:change={() => (endTime = startTime)}
+        type="time"
+        min={startDate === nowDate ? minStartTime : ""}
+        required
+      />
+    </div>
+    <div>
+      <label for="event-end">When does the event end?</label>
+      <input
+        id="event-end"
+        bind:value={endDate}
+        type="date"
+        min={startDate}
+        required
+      />
+      <input
+        bind:value={endTime}
+        type="time"
+        min={startDate === endDate ? startTime : ""}
+        required
+      />
+    </div>
 
-  <label
-    >How long should the poll stay open?
-    <select bind:value={duration}>
-      <!--TESTING
+    <div>
+      <label for="event-supervisor">Who is the supervisor?</label>
+      <p class="note">
+        The supervisor is a member responsible to make the event happen.
+      </p>
+      <select id="event-supervisor" bind:value={supervisor} required>
+        {#if $members}
+          <option value="">Select a Member</option>
+          {#each $members as member, i}
+            <option value={member.id}>Member {member.id}</option>
+          {/each}
+        {:else}
+          <option value="">Wait, loading members...</option>
+        {/if}
+      </select>
+    </div>
+
+    <div>
+      <label for="event-poll-duration"
+        >How long should the poll stay open?</label
+      >
+      <select id="event-poll-duration" bind:value={duration}>
+        <!--TESTING
       <option value="60">1 minute</option>
       <option value="600">10 minutes</option>
       END TESTING-->
-      <option value={60 * 60 * 24 * 7} selected>7 days</option>
-      <option value={60 * 60 * 24 * 30}>30 days</option>
-    </select>
-  </label>
+        <option value={60 * 60 * 24 * 7} selected>7 days</option>
+        <option value={60 * 60 * 24 * 30}>30 days</option>
+      </select>
+    </div>
 
-  <button type="submit">Create poll</button>
-</form>
-
-<style>
-  textarea {
-    height: var(--size-l);
-  }
-</style>
+    <div>
+      <p class="label">Ready to submit your event?</p>
+      <button class="button-shadow" type="submit">
+        <span>Yep, create event</span>
+      </button>
+    </div>
+  </form>
+</section>

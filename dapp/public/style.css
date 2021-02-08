@@ -8,10 +8,12 @@
   --size-xs: 0.5rem;
   --size-s: 0.8rem;
   --size-m: 1rem;
+  --size: 1rem;
   --size-l: 1.5rem;
   --size-xl: 2rem;
   --size-xxl: 3rem;
   --size-xxxl: 6rem;
+  --size-xxxxl: 12rem;
   --max-width: 1024px;
 
   --color-light: beige;
@@ -48,9 +50,19 @@ body {
   padding: 0;
 }
 
+section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--size);
+}
+
 a,
 a:visited {
   color: inherit;
+}
+
+h1 {
+  font-size: var(--size-xl);
 }
 
 /* Styles */
@@ -66,9 +78,12 @@ button,
   border: var(--size-px) solid black;
   border-radius: var(--size-px);
   display: inline-block;
-  transform: translate(-4px, -4px);
   transition: all 100ms;
   cursor: pointer;
+}
+
+.button-shadow span {
+  transform: translate(-4px, -4px);
 }
 
 button.button-shadow {
@@ -80,7 +95,7 @@ button.button-shadow {
 .button-shadow {
   border-radius: var(--size-px);
   background: black;
-  /*box-shadow: 2px 2px 0 black;*/
+  transform: translate(4px, 4px);
   text-decoration: none;
   display: inline-block;
   transition: all 50ms;
@@ -95,8 +110,61 @@ button.button-shadow {
   transform: translate(0, 0);
 }
 
-section {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 0 var(--size-m);
+/**
+ * Form
+ */
+
+form {
+}
+
+label,
+.label,
+input,
+textarea,
+select,
+button {
+  font-size: var(--size);
+}
+
+form .note {
+  font-size: var(--size-s);
+  font-style: italic;
+}
+
+form div {
+  margin-bottom: var(--size-xxl);
+}
+
+form .parallel {
+}
+
+label,
+.label {
+  display: block;
+  font-weight: bold;
+  font-size: var(--size-l);
+  margin-bottom: var(--size-m);
+}
+
+input,
+textarea,
+select {
+  padding: var(--size-xxs) var(--size-xxs);
+}
+
+input[type="text"] {
+  display: block;
+  width: 100%;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  min-height: var(--size-xxl);
+  height: var(--size-xxxxl);
+  resize: vertical;
+}
+
+button[type="submit"] {
+  font-size: var(--size-l);
 }

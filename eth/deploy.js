@@ -36,11 +36,11 @@ async function compile(outdir = "./dist") {
     outdir,
     wallet,
     // min poll duration: one hour
-    60 * 60,
+    NETWORK === "localhost" ? 0 : 60 * 60,
     // min poll meeting duration: one week
-    60 * 60 * 24 * 7,
+    NETWORK === "localhost" ? 0 : 60 * 60 * 24 * 7,
     // time unit: one day
-    60 * 60 * 24,
+    NETWORK === "localhost" ? 1 : 60 * 60 * 24,
     await getTrustedForwarder()
   );
 

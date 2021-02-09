@@ -1,4 +1,5 @@
 <script>
+  import { pollMeetingDurations, minPollMeetingDuration } from "src/state/dao";
   import { list as members } from "src/state/dao/member";
   import { wallet } from "src/state/eth";
   import Loading from "src/components/Loading.svelte";
@@ -7,10 +8,10 @@
     ONE_HOUR,
     ONE_DAY,
     ONE_WEEK,
+    prettyDuration,
     splitDate,
     fromSplitToTimestamp,
   } from "./utils";
-  import CONFIG from "src/config";
 
   import * as ipfs from "src/ipfs";
 
@@ -26,11 +27,13 @@
   let [endDate, endTime] = [startDate, startTime];
 
   $: {
-    //  const max = Math.max(duration * 1000, ONE_WEEK + ONE_HOUR);
-    //TESTING
-    const max = Math.max(duration * 1000);
-    //END TESTING
-    [minStartDate, minStartTime] = splitDate(new Date(Date.now() + max));
+    const min = new Date(
+      Date.now() + $minPollMeetingDuration * 1000 + ONE_HOUR
+    );
+    console.log("min is", min);
+    [minStartDate, minStartTime] = splitDate(min);
+    [startDate, startTime] = [minStartDate, minStartTime];
+    [endDate, endTime] = [startDate, startTime];
   }
 
   function handleClose() {
@@ -117,13 +120,13 @@
     <div>
       <label for="event-start">When does the event start?</label>
       <p class="note">
-        Events must begin at least one week from now so members have time to
-        vote.
+        Events must begin at least {prettyDuration(
+          $minPollMeetingDuration * 1000
+        )} from now so members have time to vote.
       </p>
       <input
         id="event-start"
         bind:value={startDate}
-        on:change={() => (endDate = startDate)}
         type="date"
         min={minStartDate}
         required
@@ -175,12 +178,9 @@
         >How long should the poll stay open?</label
       >
       <select id="event-poll-duration" bind:value={duration}>
-        {#if CONFIG.environment === "development"}
-          <option value="60">1 minute</option>
-          <option value="600">10 minutes</option>
-        {/if}
-        <option value={60 * 60 * 24 * 7} selected>7 days</option>
-        <option value={60 * 60 * 24 * 30}>30 days</option>
+        {#each $pollMeetingDurations as [value, label]}
+          <option {value}>{label}</option>
+        {/each}
       </select>
     </div>
 

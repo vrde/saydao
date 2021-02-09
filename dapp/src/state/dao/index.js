@@ -45,3 +45,38 @@ export const memberId = derived(wallet, async ($wallet, set) => {
   console.log("member id is", id);
   set(id !== 0 ? id : null);
 });
+
+export const minPollDuration = derived(wallet, async ($wallet, set) => {
+  if ($wallet) {
+    const v = await $wallet.contracts.SayDAO.minPollDuration();
+    set(v);
+  } else {
+    set(undefined);
+  }
+});
+
+export const minPollMeetingDuration = derived(wallet, async ($wallet, set) => {
+  if ($wallet) {
+    const v = await $wallet.contracts.SayDAO.minPollMeetingDuration();
+    set(v);
+  } else {
+    set(undefined);
+  }
+});
+
+const DURATIONS = [
+  [60, "1 minute"],
+  [60 * 10, "10 minutes"],
+  [60 * 60, "1 hour"],
+  [60 * 60 * 24, "1 day"],
+  [60 * 60 * 24 * 7, "7 days"],
+  [60 * 60 * 24 * 30, "30 days"],
+];
+
+export const pollDurations = derived(minPollDuration, (m) => {
+  return DURATIONS.filter((d) => d[0] >= m);
+});
+
+export const pollMeetingDurations = derived(minPollMeetingDuration, (m) => {
+  return DURATIONS.filter((d) => d[0] >= m);
+});

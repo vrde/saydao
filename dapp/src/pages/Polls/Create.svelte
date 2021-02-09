@@ -1,9 +1,9 @@
 <script>
+  import { pollDurations } from "src/state/dao";
   import { wallet } from "src/state/eth";
   import Loading from "src/components/Loading.svelte";
   import { push } from "svelte-spa-router";
   import * as ipfs from "src/ipfs";
-  import CONFIG from "src/config";
 
   let title = "";
   let question = "";
@@ -117,14 +117,9 @@
     <div>
       <label for="poll-duration">How long should the poll stay open?</label>
       <select id="poll-duration" bind:value={duration}>
-        {#if CONFIG.environment === "development"}
-          <option value="60">1 minute</option>
-          <option value="600">10 minutes</option>
-        {/if}
-        <option value={60 * 60}>1 hour</option>
-        <option value={60 * 60 * 24}>1 day</option>
-        <option value={60 * 60 * 24 * 7} selected>7 days</option>
-        <option value={60 * 60 * 24 * 30}>30 days</option>
+        {#each $pollDurations as [value, label]}
+          <option {value}>{label}</option>
+        {/each}
       </select>
     </div>
 

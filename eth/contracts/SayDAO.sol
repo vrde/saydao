@@ -32,9 +32,9 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
 
     // END OPENGSN
 
-    uint256 minPollDuration;
-    uint256 minPollMeetingDuration;
-    uint256 timeUnit;
+    uint256 public minPollDuration;
+    uint256 public minPollMeetingDuration;
+    uint256 public timeUnit;
 
     uint256 public genesis;
 

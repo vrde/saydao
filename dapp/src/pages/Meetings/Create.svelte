@@ -22,18 +22,21 @@
   let state = {};
 
   let [nowDate, nowTime] = splitDate(new Date());
-  let [minStartDate, minStartTime] = splitDate(new Date());
-  let [startDate, startTime] = [minStartDate, minStartTime];
-  let [endDate, endTime] = [startDate, startTime];
+  let minStartDate, minStartTime;
+  let startDate, startTime;
+  let endDate, endTime;
 
   $: {
-    const min = new Date(
-      Date.now() + $minPollMeetingDuration * 1000 + ONE_HOUR
-    );
-    console.log("min is", min);
-    [minStartDate, minStartTime] = splitDate(min);
-    [startDate, startTime] = [minStartDate, minStartTime];
-    [endDate, endTime] = [startDate, startTime];
+    if ($minPollMeetingDuration !== undefined) {
+      const min = new Date(
+        Date.now() + $minPollMeetingDuration * 1000 + ONE_HOUR
+      );
+      if (minStartDate === undefined) {
+        [minStartDate, minStartTime] = splitDate(min);
+        [startDate, startTime] = [minStartDate, minStartTime];
+        [endDate, endTime] = [startDate, startTime];
+      }
+    }
   }
 
   function handleClose() {

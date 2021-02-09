@@ -3,13 +3,10 @@
   import marked from "marked";
   import DateTime from "src/components/DateTime.svelte";
   import Participants from "./components/Participants.svelte";
-  import { wallet } from "src/state/eth";
   import { get as getPoll } from "src/state/dao/poll";
-  import { location } from "svelte-spa-router";
   import Loading from "src/components/Loading.svelte";
   export let params = null;
 
-  let vote = null;
   let state = {};
   let poll = getPoll(params.id);
 
@@ -23,6 +20,16 @@
 
   function handleParticipantListDone() {}
 </script>
+
+<style>
+  .question {
+    font-size: 1.5rem;
+  }
+
+  .details p {
+    margin: 0;
+  }
+</style>
 
 <Loading {state} onClose={handleClose} />
 
@@ -73,40 +80,3 @@
     <Participants poll={$poll} onDone={handleParticipantListDone} />
   {/if}
 {/if}
-
-<style>
-  label {
-    padding: var(--size-xs) var(--size-s);
-    border: 2px solid transparent;
-  }
-
-  input {
-    width: var(--size-s);
-    height: var(--size-s);
-    vertical-align: bottom;
-  }
-
-  label.active {
-    border: 2px solid black;
-  }
-
-  fieldset {
-    background-color: white;
-  }
-
-  button {
-    width: 100%;
-  }
-
-  li p {
-    margin: 0;
-  }
-
-  .question {
-    font-size: 1.5rem;
-  }
-
-  .details p {
-    margin: 0;
-  }
-</style>

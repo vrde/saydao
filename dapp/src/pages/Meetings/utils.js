@@ -8,7 +8,6 @@ export const ONE_WEEK = ONE_DAY * 7;
 export const ONE_MONTH = ONE_DAY * 30;
 
 export function prettyDuration(ms) {
-  console.log("duration", ms);
   const weeks = Math.trunc(ms / ONE_WEEK);
   ms = ms % ONE_WEEK;
   const days = Math.trunc(ms / ONE_DAY);

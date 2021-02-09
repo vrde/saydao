@@ -14,5 +14,5 @@
   name={CONFIG.name}
   memberId={success.memberId}
   txHash={success.tx}
-  networkName={$wallet.networkName}
+  networkName={$wallet && $wallet.networkName}
 />

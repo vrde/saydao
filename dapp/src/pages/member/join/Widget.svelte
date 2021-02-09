@@ -25,7 +25,7 @@
 
 <style>
   .fullpage {
-    translate: background-color 1s;
+    transition: background-color 1s;
   }
 
   .fullpage.idle {

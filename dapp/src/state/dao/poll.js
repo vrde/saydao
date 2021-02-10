@@ -12,6 +12,8 @@ const NULL = etherea.BigNumber.from(
 const MEETING_STATES = ["initial", "sealed", "finalized"];
 
 async function _get(wallet, id, memberId) {
+  const p = `[poll:get(${id})]`;
+  console.log(p, "Fetch poll from smart contract");
   const poll = await wallet.contracts.SayDAO.polls(id);
   const content = await ipfs.get(ipfs.uintToCid(poll.cid.toHexString()));
 
@@ -135,10 +137,11 @@ function getPollKey(wallet, id) {
 }
 
 function onTimer(poll, memberId, set) {
+  //const p = `[poll:get(${poll.id})]`;
   const unsubscribeFuncs = [];
   const refreshPoll = poll.end - Date.now();
-  console.log("refresh", poll, refreshPoll);
   if (refreshPoll > 0) {
+    //console.log(p, "Refresh", poll, refreshPoll);
     const timerId = setTimeout(
       () => set(updatePollDynamicFields(poll, memberId)),
       refreshPoll + 1000
@@ -162,7 +165,9 @@ function onTimer(poll, memberId, set) {
 const OBJECTS = {};
 
 export function get(id, onUpdate) {
+  const p = `[poll:get(${id})]`;
   if (OBJECTS[id] === undefined) {
+    console.log(p, "Poll not in OBJECTS cache");
     OBJECTS[id] = derived(
       [wallet, memberId],
       async ([$wallet, $memberId], set) => {
@@ -173,9 +178,22 @@ export function get(id, onUpdate) {
         let poll = db.get(key);
 
         if (!poll || blockNumber - poll._blockNumber > 1024) {
+          if (!poll) {
+            console.log(p, "Poll not in localStorage)");
+          } else {
+            console.log(p, "Poll older than 1024 blocks)");
+          }
           poll = await _get($wallet, id, $memberId);
           poll._blockNumber = blockNumber;
           db.set(key, poll);
+        } else {
+          console.log(
+            p,
+            "Poll block number",
+            poll._blockNumber,
+            "current block number",
+            blockNumber
+          );
         }
 
         updatePollDynamicFields(poll, $memberId);
@@ -184,6 +202,7 @@ export function get(id, onUpdate) {
 
         const onEventCallback = async (event) => {
           if (event.pollId && event.pollId.toString() === id) {
+            console.log(p, "New event", event);
             poll = await _get($wallet, id, $memberId);
             poll._blockNumber = blockNumber;
             updatePollDynamicFields(poll);
@@ -198,9 +217,9 @@ export function get(id, onUpdate) {
         };
 
         const filterVote = $wallet.contracts.SayDAO.filters.Vote();
-        filterVote.fromBlock = blockNumber + 1;
+        filterVote.fromBlock = poll._blockNumber + 1;
         const filterSeal = $wallet.contracts.SayDAO.filters.Seal();
-        filterSeal.fromBlock = blockNumber + 1;
+        filterSeal.fromBlock = poll._blockNumber + 1;
         const filterAllocationDone = $wallet.contracts.SayDAO.filters.AllocationDone();
         filterAllocationDone.fromBlock = blockNumber + 1;
 

@@ -1,7 +1,3 @@
-<div>
-  <slot />
-</div>
-
 <style>
   div {
     margin-bottom: var(--size-m);
@@ -18,3 +14,7 @@
     background-size: 10px 10px;
   }
 </style>
+
+<div>
+  <slot />
+</div>

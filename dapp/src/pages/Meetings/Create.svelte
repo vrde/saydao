@@ -19,6 +19,9 @@
   let question = "";
   let duration = 60 * 60 * 24 * 7;
   let supervisor;
+  let address;
+  let url;
+  let type;
   let state = {};
 
   let [nowDate, nowTime] = splitDate(new Date());
@@ -60,7 +63,16 @@
     state.action = "submit";
 
     // Upload to IPFS and get the CID
-    const data = { title, question, start, end, duration };
+    const data = {
+      title,
+      question,
+      start,
+      end,
+      type,
+      url,
+      address,
+      duration,
+    };
     const cid = await ipfs.add(data);
 
     // Create the meeting poll in the smart contract
@@ -84,10 +96,24 @@
   }
 </script>
 
+<style>
+  li,
+  li div {
+    margin: var(--size) 0 0 var(--size-l);
+  }
+  li div label {
+    display: block;
+    margin-bottom: var(--size-s);
+  }
+  li div input {
+    margin-bottom: var(--size);
+  }
+</style>
+
 <Loading {state} onClose={handleClose} />
 
 <section>
-  <h1>Propose a new Event</h1>
+  <h1>Propose a new event</h1>
 
   <p>
     Events keep the DAO active. Members participating to an event are rewarded
@@ -98,9 +124,9 @@
 
   <form on:submit|preventDefault={handleSubmit}>
     <div>
-      <label for="event-title">What is the title of the event?</label>
+      <h2>What is the title of the event?</h2>
       <input
-        id="event-title"
+        aria-label="Title"
         type="text"
         bind:value={title}
         required
@@ -109,7 +135,7 @@
     </div>
 
     <div>
-      <label for="event-topic">What is the topic of the event?</label>
+      <h2>What is the topic of the event?</h2>
       <p class="note">
         You can use
         <a
@@ -117,24 +143,25 @@
           target="_blank">markdown</a
         > to format the text.
       </p>
-      <textarea id="event-topic" bind:value={question} required />
+      <textarea aria-label="Topic" bind:value={question} required />
     </div>
 
     <div>
-      <label for="event-start">When does the event start?</label>
+      <h2>When does the event start?</h2>
       <p class="note">
         Events must begin at least {prettyDuration(
           $minPollMeetingDuration * 1000
         )} from now so members have time to vote.
       </p>
       <input
-        id="event-start"
+        aria-label="Start date"
         bind:value={startDate}
         type="date"
         min={minStartDate}
         required
       />
       <input
+        aria-label="Start time"
         bind:value={startTime}
         on:change={() => (endTime = startTime)}
         type="time"
@@ -143,15 +170,16 @@
       />
     </div>
     <div>
-      <label for="event-end">When does the event end?</label>
+      <h2>When does the event end?</h2>
       <input
-        id="event-end"
+        aria-label="End date"
         bind:value={endDate}
         type="date"
         min={startDate}
         required
       />
       <input
+        aria-label="End time"
         bind:value={endTime}
         type="time"
         min={startDate === endDate ? startTime : ""}
@@ -160,11 +188,55 @@
     </div>
 
     <div>
-      <label for="event-supervisor">Who is the supervisor?</label>
+      <h2>Where does the event take place?</h2>
+      <ul>
+        <li>
+          <label>
+            <input type="radio" bind:group={type} value="online" /> Online only
+          </label>
+          {#if type === "online"}
+            <div>
+              <label for="meeting-url">Video conference link (optional)</label>
+              <input id="meeting-url" type="text" bind:value={url} />
+            </div>
+          {/if}
+        </li>
+        <li>
+          <label>
+            <input type="radio" bind:group={type} value="physical" />
+            In-person only
+          </label>
+          {#if type === "physical"}
+            <div>
+              <label for="meeting-address">Event address (optional)</label>
+              <input id="meeting-address" type="text" bind:value={address} />
+            </div>
+          {/if}
+        </li>
+        <li>
+          <label>
+            <input type="radio" bind:group={type} value="online+physical" />
+            Both online and in-person
+            {#if type === "online+physical"}
+              <div>
+                <label for="meeting-url">Video conference link (optional)</label
+                >
+                <input id="meeting-url" type="text" bind:value={url} />
+                <label for="meeting-address">Event address (optional)</label>
+                <input id="meeting-address" type="text" bind:value={address} />
+              </div>
+            {/if}
+          </label>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h2>Who is the supervisor?</h2>
       <p class="note">
         The supervisor is a member responsible to make the event happen.
       </p>
-      <select id="event-supervisor" bind:value={supervisor} required>
+      <select aria-label="Supervisor" bind:value={supervisor} required>
         {#if $members}
           <option value="">Select a Member</option>
           {#each $members as member, i}
@@ -177,10 +249,8 @@
     </div>
 
     <div>
-      <label for="event-poll-duration"
-        >How long should the poll stay open?</label
-      >
-      <select id="event-poll-duration" bind:value={duration}>
+      <h2>How long should the poll stay open?</h2>
+      <select aria-label="Duration" bind:value={duration}>
         {#each $pollMeetingDurations as [value, label]}
           <option {value}>{label}</option>
         {/each}
@@ -188,7 +258,7 @@
     </div>
 
     <div>
-      <p class="label">Ready to submit your event?</p>
+      <h2>Ready to submit your event?</h2>
       <button class="button-shadow" type="submit">
         <span>Yep, create event</span>
       </button>

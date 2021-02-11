@@ -20,7 +20,7 @@
   import PollsDetails from "./pages/Polls/Details.svelte";
 
   import MeetingsCreate from "./pages/Meetings/Create.svelte";
-  import MeetingsDetails from "./pages/Meetings/Details.svelte";
+  import MeetingsDetails from "./pages/Meetings/details";
   import MeetingsUpcoming from "./pages/Meetings/Upcoming.svelte";
   import MeetingsPast from "./pages/Meetings/Past.svelte";
 

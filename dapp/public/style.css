@@ -147,14 +147,6 @@ form div {
   margin-bottom: var(--size-xxl);
 }
 
-label,
-.label {
-  display: block;
-  font-weight: bold;
-  font-size: var(--size-l);
-  margin-bottom: var(--size-m);
-}
-
 input,
 textarea,
 select {
@@ -166,6 +158,16 @@ select {
 input[type="text"] {
   display: block;
   width: 100%;
+}
+
+form ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+form ul li {
+  line-height: var(--size);
 }
 
 textarea {

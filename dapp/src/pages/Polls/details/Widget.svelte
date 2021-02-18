@@ -51,6 +51,12 @@
 
   export let handleSubmit;
 
+  $: proposalState = quorumReached
+    ? "approved"
+    : !open && !quorumReached
+    ? "rejected"
+    : "";
+
   function handleClose() {
     state = {};
   }
@@ -64,9 +70,22 @@
 
   .body {
     background-color: #fff176;
+    transition: background-color 1s;
     padding: var(--size-xl) 0;
-    border-top: var(--size-px) solid #ccc;
-    border-bottom: var(--size-px) solid #ccc;
+    border-width: var(--size-px);
+    border-top-style: solid;
+    border-bottom-style: solid;
+    border-color: #daca41;
+  }
+
+  .approved .body {
+    background-color: #beff72;
+    border-color: #89c941;
+  }
+
+  .rejected .body {
+    background-color: #ffb3b3;
+    border-color: #ff8f8f;
   }
 
   .footer {
@@ -110,143 +129,145 @@
 <Loading {state} onClose={handleClose} />
 
 {#if id}
-  <div class="header">
-    <section>
-      {#if isMeeting}
-        <h1>Event proposal</h1>
-      {:else}
-        <h1>Poll</h1>
-      {/if}
-      {#if open}
-        <p>
-          <strong>{totalVotesPerc}%</strong> of {CONFIG.name} voted on this poll.
-          {#if quorumReached}
-            <strong>Quorum has been reached</strong>.
-          {:else}
-            <strong>{toQuorum}%</strong> more votes are needed for a quorum.
-          {/if}
-        </p>
-        <p>
-          <em>Voting closes on <DateTime date={end} countdown={true} /></em>
-        </p>
-      {:else}
-        <p>
-          <strong>{totalVotesPerc}%</strong> of the DAO voted on this poll.
-          {#if quorumReached}
-            <strong>Quorum has been reached</strong>.
-          {:else}
-            <strong>Quorum has not been reached</strong>.
-          {/if}
-        </p>
-        <p><em>Voting ended on <DateTime date={end} /></em></p>
-      {/if}
-    </section>
-  </div>
-
-  <div class="body">
-    <section>
-      <h3>{title}</h3>
-      {#if isMeeting}
-        <ul>
-          <li>
-            <strong>Event type</strong>:
-            {#if meetingType === "online"}
-              online only
-            {:else if meetingType === "physical"}
-              in-person only
-            {:else if meetingType === "online+physical"}
-              online and in-person
-            {/if}
-          </li>
-          {#if meetingUrl}
-            <li>
-              <strong>Video conference link</strong>:
-              <a href={meetingUrl}>{meetingUrl}</a>
-            </li>
-          {/if}
-          {#if meetingAddress}
-            <li><strong>Event address</strong>: {meetingAddress}</li>
-          {/if}
-          <li>
-            <strong>Start date</strong>: <DateTime date={meetingStart} />
-          </li>
-          <li>
-            <strong>End date</strong>: <DateTime date={meetingEnd} />
-          </li>
-          <li>
-            <strong>Supervisor</strong>: member #{meetingSupervisor}
-          </li>
-        </ul>
-      {/if}
-
-      <div class="question">
-        {@html DOMPurify.sanitize(marked(question))}
-      </div>
-    </section>
-  </div>
-
-  <div class="vote">
-    <section>
-      {#if hasVotedFor === null && open && hasTokens}
+  <div class={proposalState}>
+    <div class="header">
+      <section>
         {#if isMeeting}
-          <h2>Do you want to approve this event?</h2>
+          <h1>Event proposal</h1>
         {:else}
-          <h2>Make your choice</h2>
+          <h1>Poll</h1>
         {/if}
-        <form on:submit|preventDefault={() => handleSubmit(vote)}>
+        {#if open}
+          <p>
+            <strong>{totalVotesPerc}%</strong> of {CONFIG.name} voted on this poll.
+            {#if quorumReached}
+              <strong>Quorum has been reached</strong>.
+            {:else}
+              <strong>{toQuorum}%</strong> more votes are needed for a quorum.
+            {/if}
+          </p>
+          <p>
+            <em>Voting closes on <DateTime date={end} countdown={true} /></em>
+          </p>
+        {:else}
+          <p>
+            <strong>{totalVotesPerc}%</strong> of the DAO voted on this poll.
+            {#if quorumReached}
+              <strong>Quorum has been reached</strong>.
+            {:else}
+              <strong>Quorum has not been reached</strong>.
+            {/if}
+          </p>
+          <p><em>Voting ended on <DateTime date={end} /></em></p>
+        {/if}
+      </section>
+    </div>
+
+    <div class="body">
+      <section>
+        <h3>{title}</h3>
+        {#if isMeeting}
+          <ul>
+            <li>
+              <strong>Event type</strong>:
+              {#if meetingType === "online"}
+                online only
+              {:else if meetingType === "physical"}
+                in-person only
+              {:else if meetingType === "online+physical"}
+                online and in-person
+              {/if}
+            </li>
+            {#if meetingUrl}
+              <li>
+                <strong>Video conference link</strong>:
+                <a href={meetingUrl}>{meetingUrl}</a>
+              </li>
+            {/if}
+            {#if meetingAddress}
+              <li><strong>Event address</strong>: {meetingAddress}</li>
+            {/if}
+            <li>
+              <strong>Start date</strong>: <DateTime date={meetingStart} />
+            </li>
+            <li>
+              <strong>End date</strong>: <DateTime date={meetingEnd} />
+            </li>
+            <li>
+              <strong>Supervisor</strong>: member #{meetingSupervisor}
+            </li>
+          </ul>
+        {/if}
+
+        <div class="question">
+          {@html DOMPurify.sanitize(marked(question))}
+        </div>
+      </section>
+    </div>
+
+    <div class="vote">
+      <section>
+        {#if hasVotedFor === null && open && hasTokens}
+          {#if isMeeting}
+            <h2>Do you want to approve this event?</h2>
+          {:else}
+            <h2>Make your choice</h2>
+          {/if}
+          <form on:submit|preventDefault={() => handleSubmit(vote)}>
+            <ol>
+              {#each choices as choice, i}
+                <li>
+                  <label class:active={vote === i}>
+                    <input type="radio" bind:group={vote} value={i} />
+                    {choice}
+                  </label>
+                </li>
+              {/each}
+            </ol>
+
+            <button class="button-shadow full" disabled={vote === null}
+              ><span>Vote!</span></button
+            >
+          </form>
+        {:else}
+          {#if quorumReached}
+            <h2>Quorum has been reached</h2>
+            {#if finalDecision !== null}
+              <p>Winning choice: <strong>{choices[finalDecision]}</strong></p>
+            {/if}
+          {:else}
+            <h2>Quorum has not been reached</h2>
+          {/if}
           <ol>
             {#each choices as choice, i}
               <li>
-                <label class:active={vote === i}>
-                  <input type="radio" bind:group={vote} value={i} />
-                  {choice}
-                </label>
+                <p class:winner={finalDecision === i}>
+                  <strong>{choice}</strong><br />
+                  Votes: {votesPerc[i]}%
+                  {#if hasVotedFor === i}
+                    (You voted for this)
+                  {/if}
+                </p>
               </li>
             {/each}
           </ol>
-
-          <button class="button-shadow full" disabled={vote === null}
-            ><span>Vote!</span></button
-          >
-        </form>
-      {:else}
-        {#if quorumReached}
-          <h2>Quorum has been reached</h2>
-          {#if finalDecision !== null}
-            <p>Wining choice: <strong>{choices[finalDecision]}</strong></p>
+          {#if open && hasTokens === null}
+            <p>
+              <strong>Note:</strong> you can't vote on this poll because you
+              joined {CONFIG.name}
+              after the poll was created.
+            </p>
           {/if}
-        {:else}
-          <h2>Quorum has not been reached</h2>
         {/if}
-        <ol>
-          {#each choices as choice, i}
-            <li>
-              <p class:winner={finalDecision === i}>
-                <strong>{choice}</strong><br />
-                Votes: {votesPerc[i]}%
-                {#if hasVotedFor === i}
-                  (You voted for this)
-                {/if}
-              </p>
-            </li>
-          {/each}
-        </ol>
-        {#if open && hasTokens === null}
-          <p>
-            <strong>Note:</strong> you can't vote on this poll because you
-            joined {CONFIG.name}
-            after the poll was created.
-          </p>
-        {/if}
+      </section>
+    </div>
+
+    <section class="footer">
+      {#if open}
+        <a href="#/polls/open">Go to open polls</a>
+      {:else}
+        <a href="#/polls/closed">Go to closed polls</a>
       {/if}
     </section>
   </div>
-
-  <section class="footer">
-    {#if open}
-      <a href="#/polls/open">Go to open polls</a>
-    {:else}
-      <a href="#/polls/closed">Go to closed polls</a>
-    {/if}
-  </section>
 {/if}

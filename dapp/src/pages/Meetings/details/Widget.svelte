@@ -1,7 +1,7 @@
 <script>
   import DOMPurify from "dompurify";
   import marked from "marked";
-  import DateTime from "src/components/DateTime.svelte";
+  import DateInterval from "src/components/DateInterval.svelte";
   import Participants from "./Participants.svelte";
   import Loading from "src/components/Loading.svelte";
 
@@ -79,11 +79,6 @@
 
       {#if meetingValid}
         <p>
-          The event happens between
-          <strong><DateTime date={meetingStart} /></strong>
-          and
-          <strong><DateTime date={meetingEnd} /></strong>
-          <br />
           {#if meetingType === "online"}
             The event is online only.
           {:else if meetingType === "physical"}
@@ -91,17 +86,18 @@
           {:else if meetingType === "online+physical"}
             The event is both online and in-person.
           {/if}
+          <br />
+          <strong>When:</strong>
+          <DateInterval start={meetingStart} end={meetingEnd} />
+          <br />
+          {#if meetingUrl}
+            <strong>Join online:</strong>
+            <a href={meetingUrl}>{meetingUrl}</a><br />
+          {/if}
+          {#if meetingAddress}
+            <strong>Join in-person:</strong>{meetingAddress}
+          {/if}
         </p>
-        {#if meetingUrl || meetingAddress}
-          <ul>
-            {#if meetingUrl}
-              <li>Join online at <a href={meetingUrl}>{meetingUrl}</a></li>
-            {/if}
-            {#if meetingAddress}
-              <li>Join in-person at <strong>{meetingAddress}</strong></li>
-            {/if}
-          </ul>
-        {/if}
       {/if}
     </section>
   </div>

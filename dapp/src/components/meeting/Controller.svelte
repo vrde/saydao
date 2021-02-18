@@ -1,9 +1,26 @@
 <script>
   import Widget from "./Widget.svelte";
-  import { memberId } from "src/state/dao";
-  import CONFIG from "src/config";
+  export let list;
+  export let highlightFirst = false;
+  $: {
+    console.log(list);
+  }
 </script>
 
-{#if !$memberId}
-  <Widget name={CONFIG.name} />
+{#if list}
+  {#each list as meeting, i}
+    <Widget
+      id={meeting.id}
+      title={meeting.title}
+      question={meeting.question}
+      meetingId={meeting.meetingId}
+      meetingType={meeting.meetingType}
+      meetingUrl={meeting.meetingUrl}
+      meetingAddress={meeting.meetingAddress}
+      meetingStart={meeting.meetingStart}
+      meetingEnd={meeting.meetingEnd}
+      meetingState={meeting.meetingState}
+      highlight={highlightFirst && i === 0}
+    />
+  {/each}
 {/if}

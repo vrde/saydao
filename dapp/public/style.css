@@ -22,11 +22,15 @@
   --join--color-working: #ffc107;
   --join--color-success: #a6ff58;
   --join--color-error: #ff432a;
+
+  --color-event: var(--join--color-idle);
+  --flex-direction: row;
 }
 
 @media (max-width: 768px) {
   :root {
     --f: 0.75;
+    --flex-direction: column;
   }
 }
 

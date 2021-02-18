@@ -43,7 +43,7 @@ async function _get(wallet, id, memberId) {
   if (!poll.meetingId.eq(NULL)) {
     const meeting = await wallet.contracts.SayDAO.meetings(poll.meetingId);
     extra = {
-      meetingId: poll.meetingId,
+      meetingId: poll.meetingId.toNumber(),
       isMeeting: true,
       // Hardcode "Yes" and "No" choices.
       choices: ["Yes", "No"],
@@ -310,19 +310,28 @@ export const upcomingMeetings = derived(objects, ($objects) => {
   const now = Date.now();
   return (
     $objects &&
-    Object.values($objects).filter(
-      (poll) => poll.isMeeting && poll.meetingValid && now < poll.meetingEnd
-    )
+    Object.values($objects)
+      .filter(
+        (poll) => poll.isMeeting && poll.meetingValid && now < poll.meetingEnd
+      )
+      .sort((a, b) => a.meetingStart - b.meetingStart)
   );
 });
+
+export const upcomingMeeting = derived(
+  upcomingMeetings,
+  ($upcomingMeetings) => $upcomingMeetings && $upcomingMeetings[0]
+);
 
 export const pastMeetings = derived(objects, ($objects) => {
   const now = new Date().getTime();
   return (
     $objects &&
-    Object.values($objects).filter(
-      (poll) => poll.isMeeting && poll.meetingValid && poll.meetingEnd <= now
-    )
+    Object.values($objects)
+      .filter(
+        (poll) => poll.isMeeting && poll.meetingValid && poll.meetingEnd <= now
+      )
+      .sort((a, b) => a.meetingStart - b.meetingStart)
   );
 });
 

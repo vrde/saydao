@@ -1,54 +1,81 @@
 <script>
   import { wallet } from "src/state/eth";
   import { get as getMember, totalMembers, me } from "src/state/dao/member";
+  import { upcomingMeetings } from "src/state/dao/poll";
   import { role, memberId } from "src/state/dao";
   import Banner from "src/components/banner";
+  import Meetings from "src/components/meeting";
   import CONFIG from "src/config";
 
   window.me = me;
 </script>
 
+<style>
+  .participate {
+    padding: var(--size-l) 0;
+  }
+
+  .participate .body {
+    display: flex;
+    flex-direction: var(--flex-direction);
+  }
+
+  .participate section div {
+  }
+</style>
+
 <Banner />
 
-<section>
-  {#if $me}
-    <div>
-      <h2>About you</h2>
-      <p>You are <strong>Member {$me.id}</strong>.</p>
-      <p>
-        You have <strong>{$me.balance}</strong> Say. That is
-        <em>{$me.shares}</em>
-        of the total Say in {CONFIG.name}.
-      </p>
-      <ul>
-        <li>
-          <a href="#/settings">Settings</a>
-        </li>
-        <li>
-          <a href="#/logout">Logout</a>
-        </li>
-      </ul>
-    </div>
-  {:else}
-    <div>
-      <h2>Log in</h2>
-      <p>To participate in {CONFIG.name}, you need to log in.</p>
-      <ul>
-        <li>
-          <a href="#/login">Log in now</a> if you've already joined.
-        </li>
-        <li>
-          <a
-            href="mailto:agranzot@mailbox.org?subject=Invite me to {CONFIG.name}"
-            >Request an invite</a
-          >
-          if you are a {CONFIG.name} member and want to join.
-        </li>
-      </ul>
-      <p>If you're just looking around, you don't need to log in.</p>
-    </div>
-  {/if}
+<Meetings
+  list={$upcomingMeetings && [$upcomingMeetings[0]]}
+  highlightFirst={true}
+/>
 
+<div class="participate">
+  <section>
+    <h2>Participate</h2>
+  </section>
+  <section class="body">
+    <div>
+      <h3>Events</h3>
+      <ul>
+        <li>
+          <a href="#/events/upcoming">Upcoming events</a>: Show upcoming {CONFIG.name}
+          events.
+        </li>
+        <li>
+          <a href="#/events/past">Past events</a>: Show past {CONFIG.name} events.
+        </li>
+        {#if $role.member}
+          <li>
+            <a href="#/events/create">Create an event</a>: Propose a new {CONFIG.name}
+            event.
+          </li>
+        {/if}
+      </ul>
+    </div>
+    <div>
+      <h3>Polls</h3>
+      <ul>
+        <li>
+          <a href="#/polls/open">Open polls</a>: Show polls you can vote on.
+        </li>
+        <li>
+          <a href="#/polls/closed">Closed polls</a>: Show polls that are now
+          closed.
+        </li>
+        {#if $role.member}
+          <li>
+            <a href="#/polls/create">New poll</a>: Open a poll for {CONFIG.name}
+            to vote on.
+          </li>
+        {/if}
+      </ul>
+    </div>
+  </section>
+</div>
+
+<section>
   {#if $role.admin || $role.manager}
     <div>
       <h2>Administration</h2>
@@ -73,43 +100,9 @@
       </li>
     </ul>
   </div>
+</section>
 
-  <div>
-    <h2>Participate</h2>
-    <h3>Events</h3>
-    <ul>
-      <li>
-        <a href="#/events/upcoming">Upcoming events</a>: Show upcoming {CONFIG.name}
-        events.
-      </li>
-      <li>
-        <a href="#/events/past">Past events</a>: Show past {CONFIG.name} events.
-      </li>
-      {#if $role.member}
-        <li>
-          <a href="#/events/create">Create an event</a>: Propose a new {CONFIG.name}
-          event.
-        </li>
-      {/if}
-    </ul>
-    <h3>Polls</h3>
-    <ul>
-      <li>
-        <a href="#/polls/open">Open polls</a>: Show polls you can vote on.
-      </li>
-      <li>
-        <a href="#/polls/closed">Closed polls</a>: Show polls that are now
-        closed.
-      </li>
-      {#if $role.member}
-        <li>
-          <a href="#/polls/create">New poll</a>: Open a poll for {CONFIG.name} to
-          vote on.
-        </li>
-      {/if}
-    </ul>
-  </div>
-
+<section>
   <div>
     <h2>What is {CONFIG.name}</h2>
     <p>

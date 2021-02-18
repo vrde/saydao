@@ -61,18 +61,18 @@
   <p>Polls allow the DAO to express its preference on a specific topic.</p>
   <form on:submit|preventDefault={handleSubmit}>
     <div>
-      <label for="poll-title">What is the title of the poll?</label>
+      <h2>What is the title of the poll?</h2>
       <input
-        id="poll-title"
         type="text"
         bind:value={title}
         required
         autocomplete="off"
+        aria-label="Title"
       />
     </div>
 
     <div>
-      <label for="poll-question">What is the poll question?</label>
+      <h2>What is the poll question?</h2>
       <p class="note">
         You can use
         <a
@@ -80,13 +80,16 @@
           target="_blank">markdown</a
         > to format the text.
       </p>
-      <textarea id="poll-question" bind:value={question} required />
+      <textarea
+        id="poll-question"
+        bind:value={question}
+        required
+        aria-label="Question"
+      />
     </div>
 
     <div>
-      <p class="label">
-        What are the options to choose between? Enter at least two.
-      </p>
+      <h2>What are the options to choose between? Enter at least two.</h2>
       <ol>
         {#each choices as choice, i}
           <li>
@@ -115,8 +118,8 @@
     </div>
 
     <div>
-      <label for="poll-duration">How long should the poll stay open?</label>
-      <select id="poll-duration" bind:value={duration}>
+      <h2>How long should the poll stay open?</h2>
+      <select bind:value={duration} aria-label="Duration">
         {#each $pollDurations as [value, label]}
           <option {value}>{label}</option>
         {/each}
@@ -124,7 +127,7 @@
     </div>
 
     <div>
-      <p class="label">Ready to submit your poll?</p>
+      <h2>Ready to submit your poll?</h2>
       <button class="button-shadow" type="submit"
         ><span>Yep, open the poll</span></button
       >

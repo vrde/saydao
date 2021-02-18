@@ -17,7 +17,7 @@
   import PollsOpen from "./pages/Polls/Open.svelte";
   import PollsClosed from "./pages/Polls/Closed.svelte";
   import PollsCreate from "./pages/Polls/Create.svelte";
-  import PollsDetails from "./pages/Polls/Details.svelte";
+  import PollsDetails from "./pages/Polls/details";
 
   import MeetingsCreate from "./pages/Meetings/Create.svelte";
   import MeetingsDetails from "./pages/Meetings/details";
@@ -27,7 +27,9 @@
   import Docs from "./pages/Docs.svelte";
   import NotFound from "./pages/NotFound.svelte";
 
-  $: showHeader = !["/member/join", "/member/welcome"].some(path => $location.startsWith(path));
+  $: showHeader = !["/member/join", "/member/welcome"].some((path) =>
+    $location.startsWith(path)
+  );
 
   const routes = {
     "/": Home,

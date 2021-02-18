@@ -84,7 +84,7 @@ button,
   color: black;
   padding: var(--size-xxs) var(--size-s);
   border: var(--size-px) solid black;
-  border-radius: var(--size-px);
+  border-radius: var(--size-xxs);
   display: inline-block;
   transition: all 100ms;
   cursor: pointer;
@@ -97,11 +97,11 @@ button,
 button.button-shadow {
   padding: 0;
   border: 0;
-  border-radius: var(--size-px);
+  border-radius: var(--size-xxs);
 }
 
 .button-shadow {
-  border-radius: var(--size-px);
+  border-radius: var(--size-xxs);
   background: black;
   transform: translate(4px, 4px);
   text-decoration: none;
@@ -123,6 +123,17 @@ button.button-shadow {
 .button-shadow:disabled span:active {
   cursor: not-allowed;
   transform: translate(-2px, -2px);
+}
+
+button.full,
+.button.full,
+.button-shadow.full,
+.button-shadow.full span {
+  width: 100%;
+}
+
+.button-shadow.full span {
+  padding: var(--size-m);
 }
 
 /**
@@ -151,8 +162,9 @@ input,
 textarea,
 select {
   background: white;
-  border: var(--size-px) solid black;
-  padding: var(--size-xxs) var(--size-xxs);
+  border: var(--size-px) solid #999;
+  padding: var(--size-xs) var(--size-xs);
+  border-radius: var(--size-xxs);
 }
 
 input[type="text"] {
@@ -191,7 +203,7 @@ button:disabled {
 
 button:disabled,
 .button-shadow:disabled span {
-  text-decoration: line-through;
+  color: #666;
 }
 
 /**

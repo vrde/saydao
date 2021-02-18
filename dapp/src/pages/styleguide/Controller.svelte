@@ -1,4 +1,5 @@
 <script>
+  import PollDetails from "src/pages/Polls/details/StyleGuide.svelte";
   import MeetingDetails from "src/pages/Meetings/details/StyleGuide.svelte";
   import Join from "src/pages/member/join/StyleGuide.svelte";
   import Welcome from "src/pages/member/welcome/StyleGuide.svelte";
@@ -8,6 +9,8 @@
 </script>
 
 <h1>Style guide</h1>
+
+<PollDetails />
 
 <MeetingDetails />
 

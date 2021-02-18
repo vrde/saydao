@@ -96,8 +96,8 @@ function updatePollDynamicFields(poll, memberId) {
   //
   // - We have a quorum.
   // - The two most voted options don't have the same amount of votes.
-  // - The distance in votes between the first and second most voted option is
-  //   less than the token left.
+  // - The difference between the first and second most voted option is less
+  //   than the tokens left.
   //
   // Then we reached a final decision.
   let finalDecision = null;
@@ -177,9 +177,7 @@ export function get(id, onUpdate) {
         if (!$wallet || $memberId === undefined) return;
         const key = getPollKey($wallet, id);
         const blockNumber = await getBlockNumber($wallet.provider);
-
         let poll = db.get(key);
-
         if (!poll || blockNumber - poll._blockNumber > 1024) {
           if (!poll) {
             console.log(p, "Poll not in localStorage)");

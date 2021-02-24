@@ -10,8 +10,16 @@ const NETWORK = process.env.NETWORK || "localhost";
 
 console.log("Deploy to network", NETWORK);
 
-function getEnv(key) {
-  return process.env[`${NETWORK.toUpperCase()}_${key}`];
+function getEnv(key, fallback) {
+  const v = process.env[`${NETWORK.toUpperCase()}_${key}`];
+  if (v === undefined || v === null) {
+    if (fallback === undefined) {
+      throw new Error("Cannot find required key", key);
+    } else {
+      return fallback;
+    }
+  }
+  return v;
 }
 
 async function getTrustedForwarder() {
@@ -25,7 +33,7 @@ async function getTrustedForwarder() {
 
 async function compile(outdir = "./dist") {
   const wallet = await etherea.wallet({
-    endpoint: getEnv("ENDPOINT") || "localhost",
+    endpoint: getEnv("ENDPOINT", "localhost"),
     privateKey: getEnv("PRIVATE_KEY"),
     mnemonic: getEnv("MNEMONIC"),
   });
@@ -36,11 +44,11 @@ async function compile(outdir = "./dist") {
     outdir,
     wallet,
     // min poll duration: one hour
-    NETWORK === "localhost" ? 0 : 60 * 60,
+    getEnv("MIN_POLL_DURATION"),
     // min poll meeting duration: one week
-    NETWORK === "localhost" ? 0 : 60 * 60 * 24 * 7,
+    getEnv("MIN_POLL_MEETING_DURATION"),
     // time unit: one day
-    NETWORK === "localhost" ? 1 : 60 * 60 * 24,
+    getEnv("TIME_UNIT"),
     await getTrustedForwarder()
   );
 

@@ -4,7 +4,7 @@
   export let onClose;
 </script>
 
-<style type="text/scss">
+<style>
   section {
     position: fixed;
     top: 0;

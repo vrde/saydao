@@ -1,14 +1,14 @@
 <script>
+  import { pollDurations } from "src/state/dao";
   import { wallet } from "src/state/eth";
   import Loading from "src/components/Loading.svelte";
-  import baseX from "base-x";
-  import { push } from 'svelte-spa-router'
+  import { push } from "svelte-spa-router";
   import * as ipfs from "src/ipfs";
 
   let title = "";
   let question = "";
   let choices = ["", ""];
-  let duration = 60*60*24*7;
+  let duration = 60 * 60 * 24 * 7;
   let state = {};
 
   function handleClose() {
@@ -17,7 +17,7 @@
 
   async function handleSubmit(e) {
     if (!confirm("Are you sure? You won't be able to edit it later")) return;
-    state.action = "working"
+    state.action = "working";
 
     try {
       // Upload to IPFS and get the CID
@@ -27,12 +27,15 @@
       // Create the poll in the smart contract
 
       const receipt = await $wallet.contracts.SayDAO.createPoll(
-        ipfs.cidToUint(cid), parseInt(duration, 10), choices.length);
+        ipfs.cidToUint(cid),
+        parseInt(duration, 10),
+        choices.length
+      );
       console.log("createPoll receipt", receipt);
-      state = {}
+      state = {};
     } catch (err) {
-      console.error(err)
-      state.error = err.toString()
+      console.error(err);
+      state.error = err.toString();
       return;
     }
 
@@ -43,51 +46,91 @@
 </script>
 
 <style>
-textarea {
-  height: var(--size-l);
-}
+  button {
+    margin-right: var(--size-m);
+  }
+  li {
+    margin-bottom: var(--size-m);
+  }
 </style>
 
-<Loading {state} onClose={handleClose}/>
+<Loading {state} onClose={handleClose} />
 
-<h1>Create a poll</h1>
+<section>
+  <h1>Create a poll</h1>
+  <p>Polls allow the DAO to express its preference on a specific topic.</p>
+  <form on:submit|preventDefault={handleSubmit}>
+    <div>
+      <h2>What is the title of the poll?</h2>
+      <input
+        type="text"
+        bind:value={title}
+        required
+        autocomplete="off"
+        aria-label="Title"
+      />
+    </div>
 
-<form on:submit|preventDefault={handleSubmit}>
-  <label>What is the title of the poll?
-    <input type="text" bind:value={title} required />
-  </label>
+    <div>
+      <h2>What is the poll question?</h2>
+      <p class="note">
+        You can use
+        <a
+          href="https://guides.github.com/features/mastering-markdown/#syntax"
+          target="_blank">markdown</a
+        > to format the text.
+      </p>
+      <textarea
+        id="poll-question"
+        bind:value={question}
+        required
+        aria-label="Question"
+      />
+    </div>
 
-  <label>What is the poll question?
-    <textarea bind:value={question} required></textarea>
-  </label>
+    <div>
+      <h2>What are the options to choose between? Enter at least two.</h2>
+      <ol>
+        {#each choices as choice, i}
+          <li>
+            <input type="text" bind:value={choices[i]} required />
+          </li>
+        {/each}
+      </ol>
+      <button
+        class="button-shadow"
+        type="button"
+        on:click={() => choices.length < 8 && (choices = [...choices, ""])}
+        ><span>Add more poll options</span></button
+      >
+      {#if choices.length > 2}
+        <button
+          class="button-shadow"
+          type="button"
+          on:click={() => {
+            choices.pop();
+            choices = choices;
+          }}
+        >
+          <span>Remove last poll option</span>
+        </button>
+      {/if}
+    </div>
 
-  <fieldset>
-    <legend>What are the options to choose between? Enter at least two.</legend>
-    <ol>
-      {#each choices as choice, i}
-      <li>
-        <input type="text" bind:value={choices[i]} required/>
-      </li>
-      {/each}
-    </ol>
-    <button type="button" on:click={()=>(choices.length < 8) && (choices = [...choices, ""])}>Add more poll options</button>
-    {#if choices.length > 2}
-    <button type="button" on:click={()=>{choices.pop(); choices = choices}}>Remove last poll option</button>
-    {/if}
-  </fieldset>
+    <div>
+      <h2>How long should the poll stay open?</h2>
+      <select bind:value={duration} aria-label="Duration">
+        {#each $pollDurations as [value, label]}
+          <option {value}>{label}</option>
+        {/each}
+      </select>
+    </div>
 
-  <label>How long should the poll stay open?
-    <select bind:value={duration}>
-      <!--TESTING
-      <option value="60">1 minute</option>
-      <option value="600">10 minutes</option>
-      <END TESTING-->
-      <option value="{60*60}">1 hour</option>
-      <option value="{60*60*24}">1 day</option>
-      <option value="{60*60*24*7}" selected>7 days</option>
-      <option value="{60*60*24*30}">30 days</option>
-    </select>
-  </label>
-
-  <button type="submit">Open the poll</button>
-</form>
+    <div>
+      <h2>Ready to submit your poll?</h2>
+      <button class="button-shadow" type="submit"
+        ><span>Yep, open the poll</span></button
+      >
+    </div>
+  </form>
+</section>

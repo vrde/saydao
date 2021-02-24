@@ -1,129 +1,234 @@
-:root {
-  --size-xs: 1rem;
-  --size-s: 2rem;
-  --size-m: 4rem;
-  --size-l: 8rem;
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;1,400;1,500&display=swap");
 
-  --color-light: beige;
-  --color-dark: #424456;
+:root {
+  --size-px: 0.0625rem;
+  --size-xxxs: 0.0625rem;
+  --size-xxs: 0.2rem;
+  --size-xs: 0.5rem;
+  --size-s: 0.8rem;
+  --size-m: 1rem;
+  --size: 1rem;
+  --size-l: 1.5rem;
+  --size-xl: 2rem;
+  --size-xxl: 3rem;
+  --size-xxxl: 6rem;
+  --size-xxxxl: 12rem;
+  --max-width: 1024px;
+
+  --f: 1;
+
+  --join--color-idle: #03a9f4;
+  --join--color-working: #ffc107;
+  --join--color-success: #a6ff58;
+  --join--color-error: #ff432a;
+
+  --color-event: var(--join--color-idle);
+  --flex-direction: row;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --f: 0.75;
+    --flex-direction: column;
+  }
+}
+
+/* Font */
+
+html {
+  font-family: "Roboto", sans-serif;
+}
+
+/* Box sizing */
+
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
 }
 
 body {
-  /*font-family: "Fira Sans", sans-serif;*/
-  padding: 0;
-  max-width: 100%;
-  background-color: beige;
-}
-
-header {
-  background-color: var(--color-dark);
   margin: 0;
-  color: var(--color-light);
+  padding: 0;
 }
 
-header p strong {
-  color: var(--color-light);
-}
-
-header a {
-  color: var(--color-light);
-}
-
-header a:hover {
-  color: var(--color-light);
-}
-
-main,
-header > div {
-  padding: 2rem 0.5rem 0rem;
-  max-width: 50rem;
-  margin: auto;
-}
-
-footer {
-  margin: var(--size-s);
+section {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--size);
 }
 
 a,
-a:hover {
-  color: var(--color-dark);
-  text-decoration: underline;
-  transition: all 0.3s;
+a:visited {
+  color: inherit;
 }
 
-a:hover {
-  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
+h1 {
+  font-size: var(--size-xl);
 }
+
+p {
+  line-height: 1.5;
+}
+
+/* Styles */
 
 button,
-button:not([disabled]):hover {
-  color: var(--color-dark);
-  border-color: var(--color-dark);
-  transition: all 0.3s;
+.button,
+.button-shadow span {
+  font-family: "Roboto Mono", monospace;
+  background-color: white;
+  text-decoration: none;
+  color: black;
+  padding: var(--size-xxs) var(--size-s);
+  border: var(--size-px) solid black;
+  border-radius: var(--size-xxs);
+  display: inline-block;
+  transition: all 100ms;
+  cursor: pointer;
 }
 
-button:not([disabled]):hover {
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
+.button-shadow span {
+  transform: translate(-4px, -4px);
 }
 
-textarea,
+button.button-shadow {
+  padding: 0;
+  border: 0;
+  border-radius: var(--size-xxs);
+}
+
+.button-shadow {
+  border-radius: var(--size-xxs);
+  background: black;
+  transform: translate(4px, 4px);
+  text-decoration: none;
+  display: inline-block;
+  transition: all 50ms;
+  position: relative;
+}
+
+.button-shadow span:hover {
+  transform: translate(-3px, -3px);
+}
+
+.button-shadow span:active {
+  transform: translate(0, 0);
+}
+
+.button-shadow:disabled span,
+.button-shadow:disabled span:hover,
+.button-shadow:disabled span:active {
+  cursor: not-allowed;
+  transform: translate(-2px, -2px);
+}
+
+button.full,
+.button.full,
+.button-shadow.full,
+.button-shadow.full span {
+  width: 100%;
+}
+
+.button-shadow.full span {
+  padding: var(--size-m);
+}
+
+/**
+ * Form
+ */
+
+label,
+.label,
 input,
-button,
+textarea,
+select,
+button {
+  font-size: var(--size);
+}
+
+form .note {
+  font-size: var(--size-s);
+  font-style: italic;
+}
+
+form div {
+  margin-bottom: var(--size-xxl);
+}
+
+input,
+textarea,
 select {
-  border-color: var(--color-dark);
+  background: white;
+  border: var(--size-px) solid #999;
+  padding: var(--size-xs) var(--size-xs);
+  border-radius: var(--size-xxs);
+}
+
+input[type="text"] {
+  display: block;
+  width: 100%;
+}
+
+form ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+form ul li {
+  line-height: var(--size);
 }
 
 textarea {
   display: block;
   width: 100%;
-  height: var(--size-m);
-  margin-bottom: var(--size-s);
+  min-height: var(--size-xxl);
+  height: var(--size-xxxxl);
   resize: vertical;
 }
 
-textarea:focus,
-input:not([type="checkbox"]):not([type="radio"]):hover,
-select:hover {
-  border: 0.1rem solid var(--color-dark);
+button[type="submit"] {
+  font-size: var(--size-l);
 }
 
-textarea:focus,
-input:not([type="checkbox"]):not([type="radio"]):focus {
-  border-color: var(--color-dark);
-  box-shadow: 0 0 5px var(--color-dark);
+input:disabled,
+textarea:disabled,
+select:disabled,
+button:disabled {
+  cursor: not-allowed;
 }
 
-label,
-legend {
-  font-weight: bold;
-  display: block;
+button:disabled,
+.button-shadow:disabled span {
+  color: #666;
 }
 
-label {
-  margin-bottom: var(--size-s);
-}
+/**
+ * Fullpage omg
+ */
 
-input[type="text"] {
-  display: inline-block;
+.fullpage {
   width: 100%;
+  max-width: 100%;
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffc107;
 }
 
-h1 {
-  font-size: 2.5rem;
+.fullpage h1 {
+  font-size: var(--size-xl);
 }
 
-h2 {
-  font-size: 2.2rem;
-}
-
-h3 {
-  font-size: 1.5rem;
-}
-
-h4 {
-  font-size: 1.1rem;
-}
-
-h5 {
-  font-size: 1rem;
+.fullpage p {
+  font-size: var(--size-l);
 }

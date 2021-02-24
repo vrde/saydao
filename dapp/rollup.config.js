@@ -12,13 +12,15 @@ import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
 import serve from "rollup-plugin-serve";
 import svelte from "rollup-plugin-svelte";
+import css from "rollup-plugin-css-only";
 import { terser } from "rollup-plugin-terser";
 
 //const PRODUCTION = !process.env.ROLLUP_WATCH;
+const DAO_NAME = process.env.DAO_NAME || "SayDAO";
 const DEBUG = process.env.DEBUG === "1";
 const NETWORK = process.env.NETWORK || "localhost";
 const PRODUCTION = !DEBUG && NETWORK !== "localhost";
-const dedupe = importee =>
+const dedupe = (importee) =>
   importee === "svelte" || importee.startsWith("svelte/");
 
 console.log("Build frontend for network", NETWORK);
@@ -39,9 +41,9 @@ function setAlias() {
     entries: [
       {
         find: "src",
-        replacement: path.resolve(projectRootDir, "src")
-      }
-    ]
+        replacement: path.resolve(projectRootDir, "src"),
+      },
+    ],
   });
 }
 
@@ -53,18 +55,19 @@ function getConfig(production) {
   if (NETWORK === "kovan") {
     walletOptions = {
       endpoint: "https://kovan.infura.io/v3/67571fc7518746c2a1472668d6633438",
-      disableNativeAgent: false
+      disableNativeAgent: false,
     };
     gsn = {
       relayHubAddress: "0xE9dcD2CccEcD77a92BA48933cb626e04214Edb92",
       stakeManagerAddress: "0x93e4F8d0904a52F8a7304066499a6B2B77260ce1",
       forwarderAddress: "0x0842Ad6B8cb64364761C7c170D0002CC56b1c498",
-      paymasterAddress: "0x083082b7Eada37dbD8f263050570B31448E61c94"
+      paymasterAddress: "0x083082b7Eada37dbD8f263050570B31448E61c94",
     };
   } else {
     walletOptions = {
       endpoint: "localhost",
-      disableNativeAgent: true
+      disableNativeAgent: true,
+      environment: production ? "production" : "development",
     };
     try {
       gsn = JSON.parse(fs.readFileSync("../eth/gsn.json"));
@@ -83,8 +86,9 @@ function getConfig(production) {
   return {
     production,
     date: new Date(),
+    name: DAO_NAME,
     ipfsEndpoint,
-    walletOptions
+    walletOptions,
   };
 }
 
@@ -98,32 +102,32 @@ export default {
     sourcemap: true,
     globals: {
       etherea: "etherea",
-      "ipfs-http-client": "ipfs-http-client"
-    }
+      "ipfs-http-client": "ipfs-http-client",
+    },
   },
   plugins: [
     replace({
-      __buildEnv__: JSON.stringify(getConfig(PRODUCTION))
+      __buildEnv__: JSON.stringify(getConfig(PRODUCTION)),
     }),
     copy({
       targets: [
         {
           src: "node_modules/ipfs-http-client/dist/index.min.js",
           dest: "build",
-          rename: "ipfs-http-client.min.js"
+          rename: "ipfs-http-client.min.js",
         },
         { src: "node_modules/etherea/browser/etherea.min.js", dest: "build" },
         { src: "public/index.html", dest: "build" },
         { src: "public/classless.css", dest: "build" },
         { src: "public/style.css", dest: "build" },
         { src: "../docs/operation.md", dest: "build/docs" },
-        { src: "../docs/principles.md", dest: "build/docs" }
-      ]
+        { src: "../docs/principles.md", dest: "build/docs" },
+      ],
     }),
     svelte({
       dev: !PRODUCTION,
-      css: css => css.write("build/bundle.css")
     }),
+    css({ output: "bundle.css" }),
     builtins(),
     globals(),
     setAlias(),
@@ -138,18 +142,18 @@ export default {
       serve({
         contentBase: "build",
         /*open: true,*/ host: "0.0.0.0",
-        port: 4000
+        port: 4000,
       }),
     !PRODUCTION && livereload("build"),
-    PRODUCTION && terser()
+    PRODUCTION && terser(),
   ],
   watch: {
     include: ["src/**", "public/**"],
     buildDelay: 500,
     clearScreen: true,
     chokidar: {
-      usePolling: true
-    }
+      usePolling: true,
+    },
   },
-  onwarn
+  onwarn,
 };

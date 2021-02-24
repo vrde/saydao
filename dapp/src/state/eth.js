@@ -1,12 +1,10 @@
 import { writable, derived } from "svelte/store";
-import { get } from "svelte/store";
 
 import etherea from "etherea";
 
 import contracts from "src/contracts/contracts.json";
 import CONFIG from "src/config";
 import db from "./db";
-import { clock } from "./clock";
 
 // Autologin
 (() => (db.get("saydao:autologin") ? login() : loginAnon()))();
@@ -17,7 +15,7 @@ export async function loginAnon(mnemonic) {
   let w;
   w = await etherea.getLocalWallet({
     ...CONFIG.walletOptions,
-    mnemonic: db.get("saydao:wallet:mnemonic")
+    mnemonic: db.get("saydao:wallet:mnemonic"),
   });
   w.loadContracts(contracts);
   db.set("saydao:wallet:mnemonic", w.mnemonic);
@@ -45,7 +43,7 @@ export async function login(mnemonic) {
   } else {
     w = await etherea.getLocalWallet({
       ...CONFIG.walletOptions,
-      mnemonic: mnemonic || db.get("saydao:wallet:mnemonic")
+      mnemonic: mnemonic || db.get("saydao:wallet:mnemonic"),
     });
   }
   w.loadContracts(contracts);

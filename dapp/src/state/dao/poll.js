@@ -12,6 +12,8 @@ const NULL = etherea.BigNumber.from(
 const MEETING_STATES = ["initial", "sealed", "finalized"];
 
 async function _get(wallet, id, memberId) {
+  const p = `[poll:get(${id})]`;
+  console.log(p, "Fetch poll from smart contract");
   const poll = await wallet.contracts.SayDAO.polls(id);
   const content = await ipfs.get(ipfs.uintToCid(poll.cid.toHexString()));
 
@@ -19,20 +21,12 @@ async function _get(wallet, id, memberId) {
   const tokenStaked = poll.tokenStaked;
   const tokenLeft = tokenSupply.sub(tokenStaked);
   const votes = await wallet.contracts.SayDAO.getVotes(id);
-  const votesPerc = votes.map(vote =>
-    tokenStaked.isZero()
-      ? 0
-      : vote
-          .mul(10000)
-          .div(tokenStaked)
-          .toNumber() / 100
+  const votesPerc = votes.map((vote) =>
+    tokenStaked.isZero() ? 0 : vote.mul(10000).div(tokenStaked).toNumber() / 100
   );
   const totalVotesPerc = tokenStaked.isZero()
     ? 0
-    : tokenStaked
-        .mul(10000)
-        .div(tokenSupply)
-        .toNumber() / 100;
+    : tokenStaked.mul(10000).div(tokenSupply).toNumber() / 100;
   const quorumReached = totalVotesPerc >= 33;
   const toQuorum = 33 - totalVotesPerc;
   // How many tokens had the member when the poll was created?
@@ -49,15 +43,18 @@ async function _get(wallet, id, memberId) {
   if (!poll.meetingId.eq(NULL)) {
     const meeting = await wallet.contracts.SayDAO.meetings(poll.meetingId);
     extra = {
-      meetingId: poll.meetingId,
+      meetingId: poll.meetingId.toNumber(),
       isMeeting: true,
       // Hardcode "Yes" and "No" choices.
       choices: ["Yes", "No"],
       meetingState: MEETING_STATES[meeting.state],
       meetingDone: meeting.done,
+      meetingType: content.type,
+      meetingUrl: content.url,
+      meetingAddress: content.address,
       meetingSupervisor: meeting.supervisor,
       meetingStart: new Date(meeting.start.toNumber() * 1000).getTime(),
-      meetingEnd: new Date(meeting.end.toNumber() * 1000).getTime()
+      meetingEnd: new Date(meeting.end.toNumber() * 1000).getTime(),
       // Option 0 is yes, 1 is no.
       //meetingValid: finalDecision === 0
     };
@@ -83,12 +80,12 @@ async function _get(wallet, id, memberId) {
     hasTokens: tokensAvailableToVote.isZero()
       ? null
       : tokensAvailableToVote.toString(),
-    ...extra
+    ...extra,
   };
 }
 
 function updatePollDynamicFields(poll, memberId) {
-  const votes = poll.votes.map(v => etherea.BigNumber.from(v));
+  const votes = poll.votes.map((v) => etherea.BigNumber.from(v));
   // We need to check if there are multiple winning options.
   // This temporary data structure is [ vote (big number), position (int) ]
   const [firstOption, secondOption] = votes
@@ -99,8 +96,8 @@ function updatePollDynamicFields(poll, memberId) {
   //
   // - We have a quorum.
   // - The two most voted options don't have the same amount of votes.
-  // - The distance in votes between the first and second most voted option is
-  //   less than the token left.
+  // - The difference between the first and second most voted option is less
+  //   than the tokens left.
   //
   // Then we reached a final decision.
   let finalDecision = null;
@@ -138,15 +135,16 @@ function getPollKey(wallet, id) {
     "contract",
     wallet.contracts.SayDAO.address,
     "poll",
-    id
+    id,
   ].join(":");
 }
 
 function onTimer(poll, memberId, set) {
+  //const p = `[poll:get(${poll.id})]`;
   const unsubscribeFuncs = [];
   const refreshPoll = poll.end - Date.now();
-  console.log("refresh", poll, refreshPoll);
   if (refreshPoll > 0) {
+    //console.log(p, "Refresh", poll, refreshPoll);
     const timerId = setTimeout(
       () => set(updatePollDynamicFields(poll, memberId)),
       refreshPoll + 1000
@@ -164,34 +162,48 @@ function onTimer(poll, memberId, set) {
       unsubscribeFuncs.push(() => clearTimeout(timerId));
     }
   }
-  return () => unsubscribeFuncs.forEach(func => func());
+  return () => unsubscribeFuncs.forEach((func) => func());
 }
 
 const OBJECTS = {};
 
 export function get(id, onUpdate) {
+  const p = `[poll:get(${id})]`;
   if (OBJECTS[id] === undefined) {
+    console.log(p, "Poll not in OBJECTS cache");
     OBJECTS[id] = derived(
       [wallet, memberId],
       async ([$wallet, $memberId], set) => {
         if (!$wallet || $memberId === undefined) return;
         const key = getPollKey($wallet, id);
         const blockNumber = await getBlockNumber($wallet.provider);
-
         let poll = db.get(key);
-
         if (!poll || blockNumber - poll._blockNumber > 1024) {
+          if (!poll) {
+            console.log(p, "Poll not in localStorage)");
+          } else {
+            console.log(p, "Poll older than 1024 blocks)");
+          }
           poll = await _get($wallet, id, $memberId);
           poll._blockNumber = blockNumber;
           db.set(key, poll);
+        } else {
+          console.log(
+            p,
+            "Poll block number",
+            poll._blockNumber,
+            "current block number",
+            blockNumber
+          );
         }
 
         updatePollDynamicFields(poll, $memberId);
         onUpdate && onUpdate(poll);
         set(poll);
 
-        const onEventCallback = async event => {
+        const onEventCallback = async (event) => {
           if (event.pollId && event.pollId.toString() === id) {
+            console.log(p, "New event", event);
             poll = await _get($wallet, id, $memberId);
             poll._blockNumber = blockNumber;
             updatePollDynamicFields(poll);
@@ -206,9 +218,9 @@ export function get(id, onUpdate) {
         };
 
         const filterVote = $wallet.contracts.SayDAO.filters.Vote();
-        filterVote.fromBlock = blockNumber + 1;
+        filterVote.fromBlock = poll._blockNumber + 1;
         const filterSeal = $wallet.contracts.SayDAO.filters.Seal();
-        filterSeal.fromBlock = blockNumber + 1;
+        filterSeal.fromBlock = poll._blockNumber + 1;
         const filterAllocationDone = $wallet.contracts.SayDAO.filters.AllocationDone();
         filterAllocationDone.fromBlock = blockNumber + 1;
 
@@ -231,9 +243,9 @@ export function get(id, onUpdate) {
             filterAllocationDone,
             onEventCallback
           ),
-          onTimer(poll, $memberId, set)
+          onTimer(poll, $memberId, set),
         ];
-        return () => unsubscribeFuncs.forEach(func => func());
+        return () => unsubscribeFuncs.forEach((func) => func());
       }
     );
   }
@@ -253,7 +265,7 @@ async function _getAll(wallet, set) {
       // Unsubscribe
       SUBSCRIPTIONS[id]();
     }
-    SUBSCRIPTIONS[id] = get(id).subscribe(poll => {
+    SUBSCRIPTIONS[id] = get(id).subscribe((poll) => {
       if (poll === undefined) return;
       set(poll);
     });
@@ -263,7 +275,7 @@ async function _getAll(wallet, set) {
 const objects = derived(wallet, async ($wallet, set) => {
   if (!$wallet) return;
   const store = {};
-  const _set = poll => {
+  const _set = (poll) => {
     store[poll.id] = poll;
     set(store);
   };
@@ -276,7 +288,7 @@ const objects = derived(wallet, async ($wallet, set) => {
     $wallet.provider,
     $wallet.contracts.SayDAO,
     filter,
-    async event => {
+    async (event) => {
       _getAll($wallet, _set);
     }
   );
@@ -284,38 +296,47 @@ const objects = derived(wallet, async ($wallet, set) => {
 
 export const open = derived(
   objects,
-  $objects =>
-    $objects && Object.values($objects).filter(poll => poll && poll.open)
+  ($objects) =>
+    $objects && Object.values($objects).filter((poll) => poll && poll.open)
 );
 
 export const closed = derived(
   objects,
-  $objects =>
-    $objects && Object.values($objects).filter(poll => poll && !poll.open)
+  ($objects) =>
+    $objects && Object.values($objects).filter((poll) => poll && !poll.open)
 );
 
-export const upcomingMeetings = derived(objects, $objects => {
+export const upcomingMeetings = derived(objects, ($objects) => {
   const now = Date.now();
   return (
     $objects &&
-    Object.values($objects).filter(
-      poll => poll.isMeeting && poll.meetingValid && now < poll.meetingEnd
-    )
+    Object.values($objects)
+      .filter(
+        (poll) => poll.isMeeting && poll.meetingValid && now < poll.meetingEnd
+      )
+      .sort((a, b) => a.meetingStart - b.meetingStart)
   );
 });
 
-export const pastMeetings = derived(objects, $objects => {
+export const upcomingMeeting = derived(
+  upcomingMeetings,
+  ($upcomingMeetings) => $upcomingMeetings && $upcomingMeetings[0]
+);
+
+export const pastMeetings = derived(objects, ($objects) => {
   const now = new Date().getTime();
   return (
     $objects &&
-    Object.values($objects).filter(
-      poll => poll.isMeeting && poll.meetingValid && poll.meetingEnd <= now
-    )
+    Object.values($objects)
+      .filter(
+        (poll) => poll.isMeeting && poll.meetingValid && poll.meetingEnd <= now
+      )
+      .sort((a, b) => a.meetingStart - b.meetingStart)
   );
 });
 
 export const actionableMeetings = derived(
   objects,
-  $objects =>
-    $objects && Object.values($objects).filter(poll => poll.actionRequired)
+  ($objects) =>
+    $objects && Object.values($objects).filter((poll) => poll.actionRequired)
 );

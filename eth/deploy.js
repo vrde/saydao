@@ -14,7 +14,7 @@ function getEnv(key, fallback) {
   const v = process.env[`${NETWORK.toUpperCase()}_${key}`];
   if (v === undefined || v === null) {
     if (fallback === undefined) {
-      throw new Error("Cannot find required key", key);
+      throw new Error(`Cannot find required key ${key}`);
     } else {
       return fallback;
     }
@@ -34,8 +34,8 @@ async function getTrustedForwarder() {
 async function compile(outdir = "./dist") {
   const wallet = await etherea.wallet({
     endpoint: getEnv("ENDPOINT", "localhost"),
-    privateKey: getEnv("PRIVATE_KEY"),
-    mnemonic: getEnv("MNEMONIC"),
+    privateKey: getEnv("PRIVATE_KEY", null),
+    mnemonic: getEnv("MNEMONIC", null),
   });
 
   // Deploy the DAO

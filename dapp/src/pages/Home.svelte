@@ -48,7 +48,7 @@
         </li>
         {#if $role.member}
           <li>
-            <a href="#/events/create">Create an event</a>: Propose a new {CONFIG.name}
+            <a href="#/events/create">Propose an event</a>: Propose a new {CONFIG.name}
             event.
           </li>
         {/if}
@@ -96,7 +96,7 @@
     <p>There are currently {$totalMembers} members of {CONFIG.name}.</p>
     <ul>
       <li>
-        <a href="#/member/list">List members</a>
+        <a href="#/member/list">List members.</a>
       </li>
     </ul>
   </div>

@@ -74,9 +74,9 @@
       {#if meetingType === "online"}
         The event is online only.
       {:else if meetingType === "physical"}
-        The event is in-person only.
+        The event is in person only.
       {:else if meetingType === "online+physical"}
-        The event is both online and in-person.
+        The event is both online and in person.
       {/if}
     </p>
     {#if meetingUrl || meetingAddress}
@@ -85,7 +85,7 @@
           <li>Join online at <a href={meetingUrl}>{meetingUrl}</a></li>
         {/if}
         {#if meetingAddress}
-          <li>Join in-person at <strong>{meetingAddress}</strong></li>
+          <li>Join in person at <strong>{meetingAddress}</strong></li>
         {/if}
       </ul>
     {/if}

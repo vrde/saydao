@@ -82,9 +82,9 @@
           {#if meetingType === "online"}
             The event is online only.
           {:else if meetingType === "physical"}
-            The event is in-person only.
+            The event is in person only.
           {:else if meetingType === "online+physical"}
-            The event is both online and in-person.
+            The event is both online and in person.
           {/if}
           <br />
           <strong>When:</strong>
@@ -95,7 +95,7 @@
             <a href={meetingUrl}>{meetingUrl}</a><br />
           {/if}
           {#if meetingAddress}
-            <strong>Join in-person:</strong>{meetingAddress}
+            <strong>Join in person:</strong>{meetingAddress}
           {/if}
         </p>
       {/if}
@@ -122,8 +122,7 @@
   <div class="footer">
     <section>
       <p>
-        This event has been decided in <a href="#/polls/details/{id}"
-          >Poll #{id}</a
+        This event was approved by <a href="#/polls/details/{id}">Poll #{id}</a
         >.
       </p>
     </section>

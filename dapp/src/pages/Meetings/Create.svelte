@@ -116,10 +116,9 @@
   <h1>Propose a new event</h1>
 
   <p>
-    Events keep the DAO active. Members participating to an event are rewarded
-    with <strong>Say tokens</strong>. This form allows you to propose a new
-    event. If the DAO approves your proposal, then the event will become reality
-    and members will be able to attend it.
+    This form allows you to propose a new SayDAO event. Members will vote to
+    decide whether the event will be approved. If the event is approved, members
+    who participate will receive Say tokens.
   </p>
 
   <form on:submit|preventDefault={handleSubmit}>
@@ -204,7 +203,7 @@
         <li>
           <label>
             <input type="radio" bind:group={type} value="physical" />
-            In-person only
+            In person only
           </label>
           {#if type === "physical"}
             <div>
@@ -216,7 +215,7 @@
         <li>
           <label>
             <input type="radio" bind:group={type} value="online+physical" />
-            Both online and in-person
+            Both online and in person
             {#if type === "online+physical"}
               <div>
                 <label for="meeting-url">Video conference link (optional)</label
@@ -234,7 +233,7 @@
     <div>
       <h2>Who is the supervisor?</h2>
       <p class="note">
-        The supervisor is a member responsible to make the event happen.
+        The supervisor is responsible for recording attendance and awarding Say.
       </p>
       <select aria-label="Supervisor" bind:value={supervisor} required>
         {#if $members}
@@ -258,9 +257,9 @@
     </div>
 
     <div>
-      <h2>Ready to submit your event?</h2>
+      <h2>Ready to propose your event?</h2>
       <button class="button-shadow" type="submit">
-        <span>Yep, create event</span>
+        <span>Yep, propose event</span>
       </button>
     </div>
   </form>

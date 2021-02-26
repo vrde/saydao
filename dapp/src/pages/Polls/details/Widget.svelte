@@ -173,9 +173,9 @@
               {#if meetingType === "online"}
                 online only
               {:else if meetingType === "physical"}
-                in-person only
+                in person only
               {:else if meetingType === "online+physical"}
-                online and in-person
+                online and in person
               {/if}
             </li>
             {#if meetingUrl}

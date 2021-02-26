@@ -27,7 +27,7 @@
 <Banner />
 
 <Meetings
-  list={$upcomingMeetings && [$upcomingMeetings[0]]}
+  list={$upcomingMeetings && $upcomingMeetings.length && [$upcomingMeetings[0]]}
   highlightFirst={true}
 />
 

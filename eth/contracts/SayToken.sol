@@ -1,6 +1,8 @@
-pragma solidity ^0.6.0;
+// SPDX-License-Identifier: BSD-3-Clause
 
-import "./ERC20.sol";
+pragma solidity >=0.6.0 <0.8.0;
+
+//import "@openzeppelin/contracts/token/ERC20/ERC20Snapshot.sol";
 import "./ERC20Snapshot.sol";
 import "./SayDAO.sol";
 
@@ -62,12 +64,6 @@ contract SayToken is ERC20Snapshot {
         );
         return _snapshot();
     }
-
-    /*
-  function mint2(address account, uint256 amount) public {
-    _mint(account, amount);
-  }
-  */
 
     function mint(uint16 member, uint256 amount) public {
         require(daoAddress == _msgSender(), "Only the DAO can mint new tokens");

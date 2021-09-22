@@ -45,9 +45,11 @@ describe("SayDAO", async () => {
 
     // Bob receives the invitation and splits the signature before
     // sending it to the smart contract to join the DAO.
-    const { r: aliceR, s: aliceS, v: aliceV } = etherea.signature.split(
-      aliceInvite
-    );
+    const {
+      r: aliceR,
+      s: aliceS,
+      v: aliceV,
+    } = etherea.signature.split(aliceInvite);
     await bob.contracts.SayDAO.join(42, aliceV, aliceR, aliceS);
 
     // Bob should be now registered as a member with id 42
@@ -65,9 +67,11 @@ describe("SayDAO", async () => {
     const malloryInvite = await mallory.signMessage(
       "Member: 101\nContract: " + alice.contracts.SayDAO.address
     );
-    let { r: malloryR, s: malloryS, v: malloryV } = etherea.signature.split(
-      malloryInvite
-    );
+    let {
+      r: malloryR,
+      s: malloryS,
+      v: malloryV,
+    } = etherea.signature.split(malloryInvite);
     await assert.rejects(
       mallory.contracts.SayDAO.join(101, malloryV, malloryR, malloryS)
     );

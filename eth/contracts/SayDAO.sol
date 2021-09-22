@@ -1,10 +1,11 @@
+// SPDX-License-Identifier: BSD-3-Clause
+
 // # SayDAO contract
 //
 // SayDAO is an invite only DAO.
 
-pragma solidity ^0.6.0;
+pragma solidity >=0.6.0 <0.8.0;
 
-import "@openzeppelin/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@opengsn/gsn/contracts/BaseRelayRecipient.sol";
 import "@opengsn/gsn/contracts/interfaces/IKnowForwarderAddress.sol";
@@ -132,23 +133,21 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
         //
         // Member: 11
         // Contract: 0x....
-        bytes memory message =
-            abi.encodePacked(
-                "Member: ",
-                uint2str(memberId),
-                "\n",
-                "Contract: ",
-                address2hex(address(this))
-            );
+        bytes memory message = abi.encodePacked(
+            "Member: ",
+            uint2str(memberId),
+            "\n",
+            "Contract: ",
+            address2hex(address(this))
+        );
 
-        bytes32 messageHash =
-            keccak256(
-                abi.encodePacked(
-                    "\x19Ethereum Signed Message:\n",
-                    uint2str(message.length),
-                    message
-                )
-            );
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n",
+                uint2str(message.length),
+                message
+            )
+        );
 
         address signer = ecrecover(messageHash, v, r, s);
         require(hasRole(MANAGER_ROLE, signer), "Invite not valid.");
@@ -236,16 +235,15 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
         // Take a snapshot of the ERC20 token distribution.
         uint256 snapshot = token.snapshot();
 
-        Poll memory poll =
-            Poll(
-                cid,
-                block.timestamp + secondsAfter,
-                token.totalSupply(),
-                0,
-                snapshot,
-                NULL,
-                options
-            );
+        Poll memory poll = Poll(
+            cid,
+            block.timestamp + secondsAfter,
+            token.totalSupply(),
+            0,
+            snapshot,
+            NULL,
+            options
+        );
         polls.push(poll);
 
         for (uint8 i = 0; i < options; i++) {
@@ -262,10 +260,9 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
     {
         // uint16 / 256 = 2^16 / 2^8 = 2^(16-8) = 2^8
         for (uint8 i = 0; i < 8; i++) {
-            uint256 bitmap =
-                pollToVoters[uint256(keccak256(abi.encodePacked(pollId, i)))][
-                    uint8(memberId / 256)
-                ];
+            uint256 bitmap = pollToVoters[
+                uint256(keccak256(abi.encodePacked(pollId, i)))
+            ][uint8(memberId / 256)];
             if ((bitmap & (uint256(1) << (memberId % 256))) > 0) {
                 return i;
             }
@@ -372,19 +369,25 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
         // Take a snapshot of the ERC20 token distribution.
         uint256 snapshot = token.snapshot();
 
-        Poll memory poll =
-            Poll(
-                cid,
-                block.timestamp + secondsAfter,
-                token.totalSupply(),
-                0,
-                snapshot,
-                meetings.length,
-                2
-            );
+        Poll memory poll = Poll(
+            cid,
+            block.timestamp + secondsAfter,
+            token.totalSupply(),
+            0,
+            snapshot,
+            meetings.length,
+            2
+        );
 
-        Meeting memory meeting =
-            Meeting(polls.length, start, end, 0, supervisor, 0, 0);
+        Meeting memory meeting = Meeting(
+            polls.length,
+            start,
+            end,
+            0,
+            supervisor,
+            0,
+            0
+        );
 
         polls.push(poll);
         meetings.push(meeting);
@@ -450,8 +453,9 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
             meetingToParticipants[meetingId].push(bitmap);
             meeting.totalParticipants += currentParticipants;
         } else {
-            uint8 previousParticipants =
-                countBits(meetingToParticipants[meetingId][cluster]);
+            uint8 previousParticipants = countBits(
+                meetingToParticipants[meetingId][cluster]
+            );
             meeting.totalParticipants =
                 (meeting.totalParticipants - previousParticipants) +
                 currentParticipants;

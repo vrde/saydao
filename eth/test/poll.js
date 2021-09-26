@@ -70,6 +70,7 @@ describe("SayDAO Poll", async () => {
     assert.equal(poll.options, options);
     assert(poll.tokenStaked.isZero());
     assert(poll.snapshot.eq(1));
+    assert.equal(poll.memberId, bobId);
 
     // Now Bob and Carol vote, yay!
     await bob.contracts.SayDAO.vote(0, 1);

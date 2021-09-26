@@ -250,6 +250,8 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
         uint256 snapshot;
         // If the poll is for an meeting, link to the meetingId
         uint256 meetingId;
+        // Member Id
+        uint16 memberId;
         // Number of options.
         uint8 options;
     }
@@ -284,6 +286,7 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
             0,
             snapshot,
             NULL,
+            addressToMember[_msgSender()],
             options
         );
         polls.push(poll);
@@ -418,6 +421,7 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
             0,
             snapshot,
             meetings.length,
+            addressToMember[_msgSender()],
             2
         );
 

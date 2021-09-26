@@ -11,7 +11,8 @@ const NETWORK = process.env.NETWORK || "localhost";
 console.log("Deploy to network", NETWORK);
 
 function getEnv(key, fallback) {
-  const v = process.env[`${NETWORK.toUpperCase()}_${key}`];
+  //const v = process.env[`${NETWORK.toUpperCase()}_${key}`];
+  const v = process.env[key];
   if (v === undefined || v === null) {
     if (fallback === undefined) {
       throw new Error(`Cannot find required key ${key}`);
@@ -38,17 +39,29 @@ async function compile(outdir = "./dist") {
     mnemonic: getEnv("MNEMONIC", null),
   });
 
+  // min poll duration: one hour
+  const minPollDuration = getEnv("MIN_POLL_DURATION", 60 * 60);
+  // min poll meeting duration: one week
+  const minPollMeetingDuration = getEnv(
+    "MIN_POLL_MEETING_DURATION",
+    60 * 60 * 24 * 7
+  );
+  // time unit: one day
+  const timeUnit = getEnv("TIME_UNIT", 60 * 60 * 24);
+
+  console.log("Params:");
+  console.log("- minimum poll duration", minPollDuration);
+  console.log("- minimum poll meeting duration", minPollMeetingDuration);
+  console.log("- time unit", timeUnit);
+
   // Deploy the DAO
   const sayDaoContract = await build(
     "./contracts/SayDAO.sol",
     outdir,
     wallet,
-    // min poll duration: one hour
-    getEnv("MIN_POLL_DURATION"),
-    // min poll meeting duration: one week
-    getEnv("MIN_POLL_MEETING_DURATION"),
-    // time unit: one day
-    getEnv("TIME_UNIT"),
+    minPollDuration,
+    minPollMeetingDuration,
+    timeUnit,
     await getTrustedForwarder()
   );
 

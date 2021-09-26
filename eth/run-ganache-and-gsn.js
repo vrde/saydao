@@ -26,10 +26,23 @@ async function startGanache() {
 async function startGsn() {
   await mkdir(outdir, { recursive: true });
   const gsnInstance = await GsnTestEnvironment.startGsn("localhost");
-  const config = gsnInstance.deploymentResult;
-  config.paymasterAddress = config.naivePaymasterAddress;
+  const {
+    paymasterAddress,
+    forwarderAddress,
+    penalizerAddress,
+    relayHubAddress,
+    stakeManagerAddress,
+  } = gsnInstance.contractsDeployment;
+
+  const config = {
+    paymasterAddress,
+    forwarderAddress,
+    penalizerAddress,
+    relayHubAddress,
+    stakeManagerAddress,
+  };
   await writeFile(outfile, JSON.stringify(config, null, 2));
-  return gsnInstance.deploymentResult;
+  return config;
 }
 
 async function start() {
@@ -41,4 +54,7 @@ async function start() {
   console.log("GSN configuration", gsn);
 }
 
-start();
+start().catch((e) => {
+  console.error(e.toString());
+  process.exit(1);
+});

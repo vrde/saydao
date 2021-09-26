@@ -181,7 +181,7 @@
             {#if meetingUrl}
               <li>
                 <strong>Video conference link</strong>:
-                <a href={meetingUrl}>{meetingUrl}</a>
+                {@html DOMPurify.sanitize(marked.parseInline(meetingUrl))}
               </li>
             {/if}
             {#if meetingAddress}

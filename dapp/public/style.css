@@ -171,7 +171,8 @@ select {
   border-radius: var(--size-xxs);
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="url"] {
   display: block;
   width: 100%;
 }

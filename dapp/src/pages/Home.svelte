@@ -6,8 +6,21 @@
   import Banner from "src/components/banner";
   import Meetings from "src/components/meeting";
   import CONFIG from "src/config";
+  import db from "../state/db";
 
   window.me = me;
+  let hideMagicWordsBanner = db.get("saydao:hideMagicWordsBanner");
+
+  function handleDismissBanner() {
+    if (
+      confirm(
+        "I understand that I cannot login again if I don't have my magic words."
+      )
+    ) {
+      db.set("saydao:hideMagicWordsBanner", true);
+      hideMagicWordsBanner = true;
+    }
+  }
 </script>
 
 <style>
@@ -20,7 +33,15 @@
     flex-direction: var(--flex-direction);
   }
 
-  .participate section div {
+  .save-mnemonic {
+    border: 1px solid black;
+    border-radius: var(--size-xxs);
+    padding: var(--size-m) var(--size-s);
+    background-color: var(--join--color-working);
+  }
+
+  .save-mnemonic h2 {
+    margin-top: 0;
   }
 </style>
 
@@ -30,6 +51,19 @@
   list={$upcomingMeetings && $upcomingMeetings.length && [$upcomingMeetings[0]]}
   highlightFirst={true}
 />
+
+{#if $role.member && $wallet.mnemonic && !hideMagicWordsBanner}
+  <section class="save-mnemonic">
+    <h2>Important!</h2>
+    <p>
+      Make sure to save your
+      <strong>12 magic words</strong> before you leave this page. You need these
+      magic words to log in again. Write them down and keep them safe.
+    </p>
+    <a class="button" href="#/settings">Save your magic words</a>
+    <button on:click={handleDismissBanner}> Dismiss banner </button>
+  </section>
+{/if}
 
 <div class="participate">
   <section>

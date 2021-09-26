@@ -221,7 +221,8 @@ export function get(id, onUpdate) {
         filterVote.fromBlock = poll._blockNumber + 1;
         const filterSeal = $wallet.contracts.SayDAO.filters.Seal();
         filterSeal.fromBlock = poll._blockNumber + 1;
-        const filterAllocationDone = $wallet.contracts.SayDAO.filters.AllocationDone();
+        const filterAllocationDone =
+          $wallet.contracts.SayDAO.filters.AllocationDone();
         filterAllocationDone.fromBlock = blockNumber + 1;
 
         const unsubscribeFuncs = [
@@ -297,13 +298,19 @@ const objects = derived(wallet, async ($wallet, set) => {
 export const open = derived(
   objects,
   ($objects) =>
-    $objects && Object.values($objects).filter((poll) => poll && poll.open)
+    $objects &&
+    Object.values($objects)
+      .filter((poll) => poll && poll.open)
+      .sort((a, b) => b.end - a.end)
 );
 
 export const closed = derived(
   objects,
   ($objects) =>
-    $objects && Object.values($objects).filter((poll) => poll && !poll.open)
+    $objects &&
+    Object.values($objects)
+      .filter((poll) => poll && !poll.open)
+      .sort((a, b) => b.end - a.end)
 );
 
 export const upcomingMeetings = derived(objects, ($objects) => {
@@ -331,7 +338,7 @@ export const pastMeetings = derived(objects, ($objects) => {
       .filter(
         (poll) => poll.isMeeting && poll.meetingValid && poll.meetingEnd <= now
       )
-      .sort((a, b) => a.meetingStart - b.meetingStart)
+      .sort((a, b) => b.meetingStart - a.meetingStart)
   );
 });
 

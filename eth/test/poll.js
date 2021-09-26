@@ -14,7 +14,7 @@ describe("SayDAO Poll", async () => {
   let bobId = 155;
   let carolId = 30;
   let danId = 40;
-  let erinId;
+  let erinId = 444;
   let malloryId;
 
   before(async () => {
@@ -70,6 +70,7 @@ describe("SayDAO Poll", async () => {
     assert.equal(poll.options, options);
     assert(poll.tokenStaked.isZero());
     assert(poll.snapshot.eq(1));
+    assert.equal(poll.memberId, bobId);
 
     // Now Bob and Carol vote, yay!
     await bob.contracts.SayDAO.vote(0, 1);
@@ -104,7 +105,7 @@ describe("SayDAO Poll", async () => {
     //assert.equal(poll.end.toNumber(), ???);
 
     // Erin is added to the DAO.
-    await add(alice, erin, 4);
+    await add(alice, erin, erinId);
 
     // but her vote is rejected because she tries to vote on a poll created
     // before her joining.

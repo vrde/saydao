@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-// NOTE: This is a copy of the original code but `balanceOfAt` has been marked as
-// `virtual`, so I can override it in the SayToken contract.
+// NOTE: this modified version adds `balanceOfMember`.
 
 pragma solidity ^0.6.0;
 
@@ -48,7 +47,7 @@ abstract contract ERC20Snapshot is ERC20 {
         uint256[] values;
     }
 
-    mapping (address => Snapshots) private _accountBalanceSnapshots;
+    mapping(address => Snapshots) private _accountBalanceSnapshots;
     Snapshots private _totalSupplySnapshots;
 
     // Snapshot ids increase monotonically, with the first value being 1. An id of 0 is invalid.
@@ -91,26 +90,42 @@ abstract contract ERC20Snapshot is ERC20 {
     /**
      * @dev Retrieves the balance of `account` at the time `snapshotId` was created.
      */
-    function balanceOfAt(address account, uint256 snapshotId) public virtual view returns (uint256) {
-        (bool snapshotted, uint256 value) = _valueAt(snapshotId, _accountBalanceSnapshots[account]);
+    function balanceOfAt(address account, uint256 snapshotId)
+        public
+        view
+        virtual
+        returns (uint256)
+    {
+        (bool snapshotted, uint256 value) = _valueAt(
+            snapshotId,
+            _accountBalanceSnapshots[account]
+        );
 
         return snapshotted ? value : balanceOfMember(account);
     }
 
     // FIXME: that's bit dirty and should be moved one level lower.
-    function balanceOfMember(address account) public virtual view returns (uint256) {
+    function balanceOfMember(address account)
+        public
+        view
+        virtual
+        returns (uint256)
+    {
         return balanceOf(account);
     }
 
-    function currentSnapshotId() public view returns(uint256) {
-      return _currentSnapshotId.current();
+    function currentSnapshotId() public view returns (uint256) {
+        return _currentSnapshotId.current();
     }
 
     /**
      * @dev Retrieves the total supply at the time `snapshotId` was created.
      */
-    function totalSupplyAt(uint256 snapshotId) public view returns(uint256) {
-        (bool snapshotted, uint256 value) = _valueAt(snapshotId, _totalSupplySnapshots);
+    function totalSupplyAt(uint256 snapshotId) public view returns (uint256) {
+        (bool snapshotted, uint256 value) = _valueAt(
+            snapshotId,
+            _totalSupplySnapshots
+        );
 
         return snapshotted ? value : totalSupply();
     }
@@ -118,7 +133,11 @@ abstract contract ERC20Snapshot is ERC20 {
     // _transfer, _mint and _burn are the only functions where the balances are modified, so it is there that the
     // snapshots are updated. Note that the update happens _before_ the balance change, with the pre-modified value.
     // The same is true for the total supply and _mint and _burn.
-    function _transfer(address from, address to, uint256 value) internal virtual override {
+    function _transfer(
+        address from,
+        address to,
+        uint256 value
+    ) internal virtual override {
         _updateAccountSnapshot(from);
         _updateAccountSnapshot(to);
 
@@ -140,11 +159,16 @@ abstract contract ERC20Snapshot is ERC20 {
     }
 
     function _valueAt(uint256 snapshotId, Snapshots storage snapshots)
-        private view returns (bool, uint256)
+        private
+        view
+        returns (bool, uint256)
     {
         require(snapshotId > 0, "ERC20Snapshot: id is 0");
         // solhint-disable-next-line max-line-length
-        require(snapshotId <= _currentSnapshotId.current(), "ERC20Snapshot: nonexistent id");
+        require(
+            snapshotId <= _currentSnapshotId.current(),
+            "ERC20Snapshot: nonexistent id"
+        );
 
         // When a valid snapshot is queried, there are three possibilities:
         //  a) The queried value was not modified after the snapshot was taken. Therefore, a snapshot entry was never
@@ -170,14 +194,19 @@ abstract contract ERC20Snapshot is ERC20 {
     }
 
     function _updateAccountSnapshot(address account) private {
-        _updateSnapshot(_accountBalanceSnapshots[account], balanceOfMember(account));
+        _updateSnapshot(
+            _accountBalanceSnapshots[account],
+            balanceOfMember(account)
+        );
     }
 
     function _updateTotalSupplySnapshot() private {
         _updateSnapshot(_totalSupplySnapshots, totalSupply());
     }
 
-    function _updateSnapshot(Snapshots storage snapshots, uint256 currentValue) private {
+    function _updateSnapshot(Snapshots storage snapshots, uint256 currentValue)
+        private
+    {
         uint256 currentId = _currentSnapshotId.current();
         if (_lastSnapshotId(snapshots.ids) < currentId) {
             snapshots.ids.push(currentId);
@@ -185,7 +214,11 @@ abstract contract ERC20Snapshot is ERC20 {
         }
     }
 
-    function _lastSnapshotId(uint256[] storage ids) private view returns (uint256) {
+    function _lastSnapshotId(uint256[] storage ids)
+        private
+        view
+        returns (uint256)
+    {
         if (ids.length == 0) {
             return 0;
         } else {

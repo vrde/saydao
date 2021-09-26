@@ -10,6 +10,9 @@ backend-install:
 backend-deploy:
 	cd eth && NETWORK=${NETWORK} npm run deploy
 
+backend-test-deploy:
+	cd eth && MIN_POLL_DURATION=0 MIN_POLL_MEETING_DURATION=0 TIME_UNIT=1 NETWORK=${NETWORK} npm run deploy
+
 frontend-install:
 	cd dapp && npm install
 
@@ -21,6 +24,9 @@ frontend-deploy:
 
 dev-blockchain:
 	cd eth && npm run blockchain
+
+dev-ipfs:
+	ipfs daemon
 
 dev-dapp:
 	cd dapp && npm start

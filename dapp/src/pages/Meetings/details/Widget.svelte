@@ -4,6 +4,7 @@
   import DateInterval from "src/components/DateInterval.svelte";
   import Participants from "./Participants.svelte";
   import Loading from "src/components/Loading.svelte";
+  import { parseInline } from "marked/src/Parser";
 
   // `id` is the id of the poll
   export let id;
@@ -93,6 +94,7 @@
           {#if meetingUrl}
             <strong>Join online:</strong>
             <a href={meetingUrl}>{meetingUrl}</a><br />
+            {@html DOMPurify.sanitize(marked.parseInline(meetingUrl))}<br />
           {/if}
           {#if meetingAddress}
             <strong>Join in person:</strong>{meetingAddress}

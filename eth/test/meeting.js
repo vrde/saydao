@@ -97,6 +97,7 @@ describe("SayDAO Meeting Poll", async () => {
     assert.equal(poll.options, 2);
     assert(poll.tokenStaked.isZero());
     assert(poll.snapshot.eq(1));
+    assert.equal(poll.memberId, 2);
 
     assert(meeting.pollId.eq(0));
     assert.equal(meeting.supervisor, 1);

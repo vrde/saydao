@@ -13,7 +13,7 @@
       id={meeting.id}
       title={meeting.title}
       question={meeting.question}
-      meetingId={meeting.meetingId}
+      meetingId={meeting.id}
       meetingType={meeting.meetingType}
       meetingUrl={meeting.meetingUrl}
       meetingAddress={meeting.meetingAddress}

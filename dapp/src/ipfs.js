@@ -6,7 +6,7 @@ const bs58 = baseX(
 );
 
 // FIXME: should not use an object from window
-const client = IpfsHttpClient(CONFIG.ipfsEndpoint);
+const client = IpfsHttpClient.create(CONFIG.ipfsEndpoint);
 
 // Upload to IPFS and get the CID
 export async function add(data) {

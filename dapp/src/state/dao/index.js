@@ -16,10 +16,23 @@ function prettyShares(raw) {
 }
 
 export async function invite(wallet, memberId) {
+  const memberAddress = await wallet.contracts.SayDAO.memberToAddress(memberId);
+  if (memberAddress !== "0x0000000000000000000000000000000000000000") {
+    throw new Error("Member already exists.");
+  }
   const contractAddress = wallet.contracts.SayDAO.address.toLowerCase();
   const message = `Member: ${memberId}\nContract: ${contractAddress}`;
-  const invite = await wallet.signMessage(message);
-  return invite;
+  return await wallet.signMessage(message);
+}
+
+export async function recover(wallet, memberId) {
+  const memberAddress = await wallet.contracts.SayDAO.memberToAddress(memberId);
+  if (memberAddress === "0x0000000000000000000000000000000000000000") {
+    throw new Error("Member doesn't exist.");
+  }
+  const contractAddress = wallet.contracts.SayDAO.address.toLowerCase();
+  const message = `Recover Address: ${memberAddress.toLowerCase()}\nContract: ${contractAddress}`;
+  return await wallet.signMessage(message);
 }
 
 export const role = derived(

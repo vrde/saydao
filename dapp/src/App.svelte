@@ -10,6 +10,7 @@
   import logout from "./pages/logout.svelte";
 
   import memberJoin from "./pages/member/join";
+  import memberRecover from "./pages/member/recover";
   import memberWelcome from "./pages/member/welcome";
   import memberInvite from "./pages/member/invite.svelte";
   import memberList from "./pages/member/list.svelte";
@@ -39,6 +40,7 @@
     "/logout": logout,
 
     "/member/join": memberJoin,
+    "/member/recover": memberRecover,
     "/member/welcome": memberWelcome,
     "/member/invite": memberInvite,
     "/member/list": memberList,

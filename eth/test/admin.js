@@ -25,6 +25,9 @@ describe("SayDAO ACL", async () => {
     const contracts = await deploy(
       await compile("./contracts/SayDAO.sol"),
       alice,
+      0,
+      0,
+      60 * 60 * 24,
       "0x0000000000000000000000000000000000000000"
     );
 

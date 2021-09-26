@@ -22,6 +22,10 @@
     font-size: var(--size-l);
   }
 
+  p a {
+    font-size: var(--size-m);
+  }
+
   a:visited {
     color: inherit;
   }
@@ -36,7 +40,8 @@
     {#if memberId}
       <p>
         You are <strong>{role} {memberId}</strong><br />
-        You have <strong>{balance} Say ({shares})</strong>
+        You have <strong>{balance} Say ({shares})</strong><br />
+        <a href="#/settings">Your settings</a>
       </p>
     {:else}
       <ul>

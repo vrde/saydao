@@ -196,7 +196,15 @@
           {#if type === "online"}
             <div>
               <label for="meeting-url">Video conference link (optional)</label>
-              <input id="meeting-url" type="text" bind:value={url} />
+              <p class="note">
+                The link should start with "http://" or "https://"
+              </p>
+              <input
+                id="meeting-url"
+                type="url"
+                placeholder="https://..."
+                bind:value={url}
+              />
             </div>
           {/if}
         </li>
@@ -220,7 +228,15 @@
               <div>
                 <label for="meeting-url">Video conference link (optional)</label
                 >
-                <input id="meeting-url" type="text" bind:value={url} />
+                <p class="note">
+                  The link should start with "http://" or "https://"
+                </p>
+                <input
+                  id="meeting-url"
+                  type="url"
+                  placeholder="https://..."
+                  bind:value={url}
+                />
                 <label for="meeting-address">Event address (optional)</label>
                 <input id="meeting-address" type="text" bind:value={address} />
               </div>

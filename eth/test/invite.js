@@ -11,8 +11,9 @@ describe("SayDAO", async () => {
   let bob;
   let carol;
   let mallory;
+  let bob2;
 
-  before(async () => {
+  beforeEach(async () => {
     alice = await etherea.wallet({ endpoint: "localhost" });
     bob = await etherea.wallet({
       endpoint: "localhost",
@@ -26,15 +27,18 @@ describe("SayDAO", async () => {
       endpoint: "localhost",
       index: 3,
     });
+    bob2 = await etherea.wallet({
+      endpoint: "localhost",
+      index: 4,
+    });
     const contracts = await deployAll(alice);
 
     alice.loadContracts(contracts);
     bob.loadContracts(contracts);
     carol.loadContracts(contracts);
     mallory.loadContracts(contracts);
+    bob2.loadContracts(contracts);
   });
-
-  it("has an owner", async () => {});
 
   it("allows invites", async () => {
     // Alice is the owner of the DAO, and she wants to invite Bob.
@@ -80,5 +84,53 @@ describe("SayDAO", async () => {
     const members = await alice.contracts.SayDAO.listMembers(0);
     assert(members[0].eq(merge(bob.address, 42)));
     assert(members[1].eq(0));
+  });
+
+  it("allows to recover a member", async () => {
+    // Alice is the owner of the DAO, and she wants to invite Bob.
+    // She creates an invite as a signed message with Bob's member id.
+    const aliceInvite = await alice.signMessage(
+      "Member: 42\nContract: " + alice.contracts.SayDAO.address.toLowerCase()
+    );
+
+    // Bob receives the invitation and splits the signature before
+    // sending it to the smart contract to join the DAO.
+    const {
+      r: aliceR,
+      s: aliceS,
+      v: aliceV,
+    } = etherea.signature.split(aliceInvite);
+    await bob.contracts.SayDAO.join(42, aliceV, aliceR, aliceS);
+
+    // Bob should be now registered as a member with id 42
+    assert.equal(await bob.contracts.SayDAO.memberToAddress(42), bob.address);
+    assert.equal(await bob.contracts.SayDAO.addressToMember(bob.address), 42);
+
+    // Bob forgets his seed phrase and wants to recover his account.
+
+    const bobRecover = await alice.signMessage(
+      "Recover Address: " +
+        bob.address.toLowerCase() +
+        "\nContract: " +
+        alice.contracts.SayDAO.address.toLowerCase()
+    );
+
+    const {
+      r: recoverR,
+      s: recoverS,
+      v: recoverV,
+    } = etherea.signature.split(bobRecover);
+
+    await bob2.contracts.SayDAO.recoverMember(
+      bob.address,
+      recoverV,
+      recoverR,
+      recoverS
+    );
+
+    // Bob should be now registered as a member with id 42 now associated
+    // to a different address
+    assert.equal(await bob2.contracts.SayDAO.memberToAddress(42), bob2.address);
+    assert.equal(await bob2.contracts.SayDAO.addressToMember(bob2.address), 42);
   });
 });

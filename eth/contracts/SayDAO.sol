@@ -125,11 +125,16 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
         bytes32 r,
         bytes32 s
     ) public {
-        // To keep thinkgs simple but slightly wrong, an invite can be used more than
-        // once to recover the account. Not enough time to fix it properly.
-        // require(memberToAddress[memberId] == address(0), "Invite used already");
+        require(
+            memberToAddress[memberId] == address(0),
+            "Member already registered"
+        );
+        require(
+            addressToMember[_msgSender()] == 0,
+            "Address already registered"
+        );
 
-        // The invite string is something like:
+        // The invite string is:
         //
         // Member: 11
         // Contract: 0x....
@@ -156,6 +161,43 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
         members.push(memberId);
         SayToken token = SayToken(tokenAddress);
         token.mint(memberId, 100e18);
+    }
+
+    function recoverMember(
+        address memberAddress,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public {
+        uint16 memberId = addressToMember[memberAddress];
+        require(memberId != 0, "Member not found");
+
+        // The recover string is:
+        //
+        // Recover Address: 0x...
+        // Contract: 0x...
+        bytes memory message = abi.encodePacked(
+            "Recover Address: ",
+            address2hex(memberAddress),
+            "\n",
+            "Contract: ",
+            address2hex(address(this))
+        );
+
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n",
+                uint2str(message.length),
+                message
+            )
+        );
+
+        address signer = ecrecover(messageHash, v, r, s);
+        require(hasRole(MANAGER_ROLE, signer), "Recover not valid.");
+
+        delete addressToMember[memberAddress];
+        memberToAddress[memberId] = _msgSender();
+        addressToMember[_msgSender()] = memberId;
     }
 
     function listMembers(uint256 page)

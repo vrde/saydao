@@ -321,7 +321,7 @@ export const upcomingMeetings = derived(objects, ($objects) => {
       .filter(
         (poll) => poll.isMeeting && poll.meetingValid && now < poll.meetingEnd
       )
-      .sort((a, b) => b.meetingStart - a.meetingStart)
+      .sort((a, b) => a.meetingStart - b.meetingStart)
   );
 });
 

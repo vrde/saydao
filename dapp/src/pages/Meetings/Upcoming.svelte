@@ -7,4 +7,8 @@
   <h1>Upcoming events</h1>
 </section>
 
-<Meetings list={$upcomingMeetings && $upcomingMeetings} highlightFirst={true} />
+{#if $upcomingMeetings}
+  <Meetings list={$upcomingMeetings} highlightFirst={true} />
+{:else}
+  <section>There are no upcoming events.</section>
+{/if}

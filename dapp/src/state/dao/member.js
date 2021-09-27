@@ -6,7 +6,7 @@ import { memberId } from "./";
 
 const OBJECTS = {};
 
-function prettyBalance(tokens) {
+export function prettyBalance(tokens) {
   return etherea.BigNumber.from(tokens)
     .div(etherea.BigNumber.from(10).pow(decimals))
     .toString();

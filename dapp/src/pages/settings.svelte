@@ -1,7 +1,7 @@
 <script>
   import CONFIG from "src/config";
   import { wallet } from "src/state/eth";
-  import { totalSay } from "src/state/dao/member";
+  import { totalSay, prettyBalance } from "src/state/dao/member";
 
   let reveal = false;
   let checkLogout = false;
@@ -87,7 +87,9 @@
     </p>
 
     <p>
-      The total number of Say tokens is: <strong>{$totalSay}</strong>
+      The total number of Say tokens is: <strong
+        >{$totalSay && prettyBalance($totalSay)}</strong
+      >
     </p>
   </section>
 

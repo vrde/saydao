@@ -4,11 +4,21 @@
   import { totalSay } from "src/state/dao/member";
 
   let reveal = false;
+  let checkLogout = false;
+  function handleLogout() {
+    localStorage.clear();
+    window.location.href = "/";
+  }
 </script>
 
 {#if $wallet}
   <section>
-    {#if $wallet.mnemonic}
+    <h1>Settings</h1>
+
+    <p>Your account details can be viewed and changed here.</p>
+  </section>
+  {#if $wallet.mnemonic}
+    <section>
       <h2>Magic Word Backup</h2>
 
       <p>
@@ -30,12 +40,24 @@
           >Reveal your 12 magic words</button
         >
       {/if}
-    {/if}
+    </section>
+  {/if}
 
-    <h2>Settings</h2>
+  {#if $wallet.mnemonic}
+    <section>
+      <h2>Logout</h2>
+      <label
+        ><input type="checkbox" bind:checked={checkLogout} /> I've saved my magic
+        words</label
+      >
+      <br />
+      <br />
+      <button disabled={!checkLogout} on:click={handleLogout}>Logout</button>
+    </section>
+  {/if}
 
-    <p>Your account details can be viewed and changed here.</p>
-
+  <section>
+    <h2>Ethereum blockchain info</h2>
     <h3>Your Ethereum Address</h3>
 
     <p>{$wallet.address}</p>
@@ -67,6 +89,10 @@
     <p>
       The total number of Say tokens is: <strong>{$totalSay}</strong>
     </p>
+  </section>
+
+  <section>
+    <h2>Software info</h2>
 
     <h3>Version</h3>
 

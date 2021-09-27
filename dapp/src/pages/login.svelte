@@ -9,10 +9,11 @@
   async function submitMnemonic() {
     error = false;
     try {
-      await login(mnemonic);
+      await login(mnemonic.trim());
     } catch (e) {
       console.log(e);
-      error = true;
+      error = e.toString();
+      throw e;
     }
     push("/");
   }
@@ -23,7 +24,8 @@
       await login();
     } catch (e) {
       console.log(e);
-      error = true;
+      error = e.toString();
+      throw e;
     }
     push("/");
   }
@@ -36,13 +38,15 @@
     {#if etherea.hasNativeWallet()}
       <p>Your browser supports Ethereum.</p>
 
-      {#if error}
-        <p class="error">It didn't work out. Try again please.</p>
-      {/if}
-
       <button class="button-shadow" on:click={handleLogin} href="#"
         ><span>Log in with your Ethereum account</span></button
       >
+      {#if error}
+        <p class="error">It didn't work out. Try again please.</p>
+        <details>
+          {error}
+        </details>
+      {/if}
     {:else}
       <p>Please enter your 12 magic words.</p>
 
@@ -53,6 +57,9 @@
             <p class="error">
               It didn't work out. Please double check your 12 magic words.
             </p>
+            <details>
+              {error}
+            </details>
           {/if}
           <textarea
             required

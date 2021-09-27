@@ -60,8 +60,16 @@
   };
 </script>
 
-<Notification />
-{#if showHeader}
-  <Header />
-{/if}
-<Router {routes} />
+<style>
+  main {
+    margin-bottom: var(--size-l);
+  }
+</style>
+
+<main>
+  <Notification />
+  {#if showHeader}
+    <Header />
+  {/if}
+  <Router {routes} />
+</main>

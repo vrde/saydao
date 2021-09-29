@@ -7,11 +7,10 @@
 pragma solidity >=0.6.0 <0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@opengsn/gsn/contracts/BaseRelayRecipient.sol";
-import "@opengsn/gsn/contracts/interfaces/IKnowForwarderAddress.sol";
+import "@opengsn/contracts/src/BaseRelayRecipient.sol";
 import "./SayToken.sol";
 
-contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
+contract SayDAO is BaseRelayRecipient, AccessControl {
     event CreatePoll(uint256 pollId);
     event Vote(uint256 pollId);
     event Seal(uint256 pollId);
@@ -24,11 +23,8 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
 
     address public tokenAddress;
 
-    // OPENGSN
-    string public override versionRecipient = "2.0.0";
-
-    function getTrustedForwarder() public view override returns (address) {
-        return trustedForwarder;
+    function versionRecipient() external view override returns (string memory) {
+        return "2.0.0";
     }
 
     // END OPENGSN
@@ -53,7 +49,7 @@ contract SayDAO is BaseRelayRecipient, IKnowForwarderAddress, AccessControl {
         uint256 _minPollMeetingDuration,
         uint256 _timeUnit,
         address _forwarder
-    ) public {
+    ) {
         genesis = block.timestamp;
         minPollDuration = _minPollDuration;
         minPollMeetingDuration = _minPollMeetingDuration;

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // NOTE: this modified version adds `balanceOfMember`.
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.7.0;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Arrays.sol";
@@ -121,7 +121,12 @@ abstract contract ERC20Snapshot is ERC20 {
     /**
      * @dev Retrieves the total supply at the time `snapshotId` was created.
      */
-    function totalSupplyAt(uint256 snapshotId) public view returns (uint256) {
+    function totalSupplyAt(uint256 snapshotId)
+        public
+        view
+        virtual
+        returns (uint256)
+    {
         (bool snapshotted, uint256 value) = _valueAt(
             snapshotId,
             _totalSupplySnapshots

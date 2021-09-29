@@ -58,10 +58,7 @@ function getConfig(production) {
       disableNativeAgent: false,
     };
     gsn = {
-      relayHubAddress: "0xE9dcD2CccEcD77a92BA48933cb626e04214Edb92",
-      stakeManagerAddress: "0x93e4F8d0904a52F8a7304066499a6B2B77260ce1",
-      forwarderAddress: "0x0842Ad6B8cb64364761C7c170D0002CC56b1c498",
-      paymasterAddress: "0x083082b7Eada37dbD8f263050570B31448E61c94",
+      paymasterAddress: "0x14260De05CBC3afE72f1C679b25461f7c82B862b",
     };
   } else {
     walletOptions = {

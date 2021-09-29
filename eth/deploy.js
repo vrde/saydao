@@ -27,8 +27,8 @@ async function getTrustedForwarder() {
   if (NETWORK === "localhost") {
     return JSON.parse(await readFile("./gsn.json"))["forwarderAddress"];
   } else if (NETWORK === "kovan") {
-    // Address from https://docs.opengsn.org/gsn-provider/networks.html
-    return "0x0842Ad6B8cb64364761C7c170D0002CC56b1c498";
+    // Address from https://docs.opengsn.org/contracts/addresses.html
+    return "0x7eEae829DF28F9Ce522274D5771A6Be91d00E5ED";
   }
 }
 
@@ -53,6 +53,7 @@ async function compile(outdir = "./dist") {
   console.log("- minimum poll duration", minPollDuration);
   console.log("- minimum poll meeting duration", minPollMeetingDuration);
   console.log("- time unit", timeUnit);
+  console.log("- trusted forwarder", await getTrustedForwarder());
 
   // Deploy the DAO
   const sayDaoContract = await build(

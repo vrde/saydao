@@ -33,7 +33,7 @@
   "dependencies": {
     "base-x": "^3.0.8",
     "dompurify": "^2.3.3",
-    "etherea": "0.0.12",
+    "etherea": "0.0.13",
     "ipfs-http-client": "^52.0.5",
     "marked": "^3.0.4",
     "qs": "^6.10.1",

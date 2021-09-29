@@ -4,7 +4,7 @@ const { dirname } = require("path");
 const { writeFile } = require("fs").promises;
 const { mkdir } = require("fs").promises;
 const ganache = require("ganache-core");
-const { GsnTestEnvironment } = require("@opengsn/gsn/dist/GsnTestEnvironment");
+const { GsnTestEnvironment } = require("@opengsn/cli/dist/GsnTestEnvironment");
 
 const outfile = process.argv[2] || "gsn.json";
 const outdir = dirname(outfile);

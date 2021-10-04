@@ -301,7 +301,7 @@ export const open = derived(
     $objects &&
     Object.values($objects)
       .filter((poll) => poll && poll.open)
-      .sort((a, b) => b.end - a.end)
+      .sort((a, b) => a.end - b.end)
 );
 
 export const closed = derived(
@@ -310,7 +310,7 @@ export const closed = derived(
     $objects &&
     Object.values($objects)
       .filter((poll) => poll && !poll.open)
-      .sort((a, b) => b.end - a.end)
+      .sort((a, b) => a.end - b.end)
 );
 
 export const upcomingMeetings = derived(objects, ($objects) => {

@@ -13,7 +13,7 @@ backend-install:
 	cd eth && npm install
 
 backend-deploy:
-	cd eth && MIN_POLL_DURATION=${ONE_HOUR} MIN_POLL_MEETING_DURATION=${ONE_HOUR} TIME_UNIT=${ONE_WEEK} NETWORK=${NETWORK} npm run deploy
+	cd eth && MIN_POLL_DURATION=${ONE_HOUR} MIN_POLL_MEETING_DURATION=${ONE_DAY} TIME_UNIT=${ONE_WEEK} NETWORK=${NETWORK} npm run deploy
 
 backend-test-deploy:
 	cd eth && MIN_POLL_DURATION=0 MIN_POLL_MEETING_DURATION=0 TIME_UNIT=1 NETWORK=${NETWORK} npm run deploy

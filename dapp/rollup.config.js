@@ -54,7 +54,7 @@ function getConfig(production) {
   // Addresses from https://docs.opengsn.org/gsn-provider/networks.html
   if (NETWORK === "kovan") {
     walletOptions = {
-      endpoint: "https://kovan.infura.io/v3/67571fc7518746c2a1472668d6633438",
+      endpoint: "https://kovan.poa.network",
       disableNativeAgent: false,
     };
     gsn = {

@@ -48,9 +48,7 @@ export async function login(mnemonic) {
   }
   w.loadContracts(contracts);
 
-  if (db.get("saydao:wallet:mnemonic") !== w.mnemonic) {
-    localStorage.clear();
-  }
+  localStorage.clear();
 
   if (w.mnemonic) {
     db.set("saydao:wallet:mnemonic", w.mnemonic);

@@ -43,19 +43,6 @@
     </section>
   {/if}
 
-  {#if $wallet.mnemonic}
-    <section>
-      <h2>Logout</h2>
-      <label
-        ><input type="checkbox" bind:checked={checkLogout} /> I've saved my magic
-        words</label
-      >
-      <br />
-      <br />
-      <button disabled={!checkLogout} on:click={handleLogout}>Logout</button>
-    </section>
-  {/if}
-
   <section>
     <h2>Ethereum blockchain info</h2>
     <h3>Your Ethereum Address</h3>
@@ -108,6 +95,19 @@
       >.
     </p>
   </section>
+
+  {#if $wallet.mnemonic}
+    <section>
+      <h2>Logout</h2>
+      <label
+        ><input type="checkbox" bind:checked={checkLogout} /> I've saved my magic
+        words</label
+      >
+      <br />
+      <br />
+      <button disabled={!checkLogout} on:click={handleLogout}>Logout</button>
+    </section>
+  {/if}
 {:else}
   <h1>Forbidden!</h1>
   <p>You need to be logged in to see this page.</p>

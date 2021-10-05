@@ -38,6 +38,7 @@
     border-radius: var(--size-xxs);
     padding: var(--size-m) var(--size-s);
     background-color: var(--join--color-working);
+    margin-bottom: var(--size-l);
   }
 
   .save-mnemonic h2 {
@@ -46,11 +47,6 @@
 </style>
 
 <Banner />
-
-<Meetings
-  list={$upcomingMeetings && $upcomingMeetings.length && [$upcomingMeetings[0]]}
-  highlightFirst={true}
-/>
 
 {#if $role.member && $wallet.mnemonic && !hideMagicWordsBanner}
   <section class="save-mnemonic">
@@ -64,6 +60,11 @@
     <button on:click={handleDismissBanner}> Dismiss banner </button>
   </section>
 {/if}
+
+<Meetings
+  list={$upcomingMeetings && $upcomingMeetings.length && [$upcomingMeetings[0]]}
+  highlightFirst={true}
+/>
 
 <div class="participate">
   <section>

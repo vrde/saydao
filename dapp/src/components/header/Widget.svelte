@@ -4,6 +4,7 @@
   export let balance;
   export let shares;
   export let name;
+  export let location;
 </script>
 
 <style>
@@ -22,6 +23,10 @@
     font-size: var(--size-l);
   }
 
+  h1 a span {
+    font-size: var(--size-m);
+  }
+
   p a {
     font-size: var(--size-m);
   }
@@ -34,7 +39,14 @@
 <section>
   <header role="banner">
     <h1>
-      <a href="#/">{name}</a>
+      {name}
+      {#if location !== "/"}
+        <a href="#/">
+          <span>
+            <br /> ← Go back to homepage
+          </span>
+        </a>
+      {/if}
     </h1>
 
     {#if memberId}

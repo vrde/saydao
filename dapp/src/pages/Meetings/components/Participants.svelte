@@ -60,7 +60,7 @@
 
       const receipt = await $wallet.contracts.SayDAO.distributeMeetingTokens(
         poll.meetingId,
-        8
+        64
       );
       console.log("Wait for tx", receipt.hash);
       receipt.wait();

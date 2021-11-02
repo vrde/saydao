@@ -23,14 +23,21 @@
       for (let cluster in bitmaps) {
         console.log("Cluster", cluster);
         console.log("Bitmap", toBinary(bitmaps[cluster]));
-        await $wallet.contracts.SayDAO.updateMeetingParticipants(
-          meetingId,
-          cluster,
-          bitmaps[cluster]
-        );
+        const receipt =
+          await $wallet.contracts.SayDAO.updateMeetingParticipants(
+            meetingId,
+            cluster,
+            bitmaps[cluster]
+          );
+        console.log("Wait for tx", receipt.hash);
+        await receipt.wait();
       }
       console.log("Seal participant list");
-      await $wallet.contracts.SayDAO.sealMeetingParticipants(meetingId);
+      const receipt = await $wallet.contracts.SayDAO.sealMeetingParticipants(
+        meetingId
+      );
+      console.log("Wait for tx", receipt.hash);
+      await receipt.wait();
       await handleTokenDistribution();
       state = {};
     } catch (e) {
@@ -43,13 +50,21 @@
     console.log("Start token distribution");
 
     while (true) {
-      const toProcess = await $wallet.contracts.SayDAO.getRemainingDistributionClusters(
-        meetingId
-      );
+      const toProcess =
+        await $wallet.contracts.SayDAO.getRemainingDistributionClusters(
+          meetingId
+        );
 
       if (toProcess.isZero()) break;
+
       console.log("Clusters left to process", toProcess.toNumber());
-      await $wallet.contracts.SayDAO.distributeMeetingTokens(meetingId, 8);
+
+      const receipt = await $wallet.contracts.SayDAO.distributeMeetingTokens(
+        meetingId,
+        64
+      );
+      console.log("Wait for tx", receipt.hash);
+      await receipt.wait();
     }
 
     state = "idle";
@@ -69,13 +84,13 @@
 
   <form on:submit|preventDefault={handleSubmit}>
     <formset>
-      <legend>Select the participants</legend>
       {#if $members}
         {#each $members as member}
           <label>
             <input type="checkbox" bind:group={memberIds} value={member.id} />
             Member #{member.id}
           </label>
+          <br />
         {/each}
       {:else}
         Wait, loading members...

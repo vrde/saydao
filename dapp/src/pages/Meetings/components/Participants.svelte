@@ -22,14 +22,21 @@
       for (let cluster in bitmaps) {
         console.log("Cluster", cluster);
         console.log("Bitmap", toBinary(bitmaps[cluster]));
-        await $wallet.contracts.SayDAO.updateMeetingParticipants(
-          poll.meetingId,
-          cluster,
-          bitmaps[cluster]
-        );
+        const receipt =
+          await $wallet.contracts.SayDAO.updateMeetingParticipants(
+            poll.meetingId,
+            cluster,
+            bitmaps[cluster]
+          );
+        console.log("Wait for tx", receipt.hash);
+        receipt.wait();
       }
       console.log("Seal participant list");
-      await $wallet.contracts.SayDAO.sealMeetingParticipants(poll.meetingId);
+      const receipt = await $wallet.contracts.SayDAO.sealMeetingParticipants(
+        poll.meetingId
+      );
+      console.log("Wait for tx", receipt.hash);
+      receipt.wait();
       await handleTokenDistribution();
       state = {};
     } catch (e) {
@@ -51,7 +58,12 @@
 
       console.log("Clusters left to process", toProcess.toNumber());
 
-      await $wallet.contracts.SayDAO.distributeMeetingTokens(poll.meetingId, 8);
+      const receipt = await $wallet.contracts.SayDAO.distributeMeetingTokens(
+        poll.meetingId,
+        8
+      );
+      console.log("Wait for tx", receipt.hash);
+      receipt.wait();
     }
 
     try {

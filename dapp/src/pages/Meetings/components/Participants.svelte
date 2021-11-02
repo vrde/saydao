@@ -42,9 +42,10 @@
     console.log("Start token distribution");
 
     while (true) {
-      const toProcess = await $wallet.contracts.SayDAO.getRemainingDistributionClusters(
-        poll.meetingId
-      );
+      const toProcess =
+        await $wallet.contracts.SayDAO.getRemainingDistributionClusters(
+          poll.meetingId
+        );
 
       if (toProcess.isZero()) break;
 
@@ -82,6 +83,7 @@
             <input type="checkbox" bind:group={memberIds} value={member.id} />
             Member #{member.id}
           </label>
+          <br />
         {/each}
       {:else}
         Wait, loading members...

@@ -36,7 +36,7 @@
     "etherea": "0.0.13",
     "ipfs-http-client": "^52.0.5",
     "marked": "^3.0.4",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "svelte": "^3.42.6",
     "svelte-spa-router": "^3.2.0"
   }
